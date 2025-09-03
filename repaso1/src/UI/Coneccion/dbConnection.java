@@ -1,5 +1,5 @@
 
-package UI;
+package UI.Coneccion;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -23,6 +23,8 @@ public class dbConnection {
     
 
 
-    
+    public static void main(String[] args) {
+        
+    }
     
 }

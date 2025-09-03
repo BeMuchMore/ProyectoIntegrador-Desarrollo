@@ -5,6 +5,10 @@
 package UI;
 
 import javax.swing.JOptionPane;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 
 
@@ -35,7 +39,6 @@ public class registro extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
@@ -70,24 +73,15 @@ public class registro extends javax.swing.JFrame {
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel4.setFont(new java.awt.Font("Arial", 1, 36)); // NOI18N
-        jLabel4.setText("INVOICE DAY ");
-
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 278, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(23, 23, 23))
+            .addGap(0, 742, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addGap(0, 113, Short.MAX_VALUE)
         );
 
         jPanel4.setBackground(new java.awt.Color(255, 255, 255));
@@ -221,7 +215,7 @@ public class registro extends javax.swing.JFrame {
                             .addComponent(txtContrasena)
                             .addComponent(txtUsuarios)))
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(0, 188, Short.MAX_VALUE)
+                        .addGap(0, 356, Short.MAX_VALUE)
                         .addComponent(btnRegresar, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(btnValidar, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -429,17 +423,51 @@ public class registro extends javax.swing.JFrame {
 
     private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
 
-    String id = this.txtIdent.getText();
-    String nom = this.txtNombres.getText();
-    String apel = this.txtApellidos.getText();
-    String usu = this.txtUsuarios.getText();
-    String contra = this.txtContrasena.getText();
-    StringBuilder errores = new StringBuilder();
-    
-        if (id.isEmpty()) {
-            
+  {                                             
+    String identificacion = this.txtIdent.getText().trim();
+    String nombre = this.txtNombres.getText().trim();
+    String apellido = this.txtApellidos.getText().trim();
+    String usuario = this.txtUsuarios.getText().trim();
+    String contrasena = this.txtContrasena.getText().trim();
+
+    Connection con = null;
+    PreparedStatement ps = null;
+
+    try {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        con = DriverManager.getConnection(
+            "jdbc:mysql://localhost:3306/repaso1", "root", ""
+        );
+
+        String sql = "INSERT INTO baseDatos (identificacion, nombre, apellido, usuario, contrasena) VALUES (?, ?, ?, ?, ?)";
+        ps = con.prepareStatement(sql);
+        ps.setString(1, identificacion);
+        ps.setString(2, nombre);
+        ps.setString(3, apellido);
+        ps.setString(4, usuario);
+        ps.setString(5, contrasena);
+
+        int filas = ps.executeUpdate();
+
+        if (filas > 0) {
+            JOptionPane.showMessageDialog(this, "Registro insertado correctamente");
+        } else {
+            JOptionPane.showMessageDialog(this, "No se pudo insertar el registro");
         }
 
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error: imaginate que" + e.getMessage());
+    } finally {
+        try {
+            if (ps != null) ps.close();
+            if (con != null) con.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    
+
+      
+    }}
     }//GEN-LAST:event_btnRegistrarActionPerformed
 
     private void btnRegresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegresarActionPerformed
@@ -491,7 +519,6 @@ public class registro extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
