@@ -4,13 +4,18 @@
  */
 package UI;
 
+import UI.Conexion;
+import UI.principal;
+import UI.registro;
+import java.sql.Connection;
+import java.sql.SQLException;
 
-public class Inicio extends javax.swing.JFrame {
+
+import javax.swing.JOptionPane;
+
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Inicio.class.getName());
+public class Inicio extends javax.swing.JFrame {
 
-    /**
-     */
     public Inicio() {
         initComponents();
     }
@@ -39,13 +44,6 @@ public class Inicio extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
-        jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu4 = new javax.swing.JMenu();
-        jMenuItem2 = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
-        jMenu1 = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -256,43 +254,6 @@ public class Inicio extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jMenu4.setText("INICIO");
-
-        jMenuItem2.setText("INGRESAR");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
-            }
-        });
-        jMenu4.add(jMenuItem2);
-
-        jMenuItem3.setText("REGISTRAR");
-        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem3ActionPerformed(evt);
-            }
-        });
-        jMenu4.add(jMenuItem3);
-
-        jMenuBar1.add(jMenu4);
-
-        jMenu1.setText("INFORMACION");
-
-        jMenuItem1.setText("AYUDA");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
-            }
-        });
-        jMenu1.add(jMenuItem1);
-
-        jMenuBar1.add(jMenu1);
-
-        jMenu2.setText("REGISTRAR");
-        jMenuBar1.add(jMenu2);
-
-        setJMenuBar(jMenuBar1);
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -301,7 +262,7 @@ public class Inicio extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 544, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 567, Short.MAX_VALUE)
         );
 
         pack();
@@ -316,20 +277,180 @@ public class Inicio extends javax.swing.JFrame {
     }//GEN-LAST:event_textContrasenaActionPerformed
 
     private void btnIngresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIngresarActionPerformed
-        // TODO add your handling code here:
+
+    diagnosticarConexion(); 
+     System.out.println("=== INICIO DEL LOGIN ===");
+    
+    String usuario = txtUsuario.getText();
+    String contrasena = textContrasena.getText();
+    
+    System.out.println("Usuario: " + usuario);
+    System.out.println("Contraseña: " + (contrasena.isEmpty() ? "vacía" : "tiene contenido"));
+    
+    // Verificar si los campos están vacíos
+    if (usuario.trim().isEmpty() || contrasena.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Por favor, completa todos los campos");
+        return;
+    }
+    
+    try {
+        System.out.println("Intentando obtener conexión...");
+        java.sql.Connection conn = Conexion.getConnection();
+        
+        if (conn == null) {
+            System.out.println("ERROR: Conexión es null");
+            JOptionPane.showMessageDialog(this, "No se pudo establecer conexión con la base de datos");
+            return;
+        }
+        
+        System.out.println("Conexión establecida exitosamente");
+        
+        String sql = "SELECT id, cargo FROM usuariouiux WHERE usuario=? AND contrasena=?";
+        System.out.println("Preparando consulta: " + sql);
+        
+        java.sql.PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, usuario);
+        ps.setString(2, contrasena);
+        
+        System.out.println("Ejecutando consulta...");
+        java.sql.ResultSet rs = ps.executeQuery();
+        
+        if (rs.next()) {
+            System.out.println("Usuario encontrado en la base de datos");
+            int userId = rs.getInt("id");
+            String cargo = rs.getString("cargo");
+            
+            System.out.println("UserID: " + userId + ", Cargo: " + cargo);
+            
+            JOptionPane.showMessageDialog(this, "Bienvenido " + usuario);
+            
+            if (cargo != null && !cargo.isEmpty()) {
+                System.out.println("Abriendo ventana de usuario...");
+                UX.usuario ventanaUsr = new UX.usuario(userId, cargo);
+                ventanaUsr.setVisible(true);
+            } else {
+                System.out.println("Abriendo ventana principal...");
+                principal ventanaCliente = new principal(userId);
+                ventanaCliente.setVisible(true);
+            }
+            
+            this.dispose();
+        } else {
+            System.out.println("Usuario no encontrado");
+            JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos");
+        }
+        
+        // Cerrar recursos
+        rs.close();
+        ps.close();
+        conn.close();
+        
+    } catch (Exception e) {
+        System.out.println("ERROR EN LOGIN: " + e.getClass().getSimpleName() + " - " + e.getMessage());
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error de conexión: " + e.getMessage());
+    }
+    
+    System.out.println("=== FIN DEL LOGIN ===");
+   
     }//GEN-LAST:event_btnIngresarActionPerformed
+private void diagnosticarConexion() {
+    System.out.println("=== DIAGNÓSTICO DE CONEXIÓN ===");
+    
+    // 1. Verificar driver
+    try {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        System.out.println("✓ Driver MySQL encontrado");
+    } catch (ClassNotFoundException e) {
+        System.out.println("✗ Driver MySQL NO encontrado");
+        System.out.println("  Necesitas agregar mysql-connector-java.jar al proyecto");
+        JOptionPane.showMessageDialog(this, "Driver MySQL no encontrado. Agrega mysql-connector-java.jar");
+        return;
+    }
+    
+    // 2. Probar conexión básica
+    try {
+        System.out.println("Intentando conectar a MySQL...");
+        Connection conn = Conexion.getConnection();
+        
+        if (conn != null) {
+            System.out.println("✓ Conexión exitosa");
+            
+            // 3. Verificar base de datos
+            System.out.println("Verificando base de datos...");
+            java.sql.Statement stmt = conn.createStatement();
+            
+            // Listar bases de datos
+            java.sql.ResultSet rs1 = stmt.executeQuery("SHOW DATABASES");
+            System.out.println("Bases de datos disponibles:");
+            while (rs1.next()) {
+                System.out.println("  - " + rs1.getString(1));
+            }
+            rs1.close();
+            
+            // 4. Verificar tabla usuariouiux
+            try {
+                java.sql.ResultSet rs2 = stmt.executeQuery("SELECT COUNT(*) FROM usuariouiux");
+                if (rs2.next()) {
+                    int count = rs2.getInt(1);
+                    System.out.println("✓ Tabla usuariouiux existe con " + count + " registros");
+                }
+                rs2.close();
+            } catch (SQLException e) {
+                System.out.println("✗ Tabla usuariouiux no existe o error: " + e.getMessage());
+            }
+            
+            // 5. Verificar estructura de la tabla
+            try {
+                java.sql.ResultSet rs3 = stmt.executeQuery("DESCRIBE usuariouiux");
+                System.out.println("Estructura de la tabla usuariouiux:");
+                while (rs3.next()) {
+                    System.out.println("  " + rs3.getString("Field") + " - " + rs3.getString("Type"));
+                }
+                rs3.close();
+            } catch (SQLException e) {
+                System.out.println("No se pudo obtener estructura de la tabla: " + e.getMessage());
+            }
+            
+            stmt.close();
+            conn.close();
+            
+          
+            
+        } else {
+            System.out.println("✗ No se pudo establecer conexión");
+            JOptionPane.showMessageDialog(this, "No se pudo conectar a MySQL");
+        }
+        
+    } catch (SQLException e) {
+        System.out.println("✗ Error SQL: " + e.getMessage());
+        System.out.println("  Código: " + e.getErrorCode());
+        
+        String mensaje = "";
+        switch (e.getErrorCode()) {
+            case 1045:
+                mensaje = "Usuario/contraseña incorrectos para MySQL";
+                break;
+            case 1049:
+                mensaje = "La base de datos 'basedatos' no existe";
+                break;
+            case 0:
+                if (e.getMessage().contains("Connection refused")) {
+                    mensaje = "MySQL server no está ejecutándose";
+                } else {
+                    mensaje = "Error de conexión: " + e.getMessage();
+                }
+                break;
+            default:
+                mensaje = "Error SQL: " + e.getMessage();
+        }
+        
+        System.out.println("  " + mensaje);
+        JOptionPane.showMessageDialog(this, mensaje);
+    }
+}
 
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
 
-    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jMenuItem3ActionPerformed
-
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void btnRegistrarseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarseActionPerformed
         // TODO add 
@@ -341,27 +462,24 @@ public class Inicio extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+public static void main(String args[]) {
+    try {
+        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            if ("Nimbus".equals(info.getName())) {
+                javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                break;
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new Inicio().setVisible(true));
+    } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+        // Usar directamente Logger.getLogger en lugar del campo estático
+       
     }
+
+    java.awt.EventQueue.invokeLater(() -> {
+        new Inicio().setVisible(true);
+    });
+}
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnIngresar;
@@ -376,13 +494,6 @@ public class Inicio extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenu jMenu4;
-    private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

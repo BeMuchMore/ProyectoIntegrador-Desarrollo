@@ -108,6 +108,7 @@ public class registro extends javax.swing.JFrame {
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
 
         txtIdent.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        txtIdent.setText("23456789");
         txtIdent.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtIdentActionPerformed(evt);
@@ -436,10 +437,10 @@ public class registro extends javax.swing.JFrame {
     try {
         Class.forName("com.mysql.cj.jdbc.Driver");
         con = DriverManager.getConnection(
-            "jdbc:mysql://localhost:3306/repaso1", "root", ""
+            "jdbc:mysql://localhost:3306/basedatos", "root", ""
         );
 
-        String sql = "INSERT INTO baseDatos (identificacion, nombre, apellido, usuario, contrasena) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO usuariouiux (identificacion, nombre, apellido, usuario, contrasena) VALUES (?, ?, ?, ?, ?)";
         ps = con.prepareStatement(sql);
         ps.setString(1, identificacion);
         ps.setString(2, nombre);
@@ -535,4 +536,14 @@ public class registro extends javax.swing.JFrame {
     private javax.swing.JTextField txtNombres;
     private javax.swing.JTextField txtUsuarios;
     // End of variables declaration//GEN-END:variables
+
+    private static class Inicio {
+
+        public Inicio() {
+        }
+
+        private void setVisible(boolean b) {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
+    }
 }
