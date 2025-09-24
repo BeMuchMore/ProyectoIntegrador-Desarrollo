@@ -8,7 +8,7 @@ import UI.Conexion;
 import UI.principal;
 import UI.registro;
 import java.sql.Connection;
-import java.sql.SQLException;
+import java.sql.SQLException;  
 
 
 import javax.swing.JOptionPane;
@@ -269,7 +269,7 @@ public class Inicio extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsuarioActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_txtUsuarioActionPerformed
 
     private void textContrasenaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textContrasenaActionPerformed
@@ -279,7 +279,7 @@ public class Inicio extends javax.swing.JFrame {
     private void btnIngresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIngresarActionPerformed
 
     diagnosticarConexion(); 
-     System.out.println("=== INICIO DEL LOGIN ===");
+    System.out.println("=== INICIO DEL LOGIN ===");
     
     String usuario = txtUsuario.getText();
     String contrasena = textContrasena.getText();
@@ -322,11 +322,14 @@ public class Inicio extends javax.swing.JFrame {
             
             System.out.println("UserID: " + userId + ", Cargo: " + cargo);
             
+            // *** NUEVA FUNCIONALIDAD: Iniciar sesión ***
+            SessionManager.getInstance().login(userId, usuario, cargo);
+            
             JOptionPane.showMessageDialog(this, "Bienvenido " + usuario);
             
             if (cargo != null && !cargo.isEmpty()) {
                 System.out.println("Abriendo ventana de usuario...");
-                UX.usuario ventanaUsr = new UX.usuario(userId, cargo);
+                UX.Usuario ventanaUsr = new UX.Usuario(userId, cargo);
                 ventanaUsr.setVisible(true);
             } else {
                 System.out.println("Abriendo ventana principal...");

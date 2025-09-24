@@ -108,7 +108,6 @@ public class registro extends javax.swing.JFrame {
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
 
         txtIdent.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
-        txtIdent.setText("23456789");
         txtIdent.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtIdentActionPerformed(evt);
