@@ -51,7 +51,7 @@ public class Agregar extends javax.swing.JFrame {
 
     private ProductoDAO productoDAO;
     private String imagenUrlSeleccionada = "";
-private static final String CARPETA_IMAGENES = "...Z-Global-Img/";
+    private static final String CARPETA_IMAGENES = "...Z-Global-Img/";
    
     public Agregar() {
         

@@ -21,9 +21,15 @@ import java.awt.event.MouseEvent;
 
 public class principal extends javax.swing.JFrame {
     
+      private static SessionManager instance;
+    
+    // Información del usuario actual
     private int userId;
     private String username;
-    private boolean isLoggedIn = false;
+    private String cargo;
+    private boolean isLoggedIn;
+    
+    
   
     public principal(int userId) {
          this.userId = userId;
@@ -89,39 +95,38 @@ private void configurarImagenFondo() {
 
 
  private void configurarSesion() {
-        if (isLoggedIn && userId > 0) {
-            // Obtener nombre del usuario desde la base de datos
-            try (Connection conn = Conexion.getConnection()) {
-                String query = "SELECT username FROM tb_usuarios WHERE id = ?";
-                PreparedStatement pstmt = conn.prepareStatement(query);
-                pstmt.setInt(1, userId);
-                ResultSet rs = pstmt.executeQuery();
-                
-                if (rs.next()) {
-                    username = rs.getString("username");
-                    
-                    // Ocultar botones de iniciar sesión y registrar
-                    jIniciarButton.setVisible(false);
-                    jRegistrarButton.setVisible(false);
-                    jTextField1.setVisible(false);
-                    jLabel2.setVisible(false);
-                    
-                    // Mostrar nombre del usuario
-                    JLabel lblUsuario = new JLabel("Bienvenido, " + username);
-                    lblUsuario.setFont(new Font("Arial", Font.BOLD, 14));
-                    lblUsuario.setBounds(1040, 50, 200, 23);
-                    jPanel15.add(lblUsuario);
-                    
-                    // Agregar botón de cerrar sesión
-                    JButton btnCerrarSesion = new JButton("Cerrar Sesión");
-                    btnCerrarSesion.setBounds(1250, 50, 100, 23);
-                    btnCerrarSesion.addActionListener(e -> cerrarSesion());
-                    jPanel15.add(btnCerrarSesion);
-                }
-            } catch (SQLException e) {
-                System.err.println("Error al obtener datos del usuario: " + e.getMessage());
-            }
+     
+     
+   if (isLoggedIn && userId > 0) {
+    System.err.println("Referencias: " + isLoggedIn + " o " + userId);
+    try (Connection conn = Conexion.getConnection()) {
+        String query = "SELECT nombre FROM usuariouiux WHERE id = ?";
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        pstmt.setInt(1, userId);
+        ResultSet rs = pstmt.executeQuery();
+
+        if (rs.next()) {
+            String username = rs.getString("nombre"); // ← aquí el cambio
+
+            jIniciarButton.setVisible(false);
+            jRegistrarButton.setVisible(false);
+            jTextField1.setVisible(false);
+            jLabel2.setVisible(false);
+
+            JLabel lblUsuario = new JLabel("Bienvenido, " + username);
+            lblUsuario.setFont(new Font("Arial", Font.BOLD, 14));
+            lblUsuario.setBounds(1040, 50, 200, 23);
+            jPanel15.add(lblUsuario);
+
+            JButton btnCerrarSesion = new JButton("Cerrar Sesión");
+            btnCerrarSesion.setBounds(1250, 50, 120, 23);
+            btnCerrarSesion.addActionListener(e -> cerrarSesion());
+            jPanel15.add(btnCerrarSesion);
         }
+    } catch (SQLException e) {
+        System.err.println("Error al obtener datos del usuario: " + e.getMessage());
+    }
+}
     }
     
     
@@ -539,12 +544,10 @@ private void configurarImagenFondo() {
         jLabel3 = new javax.swing.JLabel();
         jPanel22 = new javax.swing.JPanel();
         jLabel55 = new javax.swing.JLabel();
-        jPanel9 = new RoundedPanel(30);
-        jTextField1 = new javax.swing.JTextField();
-        jIniciarButton = new javax.swing.JButton();
-        jLabel2 = new javax.swing.JLabel();
-        jButton17 = new javax.swing.JButton();
         jRegistrarButton = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        jIniciarButton = new javax.swing.JButton();
+        jTextField1 = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel10 = new RoundedPanel(30);
         jFondoPanel = new javax.swing.JPanel();
@@ -630,7 +633,6 @@ private void configurarImagenFondo() {
         jPanel15.setMaximumSize(new java.awt.Dimension(70, 120));
         jPanel15.setMinimumSize(new java.awt.Dimension(70, 120));
         jPanel15.setName(""); // NOI18N
-        jPanel15.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel18.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -654,8 +656,6 @@ private void configurarImagenFondo() {
                 .addContainerGap())
         );
 
-        jPanel15.add(jPanel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 30, -1, 40));
-
         jPanel19.setBackground(new java.awt.Color(255, 255, 255));
 
         jLabel5.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
@@ -677,8 +677,6 @@ private void configurarImagenFondo() {
                 .addComponent(jLabel5)
                 .addContainerGap())
         );
-
-        jPanel15.add(jPanel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 30, -1, 40));
 
         jPanel20.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -702,8 +700,6 @@ private void configurarImagenFondo() {
                 .addContainerGap())
         );
 
-        jPanel15.add(jPanel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 30, -1, 40));
-
         jPanel21.setBackground(new java.awt.Color(255, 255, 255));
 
         jLabel3.setBackground(new java.awt.Color(255, 255, 255));
@@ -717,7 +713,7 @@ private void configurarImagenFondo() {
             .addGroup(jPanel21Layout.createSequentialGroup()
                 .addGap(33, 33, 33)
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
         jPanel21Layout.setVerticalGroup(
             jPanel21Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -726,8 +722,6 @@ private void configurarImagenFondo() {
                 .addComponent(jLabel3)
                 .addContainerGap())
         );
-
-        jPanel15.add(jPanel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 30, 210, 40));
 
         jPanel22.setBackground(new java.awt.Color(248, 244, 220));
 
@@ -740,55 +734,15 @@ private void configurarImagenFondo() {
             .addGroup(jPanel22Layout.createSequentialGroup()
                 .addGap(512, 512, 512)
                 .addComponent(jLabel55)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(633, Short.MAX_VALUE))
         );
         jPanel22Layout.setVerticalGroup(
             jPanel22Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel22Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel55)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(8, Short.MAX_VALUE))
         );
-
-        jPanel15.add(jPanel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1360, 30));
-
-        jPanel9.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel9.setMaximumSize(new java.awt.Dimension(125, 128));
-        jPanel9.setMinimumSize(new java.awt.Dimension(125, 128));
-        jPanel9.setPreferredSize(new java.awt.Dimension(125, 128));
-
-        jIniciarButton.setText("Iniciar");
-
-        jLabel2.setText("o");
-
-        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
-        jPanel9.setLayout(jPanel9Layout);
-        jPanel9Layout.setHorizontalGroup(
-            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel9Layout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 70, Short.MAX_VALUE)
-                .addComponent(jIniciarButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2)
-                .addContainerGap())
-        );
-        jPanel9Layout.setVerticalGroup(
-            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel9Layout.createSequentialGroup()
-                .addGap(18, 18, 18)
-                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jIniciarButton)
-                    .addComponent(jLabel2))
-                .addContainerGap(87, Short.MAX_VALUE))
-        );
-
-        jPanel15.add(jPanel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 30, 330, 50));
-
-        jButton17.setText("Carrito");
-        jPanel15.add(jButton17, new org.netbeans.lib.awtextra.AbsoluteConstraints(1170, 50, -1, -1));
 
         jRegistrarButton.setText("Registrar");
         jRegistrarButton.addActionListener(new java.awt.event.ActionListener() {
@@ -796,7 +750,65 @@ private void configurarImagenFondo() {
                 jRegistrarButtonActionPerformed(evt);
             }
         });
-        jPanel15.add(jRegistrarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 50, -1, -1));
+
+        jLabel2.setText("o");
+
+        jIniciarButton.setText("Iniciar");
+        jIniciarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jIniciarButtonActionPerformed(evt);
+            }
+        });
+
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
+        jPanel15.setLayout(jPanel15Layout);
+        jPanel15Layout.setHorizontalGroup(
+            jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel22, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(jPanel15Layout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(jPanel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(60, 60, 60)
+                .addComponent(jPanel18, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(26, 26, 26)
+                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel15Layout.createSequentialGroup()
+                        .addGap(120, 120, 120)
+                        .addComponent(jPanel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel19, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(107, 107, 107)
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(69, 69, 69)
+                .addComponent(jIniciarButton)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jRegistrarButton))
+        );
+        jPanel15Layout.setVerticalGroup(
+            jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel15Layout.createSequentialGroup()
+                .addComponent(jPanel22, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel18, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel19, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel15Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jRegistrarButton)
+                            .addComponent(jLabel2)
+                            .addComponent(jIniciarButton)
+                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(10, 10, 10))
+        );
 
         jPanel10.setBackground(new java.awt.Color(255, 255, 255));
         jPanel10.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -1297,7 +1309,7 @@ private void configurarImagenFondo() {
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
                                 .addComponent(jLabel1))
-                            .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, 1359, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         jPanel1Layout.setVerticalGroup(
@@ -1329,7 +1341,22 @@ private void configurarImagenFondo() {
 
     private void jRegistrarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRegistrarButtonActionPerformed
         // TODO add your handling code here:
+        registro temp = new registro();
+        temp.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_jRegistrarButtonActionPerformed
+
+    private void jIniciarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jIniciarButtonActionPerformed
+        // TODO add your handling code here:
+        
+         Inicio temp = new Inicio();
+        temp.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jIniciarButtonActionPerformed
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1345,7 +1372,6 @@ private void configurarImagenFondo() {
     private javax.swing.JPanel jAccesoriosPanel;
     private javax.swing.JPanel jBlusasTopsPanel;
     private javax.swing.JTextField jBuscarTextField;
-    private javax.swing.JButton jButton17;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JPanel jCalzadoPanel;
@@ -1414,7 +1440,6 @@ private void configurarImagenFondo() {
     private javax.swing.JPanel jPanel26;
     private javax.swing.JPanel jPanel31;
     private javax.swing.JPanel jPanel32;
-    private javax.swing.JPanel jPanel9;
     private javax.swing.JPanel jPantalonesPanel;
     private javax.swing.JButton jPegruntasFrecuentesButton;
     private javax.swing.JButton jPoliticaPrivacidadButton;
