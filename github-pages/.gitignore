@@ -1,0 +1,44 @@
+# Archivos que no se deben subir a GitHub
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos temporales
+*.tmp
+*.temp
+*~
+
+# Logs
+*.log
+
+# Archivos de configuración local
+.env
+config.local.js
+
+# Carpetas de dependencias (si usas npm en el futuro)
+node_modules/
+dist/
+build/
+
+# Archivos de respaldo
+*.bak
+*.backup
+
+# Archivos muy grandes (GitHub tiene límite de 100MB por archivo)
+*.zip
+*.rar
+*.7z
+*.tar.gz
+
+# Archivos de video pesados
+*.mp4
+*.avi
+*.mov
+*.wmv
+
+# Archivos de imagen muy grandes (mantener bajo 10MB)
+# *.jpg
+# *.png
+# *.gif
