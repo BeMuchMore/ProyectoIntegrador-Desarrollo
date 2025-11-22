@@ -1,0 +1,232 @@
+{% load static %}
+{% load image_tags %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ producto.Nombre }} - {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}</title>
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+</head>
+<body {% if config and config.fondoPrincipal %}style="background: {{ config.fondoPrincipal }};"{% endif %}>
+    <!-- Header Top -->
+    <div class="header-top" {% if config and config.fondoPrincipal %}style="background: {{ config.fondoPrincipal }};"{% endif %}>
+        <div class="header-top-content">
+            <span>📞 +1 234 567 8900 | 📧 {% if config and config.CorreoApp %}{{ config.CorreoApp }}{% else %}info@fashion.com{% endif %}</span>
+            <span>Envío gratis en pedidos superiores a $100</span>
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <header class="header-main">
+        <div class="header-content">
+            <div class="logo">
+                <a href="{% url 'home' %}" style="text-decoration: none; color: inherit;">
+                    {% if config and config.Logo %}
+                        <img src="{{ config.Logo|fix_image_url }}" alt="{% if config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}" style="max-height: 50px; vertical-align: middle;">
+                    {% endif %}
+                    <span style="{% if config and config.Logo %}margin-left: 10px;{% endif %}">
+                        {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}
+                    </span>
+                </a>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'home' %}">Inicio</a></li>
+                    <li><a href="{% url 'shop' %}">Tienda</a></li>
+                    {% for categoria in categorias|slice:":5" %}
+                    <li><a href="{% url 'shop' %}?categoria={{ categoria }}">{{ categoria }}</a></li>
+                    {% endfor %}
+                </ul>
+            </nav>
+            <div class="header-icons">
+                <a href="{% url 'shop' %}" class="header-icon" title="Buscar">🔍</a>
+                {% if request.session.usuario_id %}
+                <a href="{% url 'perfil' %}" class="header-icon" title="Mi Perfil">👤</a>
+                <a href="{% url 'logout' %}" class="header-icon" title="Cerrar Sesión">🚪</a>
+                {% else %}
+                <a href="{% url 'login' %}" class="header-icon" title="Iniciar Sesión">👤</a>
+                {% endif %}
+                <a href="{% url 'carrito' %}" class="header-icon" title="Carrito">
+                    🛒 <span id="cart-count" class="cart-badge">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Product Detail Section -->
+    <main style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px;">
+            <!-- Product Image -->
+            <div style="background: white; padding: 20px; border-radius: 20px; box-shadow: 0 8px 25px rgba(212, 165, 199, 0.15); position: sticky; top: 100px;">
+                {% if producto.ImgUrl|fix_image_url %}
+                <img src="{{ producto.ImgUrl|fix_image_url }}" alt="{{ producto.Nombre }}" style="width: 100%; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div style="width: 100%; aspect-ratio: 1; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); display: none; align-items: center; justify-content: center; border-radius: 15px;">
+                    <p style="color: #c98bb8; font-weight: 500;">Sin imagen</p>
+                </div>
+                {% else %}
+                <div style="width: 100%; aspect-ratio: 1; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); display: flex; align-items: center; justify-content: center; border-radius: 15px;">
+                    <p style="color: #c98bb8; font-weight: 500;">Sin imagen</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Product Info -->
+            <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 8px 25px rgba(212, 165, 199, 0.15);">
+                <h1 style="font-family: 'Playfair Display', serif; font-size: 2.8rem; margin-bottom: 25px; color: #333; line-height: 1.2;">{{ producto.Nombre|default:"Sin nombre" }}</h1>
+                
+                <div style="margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px; border-left: 4px solid #c98bb8;">
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 8px; font-weight: 500;">Precio</p>
+                    <span style="font-size: 2.2rem; font-weight: bold; background: linear-gradient(135deg, #8b4a6b 0%, #c98bb8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-family: 'Playfair Display', serif;">
+                        {% if producto.get_precio_minimo %}
+                            {% if producto.get_precio_minimo != producto.get_precio_maximo %}
+                            {{ producto.get_precio_minimo|precio_colombiano }} - {{ producto.get_precio_maximo|precio_colombiano }}
+                            {% else %}
+                            {{ producto.get_precio_minimo|precio_colombiano }}
+                            {% endif %}
+                        {% else %}
+                            <span style="color: #999;">Precio no disponible</span>
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div style="margin-bottom: 30px; padding: 25px; background: #f9f9f9; border-radius: 15px;">
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #c98bb8; margin-bottom: 20px; border-bottom: 2px solid #d4a5c7; padding-bottom: 10px;">📋 Detalles del Producto</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <p style="margin-bottom: 12px;"><strong style="color: #666;">Categoría:</strong> <span style="color: #333;">{{ producto.Categorias|default:"N/A" }}</span></p>
+                            <p style="margin-bottom: 12px;"><strong style="color: #666;">Colección:</strong> <span style="color: #333;">{{ producto.Coleccion|default:"N/A" }}</span></p>
+                        </div>
+                        <div>
+                            <p style="margin-bottom: 12px;"><strong style="color: #666;">Color:</strong> <span style="color: #333;">{{ producto.Color|default:"N/A" }}</span></p>
+                            <p style="margin-bottom: 12px;"><strong style="color: #666;">Material:</strong> <span style="color: #333;">{{ producto.MaterialBase|default:"N/A" }}</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                {% if producto.Descripcion %}
+                <div style="margin-bottom: 30px; padding: 25px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px;">
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #c98bb8; margin-bottom: 15px;">📝 Descripción</h3>
+                    <p style="color: #555; line-height: 1.8; font-size: 1.05rem;">{{ producto.Descripcion }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Add to Cart Form -->
+                <div style="margin-top: 30px; padding: 30px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px; border: 2px solid #d4a5c7;">
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #c98bb8; margin-bottom: 20px;">🛒 Agregar al Carrito</h3>
+                    <form id="add-to-cart-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="producto_id" value="{{ producto.id }}">
+                        
+                        <div style="margin-bottom: 25px;">
+                            <label for="talla_id" style="display: block; margin-bottom: 12px; font-weight: 600; color: #333; font-size: 1.05rem;">Talla:</label>
+                            <select id="talla_id" name="talla_id" required style="width: 100%; padding: 12px; border: 2px solid #d4a5c7; border-radius: 10px; font-size: 1rem; background: white; transition: border-color 0.3s ease;">
+                                <option value="">Selecciona una talla</option>
+                                {% for inventario in inventarios %}
+                                <option value="{{ inventario.id_talla.id }}" data-precio="{{ inventario.precio }}" data-cantidad="{{ inventario.cantidad }}">
+                                    {{ inventario.id_talla.nombre }} - {{ inventario.precio|precio_colombiano }} ({{ inventario.cantidad }} disponibles)
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div style="margin-bottom: 25px;">
+                            <label for="cantidad" style="display: block; margin-bottom: 12px; font-weight: 600; color: #333; font-size: 1.05rem;">Cantidad:</label>
+                            <input type="number" id="cantidad" name="cantidad" value="1" min="1" max="10" style="width: 120px; padding: 12px; border: 2px solid #d4a5c7; border-radius: 10px; font-size: 1rem; text-align: center; background: white; transition: border-color 0.3s ease;">
+                        </div>
+
+                        <button type="submit" class="btn-primary" style="width: 100%; padding: 18px; font-size: 1.2rem; font-weight: 600; box-shadow: 0 6px 20px rgba(212, 165, 199, 0.4);">
+                            ✨ Agregar al Carrito
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Products -->
+        {% if productos_relacionados %}
+        <div style="margin-top: 60px;">
+            <h2 style="margin-bottom: 30px;">Productos Relacionados</h2>
+            <div class="product-grid">
+                {% for producto_rel in productos_relacionados %}
+                <div class="product-card">
+                    <div class="product-image">
+                        {% if producto_rel.ImgUrl|fix_image_url %}
+                        <img src="{{ producto_rel.ImgUrl|fix_image_url }}" alt="{{ producto_rel.Nombre }}" onerror="this.style.display='none'">
+                        {% else %}
+                        <div style="width: 100%; height: 100%; background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
+                            <p style="color: #999; font-size: 0.8rem;">Sin imagen</p>
+                        </div>
+                        {% endif %}
+                        <div class="product-overlay">
+                            <div class="overlay-buttons">
+                                <a href="{% url 'producto_detalle' producto_rel.id %}" class="overlay-btn">Ver Detalles</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h4>{{ producto_rel.Nombre|default:"Sin nombre" }}</h4>
+                        <div class="product-price">
+                            {% if producto_rel.get_precio_minimo %}
+                            <span class="price-current">{{ producto_rel.get_precio_minimo|precio_colombiano }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </main>
+
+    {% include 'base_footer.html' %}
+
+    <script src="{% static 'js/index.js' %}"></script>
+    <script>
+        // Add to cart functionality
+        document.getElementById('add-to-cart-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const cantidad = parseInt(formData.get('cantidad'));
+            const tallaSelect = document.getElementById('talla_id');
+            const tallaOption = tallaSelect.options[tallaSelect.selectedIndex];
+            
+            if (!tallaSelect.value) {
+                alert('Por favor selecciona una talla');
+                return;
+            }
+            
+            const cantidadDisponible = parseInt(tallaOption.dataset.cantidad);
+            if (cantidad > cantidadDisponible) {
+                alert(`Solo hay ${cantidadDisponible} unidades disponibles`);
+                return;
+            }
+            
+            fetch('{% url "agregar_al_carrito" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    if (document.getElementById('cart-count')) {
+                        document.getElementById('cart-count').textContent = data.carrito_count || 0;
+                    }
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al agregar al carrito. Por favor, intenta nuevamente.');
+            });
+        });
+    </script>
+</body>
+</html>
+

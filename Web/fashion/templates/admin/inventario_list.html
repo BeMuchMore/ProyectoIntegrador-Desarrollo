@@ -1,0 +1,48 @@
+{% extends 'admin/base_admin.html' %}
+{% load image_tags %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+    <h2 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin: 0;">📦 Gestión de Inventario</h2>
+    <a href="{% url 'admin_inventario_nuevo' %}" class="btn-admin">➕ Nuevo Inventario</a>
+</div>
+
+<table class="table-admin">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Producto</th>
+            <th>Talla</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for inventario in inventarios %}
+        <tr>
+            <td>{{ inventario.id }}</td>
+            <td><strong>{{ inventario.id_producto.Nombre|default:"N/A" }}</strong></td>
+            <td>{{ inventario.id_talla.nombre|default:"N/A" }}</td>
+            <td>
+                <span style="padding: 5px 10px; border-radius: 5px; font-size: 0.85rem; {% if inventario.cantidad > 10 %}background: #d4edda; color: #155724;{% elif inventario.cantidad > 0 %}background: #fff3cd; color: #856404;{% else %}background: #f8d7da; color: #721c24;{% endif %}">
+                    {{ inventario.cantidad|default:0 }}
+                </span>
+            </td>
+            <td>{{ inventario.precio|precio_colombiano }}</td>
+            <td>
+                <a href="{% url 'admin_inventario_editar' inventario.id %}" class="btn-admin" style="padding: 8px 15px; font-size: 0.9rem; margin-right: 5px;">✏️ Editar</a>
+                <a href="{% url 'admin_inventario_eliminar' inventario.id %}" class="btn-admin btn-danger" style="padding: 8px 15px; font-size: 0.9rem;" onclick="return confirm('¿Estás seguro de eliminar este inventario?');">🗑️ Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" style="text-align: center; padding: 40px; color: #999;">
+                No hay inventario registrado.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+

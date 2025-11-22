@@ -1,0 +1,243 @@
+{% load static %}
+{% load image_tags %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}</title>
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+</head>
+<body {% if config and config.fondoPrincipal %}style="background: {{ config.fondoPrincipal }};"{% endif %}>
+    <!-- Header Top -->
+    <div class="header-top" {% if config and config.fondoPrincipal %}style="background: {{ config.fondoPrincipal }};"{% endif %}>
+        <div class="header-top-content">
+            <span>📞 +1 234 567 8900 | 📧 {% if config and config.CorreoApp %}{{ config.CorreoApp }}{% else %}info@fashion.com{% endif %}</span>
+            <span>Envío gratis en pedidos superiores a $100</span>
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <header class="header-main">
+        <div class="header-content">
+            <div class="logo">
+                <a href="{% url 'home' %}" style="text-decoration: none; color: inherit;">
+                    {% if config and config.Logo %}
+                        <img src="{{ config.Logo|fix_image_url }}" alt="{% if config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}" style="max-height: 50px; vertical-align: middle;">
+                    {% endif %}
+                    <span style="{% if config and config.Logo %}margin-left: 10px;{% endif %}">
+                        {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}
+                    </span>
+                </a>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'home' %}">Inicio</a></li>
+                    <li><a href="{% url 'shop' %}">Tienda</a></li>
+                    {% for categoria in categorias|slice:":5" %}
+                    <li><a href="{% url 'shop' %}?categoria={{ categoria }}">{{ categoria }}</a></li>
+                    {% endfor %}
+                </ul>
+            </nav>
+            <div class="header-icons">
+                <a href="{% url 'shop' %}" class="header-icon" title="Buscar">🔍</a>
+                {% if request.session.usuario_id %}
+                <a href="{% url 'perfil' %}" class="header-icon" title="Mi Perfil">👤</a>
+                <a href="{% url 'logout' %}" class="header-icon" title="Cerrar Sesión">🚪</a>
+                {% else %}
+                <a href="{% url 'login' %}" class="header-icon" title="Iniciar Sesión">👤</a>
+                {% endif %}
+                <a href="{% url 'carrito' %}" class="header-icon" title="Carrito">
+                    🛒 <span id="cart-count" class="cart-badge">{{ carro.cantidad_items }}</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Checkout Section -->
+    <main style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
+        <h1 style="margin-bottom: 30px;">Finalizar Compra</h1>
+
+        {% if messages %}
+        <div style="margin-bottom: 20px;">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" style="padding: 15px; margin-bottom: 10px; border-radius: 5px; background: {% if message.tags == 'error' %}#f8d7da{% elif message.tags == 'success' %}#d4edda{% else %}#d1ecf1{% endif %}; color: {% if message.tags == 'error' %}#721c24{% elif message.tags == 'success' %}#155724{% else %}#0c5460{% endif %};">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+            <!-- Checkout Form -->
+            <div>
+                <div style="background: white; padding: 30px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <h2 style="margin-bottom: 20px;">Información de Envío</h2>
+                    
+                    <form id="checkout-form">
+                        {% csrf_token %}
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div>
+                                <label for="nombre" style="display: block; margin-bottom: 5px; font-weight: bold;">Nombre:</label>
+                                <input type="text" id="nombre" name="nombre" value="{{ usuario.nombre }}" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                            </div>
+                            <div>
+                                <label for="apellido" style="display: block; margin-bottom: 5px; font-weight: bold;">Apellido:</label>
+                                <input type="text" id="apellido" name="apellido" value="{{ usuario.apellido|default:'' }}" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label for="correo" style="display: block; margin-bottom: 5px; font-weight: bold;">Email:</label>
+                            <input type="email" id="correo" name="correo" value="{{ usuario.correo|default:'' }}" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label for="direccion" style="display: block; margin-bottom: 5px; font-weight: bold;">Dirección:</label>
+                            <input type="text" id="direccion" name="direccion" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div>
+                                <label for="ciudad" style="display: block; margin-bottom: 5px; font-weight: bold;">Ciudad:</label>
+                                <input type="text" id="ciudad" name="ciudad" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                            </div>
+                            <div>
+                                <label for="departamento" style="display: block; margin-bottom: 5px; font-weight: bold;">Departamento:</label>
+                                <input type="text" id="departamento" name="departamento" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                            </div>
+                            <div>
+                                <label for="codigo_postal" style="display: block; margin-bottom: 5px; font-weight: bold;">Código Postal:</label>
+                                <input type="text" id="codigo_postal" name="codigo_postal" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label for="telefono" style="display: block; margin-bottom: 5px; font-weight: bold;">Teléfono:</label>
+                            <input type="tel" id="telefono" name="telefono" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        </div>
+                    </form>
+                </div>
+
+                <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <h2 style="margin-bottom: 20px;">Método de Pago</h2>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #ddd; border-radius: 5px; cursor: pointer; margin-bottom: 10px;">
+                            <input type="radio" name="metodo_pago" value="Efectivo" checked style="margin-right: 10px;">
+                            <span>Efectivo</span>
+                        </label>
+                        <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #ddd; border-radius: 5px; cursor: pointer; margin-bottom: 10px;">
+                            <input type="radio" name="metodo_pago" value="Tarjeta de Crédito" style="margin-right: 10px;">
+                            <span>Tarjeta de Crédito</span>
+                        </label>
+                        <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #ddd; border-radius: 5px; cursor: pointer; margin-bottom: 10px;">
+                            <input type="radio" name="metodo_pago" value="Tarjeta de Débito" style="margin-right: 10px;">
+                            <span>Tarjeta de Débito</span>
+                        </label>
+                        <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #ddd; border-radius: 5px; cursor: pointer;">
+                            <input type="radio" name="metodo_pago" value="Transferencia" style="margin-right: 10px;">
+                            <span>Transferencia Bancaria</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; height: fit-content; position: sticky; top: 100px;">
+                <h2 style="margin-bottom: 20px;">Resumen del Pedido</h2>
+                
+                <div style="margin-bottom: 20px;">
+                    {% for item in items %}
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #ddd;">
+                        <div>
+                            <p style="font-weight: bold; margin-bottom: 5px;">{{ item.id_producto.Nombre }}</p>
+                            <p style="font-size: 0.9rem; color: #666;">Talla: {{ item.id_talla.nombre }} x{{ item.cantidad }}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <p>{{ item.subtotal|precio_colombiano }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Subtotal:</span>
+                        <span>{{ subtotal|precio_colombiano }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>IVA (19%):</span>
+                        <span>{{ impuestos|precio_colombiano }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Envío:</span>
+                        <span>Gratis</span>
+                    </div>
+                    <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
+                    <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: bold;">
+                        <span>Total:</span>
+                        <span style="color: #667eea;">{{ total_con_impuestos|precio_colombiano }}</span>
+                    </div>
+                </div>
+
+                <button type="button" id="procesar-pago-btn" class="btn-primary" style="width: 100%; padding: 15px; margin-bottom: 15px;">
+                    Confirmar Pedido
+                </button>
+                
+                <a href="{% url 'carrito' %}" style="width: 100%; padding: 15px; text-align: center; display: block; text-decoration: none; border: 1px solid #ddd; border-radius: 5px; color: #333;">
+                    Volver al Carrito
+                </a>
+            </div>
+        </div>
+    </main>
+
+    {% include 'base_footer.html' %}
+
+    <script src="{% static 'js/index.js' %}"></script>
+    <script>
+        document.getElementById('procesar-pago-btn').addEventListener('click', function() {
+            const form = document.getElementById('checkout-form');
+            const formData = new FormData(form);
+            
+            const metodoPago = document.querySelector('input[name="metodo_pago"]:checked').value;
+            formData.append('metodo_pago', metodoPago);
+            
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            this.disabled = true;
+            this.textContent = 'Procesando...';
+            
+            fetch('{% url "procesar_pago" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('¡Pago procesado exitosamente! ID de pago: ' + data.pago_id);
+                    window.location.href = '{% url "perfil" %}';
+                } else {
+                    alert('Error: ' + data.message);
+                    this.disabled = false;
+                    this.textContent = 'Confirmar Pedido';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al procesar el pago');
+                this.disabled = false;
+                this.textContent = 'Confirmar Pedido';
+            });
+        });
+    </script>
+</body>
+</html>
+

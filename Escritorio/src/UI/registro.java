@@ -1,31 +1,284 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package UI;
 
-import javax.swing.JOptionPane;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
+import javax.swing.*;
+import javax.swing.BorderFactory;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.regex.Pattern;
+import UI.util.ModernStyles;
 
-
-/**
- *
- * @author calam
- */
 public class registro extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(registro.class.getName());
+    private ValidadorContrasena.NivelSeguridad nivelActual;
 
-   
+    /**
+     * Creates new form PRF
+     */
     public registro() {
+        ModernStyles.applyModernLookAndFeel();
         initComponents();
-      
-    btnRegistrar.setEnabled(false); // deshabilitado desde el inicio
-
+        aplicarEstilosModernos();
+        configurarValidaciones();
+        cargarComplementos();
+    }
+    
+    /**
+     * Aplica estilos modernos a todos los componentes (diseño web)
+     */
+    private void aplicarEstilosModernos() {
+        // Panel principal con gradiente rosado (como body de la web)
+        jPanel1.setBackground(ModernStyles.BG_LIGHT);
+        
+        // Panel de formulario (auth-card estilo web: blanco con sombra y bordes redondeados)
+        jPanel3.setBackground(ModernStyles.BG_WHITE);
+        jPanel3.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(225, 229, 233), 1),
+            BorderFactory.createEmptyBorder(30, 30, 30, 30)
+        ));
+        
+        // Títulos con tipografía mejorada (gradiente morado como auth-header de la web)
+        jLabel4.setFont(ModernStyles.getHeading2Font());
+        jLabel4.setForeground(ModernStyles.INFO_COLOR); // Morado azulado como web
+        ModernStyles.enableTextAntialiasing(jLabel4);
+        
+        jLabel3.setFont(ModernStyles.getBodyLargeFont());
+        jLabel3.setForeground(ModernStyles.TEXT_SECONDARY);
+        ModernStyles.enableTextAntialiasing(jLabel3);
+        
+        // Labels de campos con tipografía mejorada
+        jLabel17.setFont(ModernStyles.getSemiboldFont(13));
+        jLabel17.setForeground(ModernStyles.TEXT_PRIMARY);
+        ModernStyles.enableTextAntialiasing(jLabel17);
+        
+        jLabel13.setFont(ModernStyles.getSemiboldFont(13));
+        jLabel13.setForeground(ModernStyles.TEXT_PRIMARY);
+        ModernStyles.enableTextAntialiasing(jLabel13);
+        
+        jLabel14.setFont(ModernStyles.getSemiboldFont(13));
+        jLabel14.setForeground(ModernStyles.TEXT_PRIMARY);
+        ModernStyles.enableTextAntialiasing(jLabel14);
+        
+        jLabel15.setFont(ModernStyles.getSemiboldFont(13));
+        jLabel15.setForeground(ModernStyles.TEXT_PRIMARY);
+        ModernStyles.enableTextAntialiasing(jLabel15);
+        
+        jLabel16.setFont(ModernStyles.getSemiboldFont(13));
+        jLabel16.setForeground(ModernStyles.TEXT_PRIMARY);
+        ModernStyles.enableTextAntialiasing(jLabel16);
+        
+        jLabel12.setFont(ModernStyles.getSemiboldFont(13));
+        jLabel12.setForeground(ModernStyles.TEXT_PRIMARY);
+        ModernStyles.enableTextAntialiasing(jLabel12);
+        
+        // Campos de texto
+        ModernStyles.styleTextField(textCorreo);
+        ModernStyles.styleTextField(txtNombres);
+        ModernStyles.styleTextField(txtApellidos);
+        ModernStyles.styleTextField(txtUsuarios);
+        ModernStyles.stylePasswordField(txtContrasena);
+        ModernStyles.styleTextField(txtIdent);
+        
+        // Botones (estilo auth-button morado azulado como web)
+        ModernStyles.styleAuthButton(btnRegistrar);
+        ModernStyles.styleAuthButton(btnRegresar);
+        
+        // Labels informativos con tipografía mejorada
+        LabelCorreoInformacion.setFont(ModernStyles.getCaptionFont());
+        LabelCorreoInformacion.setForeground(ModernStyles.TEXT_SECONDARY);
+        ModernStyles.enableTextAntialiasing(LabelCorreoInformacion);
+        
+        LabelUsuarioInforacion.setFont(ModernStyles.getCaptionFont());
+        LabelUsuarioInforacion.setForeground(ModernStyles.TEXT_SECONDARY);
+        ModernStyles.enableTextAntialiasing(LabelUsuarioInforacion);
+        
+        LabelContraseñaInformacion.setFont(ModernStyles.getCaptionFont());
+        LabelContraseñaInformacion.setForeground(ModernStyles.TEXT_SECONDARY);
+        ModernStyles.enableTextAntialiasing(LabelContraseñaInformacion);
+        
+        // Panel de beneficios con tipografía mejorada
+        jLabel18.setFont(ModernStyles.getHeading3Font());
+        jLabel18.setForeground(ModernStyles.TEXT_PRIMARY);
+        ModernStyles.enableTextAntialiasing(jLabel18);
+        
+        jLabel20.setFont(ModernStyles.getBodyFont());
+        jLabel20.setForeground(ModernStyles.TEXT_SECONDARY);
+        ModernStyles.enableTextAntialiasing(jLabel20);
+        
+        jLabel22.setFont(ModernStyles.getBodyFont());
+        jLabel22.setForeground(ModernStyles.TEXT_SECONDARY);
+        ModernStyles.enableTextAntialiasing(jLabel22);
+        
+        jLabel24.setFont(ModernStyles.getBodyFont());
+        jLabel24.setForeground(ModernStyles.TEXT_SECONDARY);
+        ModernStyles.enableTextAntialiasing(jLabel24);
+        
+        jLabel26.setFont(ModernStyles.getBodyFont());
+        jLabel26.setForeground(ModernStyles.TEXT_SECONDARY);
+        ModernStyles.enableTextAntialiasing(jLabel26);
+        
+        // Panel footer con fondo oscuro (como footer de la web #0a0a0a)
+        jPanel5.setBackground(ModernStyles.BG_DARK);
+        jPanel5.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        jLabel6.setFont(ModernStyles.getHeading4Font());
+        jLabel6.setForeground(ModernStyles.TEXT_LIGHT);
+        ModernStyles.enableTextAntialiasing(jLabel6);
+        
+        jLabel7.setFont(ModernStyles.getBodySmallFont());
+        jLabel7.setForeground(new Color(200, 200, 200));
+        ModernStyles.enableTextAntialiasing(jLabel7);
+        
+        jLabel8.setFont(ModernStyles.getCaptionFont());
+        jLabel8.setForeground(new Color(150, 150, 150));
+        ModernStyles.enableTextAntialiasing(jLabel8);
+        
+        // Centrar ventana
+        setLocationRelativeTo(null);
+    }
+    
+    /**
+     * Carga los complementos desde la base de datos
+     */
+    private void cargarComplementos() {
+        try (Connection conn = Conexion.getConnection()) {
+            String sql = "SELECT * FROM tb_complementos ORDER BY id DESC LIMIT 1";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                String nombre = rs.getString("NombreDeApp");
+                String correo = rs.getString("CorreoApp");
+                
+                if (nombre != null && !nombre.isEmpty()) {
+                    jLabel6.setText(nombre);
+                }
+                if (correo != null && !correo.isEmpty()) {
+                    jLabel7.setText(correo);
+                }
+            }
+        } catch (SQLException e) {
+            // Usar valores por defecto si hay error
+            jLabel6.setText("FASHION");
+            jLabel7.setText("contacto@fashion.com");
+        }
+    }
+    
+    // Configurar listeners para validaciones en tiempo real
+    private void configurarValidaciones() {
+        // Listener para el campo de contraseña
+        txtContrasena.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                actualizarNivelContrasena();
+            }
+        });
+        
+        // Listener para el campo de correo
+        textCorreo.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                validarCorreo();
+            }
+        });
+        
+        // Listener para el campo de usuario
+        txtUsuarios.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                validarUsuario();
+            }
+        });
+    }
+    
+    // Actualizar indicador de nivel de contraseña
+    private void actualizarNivelContrasena() {
+        String contrasena = new String(txtContrasena.getPassword());
+        if (contrasena.isEmpty()) {
+            LabelContraseñaInformacion.setText("-");
+            LabelContraseñaInformacion.setForeground(Color.BLACK);
+            return;
+        }
+        
+        nivelActual = ValidadorContrasena.evaluarContrasena(contrasena);
+        LabelContraseñaInformacion.setText("Nivel: " + nivelActual.getTexto());
+        
+        switch (nivelActual) {
+            case FACIL:
+                LabelContraseñaInformacion.setForeground(Color.RED);
+                break;
+            case MEDIO:
+                LabelContraseñaInformacion.setForeground(Color.ORANGE);
+                break;
+            case DIFICIL:
+                LabelContraseñaInformacion.setForeground(new Color(204, 204, 0)); // Yellow-ish
+                break;
+            case AVANZADO:
+                LabelContraseñaInformacion.setForeground(Color.GREEN);
+                break;
+        }
+    }
+    
+    // Validar formato de correo
+    private void validarCorreo() {
+        String correo = textCorreo.getText().trim();
+        if (correo.isEmpty()) {
+            LabelCorreoInformacion.setText("-");
+            LabelCorreoInformacion.setForeground(Color.BLACK);
+            return;
+        }
+        
+        // Validar formato de correo
+        String patronCorreo = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+        if (!Pattern.matches(patronCorreo, correo)) {
+            LabelCorreoInformacion.setText("Formato inválido");
+            LabelCorreoInformacion.setForeground(Color.RED);
+            return;
+        }
+        
+        // Verificar si el correo ya existe
+        if (Conexion.correoExiste(correo)) {
+            LabelCorreoInformacion.setText("Correo ya registrado");
+            LabelCorreoInformacion.setForeground(Color.RED);
+        } else {
+            LabelCorreoInformacion.setText("Correo disponible ✓");
+            LabelCorreoInformacion.setForeground(Color.GREEN);
+        }
+    }
+    
+    // Validar usuario
+    private void validarUsuario() {
+        String usuario = txtUsuarios.getText().trim();
+        if (usuario.isEmpty()) {
+            LabelUsuarioInforacion.setText("-");
+            LabelUsuarioInforacion.setForeground(Color.BLACK);
+            return;
+        }
+        
+        // Verificar si el usuario ya existe
+        if (Conexion.usuarioExiste(usuario)) {
+            String sugerencia = Conexion.sugerirUsuario(usuario);
+            LabelUsuarioInforacion.setText("Ya existe. Sugerencia: " + sugerencia);
+            LabelUsuarioInforacion.setForeground(Color.ORANGE);
+            
+            // Preguntar si quiere usar la sugerencia
+            int respuesta = JOptionPane.showConfirmDialog(this,
+                "El usuario '" + usuario + "' ya existe.\n" +
+                "¿Desea usar '" + sugerencia + "' como nombre de usuario?",
+                "Usuario existente",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+                
+            if (respuesta == JOptionPane.YES_OPTION) {
+                txtUsuarios.setText(sugerencia);
+                LabelUsuarioInforacion.setText("Usuario disponible ✓");
+                LabelUsuarioInforacion.setForeground(Color.GREEN);
+            }
+        } else {
+            LabelUsuarioInforacion.setText("Usuario disponible ✓");
+            LabelUsuarioInforacion.setForeground(Color.GREEN);
+        }
     }
 
     /**
@@ -34,21 +287,25 @@ public class registro extends javax.swing.JFrame {
      * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
+        jPanel5 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
         jPanel3 = new javax.swing.JPanel();
         txtIdent = new javax.swing.JTextField();
         txtApellidos = new javax.swing.JTextField();
-        btnValidar = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         txtNombres = new javax.swing.JTextField();
-        txtContrasena = new javax.swing.JTextField();
+        txtContrasena = new javax.swing.JPasswordField();
         txtUsuarios = new javax.swing.JTextField();
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
@@ -57,55 +314,74 @@ public class registro extends javax.swing.JFrame {
         jLabel16 = new javax.swing.JLabel();
         btnRegistrar = new javax.swing.JButton();
         btnRegresar = new javax.swing.JButton();
-        jPanel5 = new javax.swing.JPanel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
+        jLabel17 = new javax.swing.JLabel();
+        textCorreo = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel18 = new javax.swing.JLabel();
+        jLabel19 = new javax.swing.JLabel();
+        jLabel20 = new javax.swing.JLabel();
+        jLabel21 = new javax.swing.JLabel();
+        jLabel22 = new javax.swing.JLabel();
+        jLabel23 = new javax.swing.JLabel();
+        jLabel24 = new javax.swing.JLabel();
+        jLabel25 = new javax.swing.JLabel();
+        jLabel26 = new javax.swing.JLabel();
+        jTerminosCondicionesCheckBox = new javax.swing.JCheckBox();
+        jTipoDeIdentificacionComboBox = new javax.swing.JComboBox<>();
+        jButton1 = new javax.swing.JButton();
+        jLabel27 = new javax.swing.JLabel();
+        LabelContraseñaInformacion = new javax.swing.JLabel();
+        LabelUsuarioInforacion = new javax.swing.JLabel();
+        LabelCorreoInformacion = new javax.swing.JLabel();
+        
+        jLabel5 = new javax.swing.JLabel();//condiciones
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(102, 102, 255));
         jPanel1.setPreferredSize(new java.awt.Dimension(757, 544));
 
-        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel5.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 742, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 113, Short.MAX_VALUE)
-        );
+        jLabel6.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel6.setText("FASHION");
+        jLabel6.setAlignmentX(0.5F);
+        jPanel5.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 5, 203, -1));
 
-        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel7.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel7.setText("INVOICEDAY@CORREOUNIVALLE.EDU.CO");
+        jPanel5.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 253, 20));
 
-        jLabel3.setIcon(new javax.swing.ImageIcon("C:\\Users\\calam\\OneDrive\\Pictures\\istockphoto-1410493250-612x612.jpg")); // NOI18N
+        jLabel8.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel8.setText("COPYRIGHT (C) 2025");
+        jPanel5.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, -1, -1));
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(36, 36, 36)
-                .addComponent(jLabel3)
-                .addContainerGap(47, Short.MAX_VALUE))
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel3)
-                .addContainerGap(17, Short.MAX_VALUE))
-        );
+        // Iconos de redes sociales - cargar desde recursos si existen, sino ocultar
+        try {
+            jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/insta.png")));
+        } catch (Exception e) {
+            jLabel9.setVisible(false);
+        }
+        jPanel5.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 0, 60, 60));
+
+        try {
+            jLabel10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/face.png")));
+        } catch (Exception e) {
+            jLabel10.setVisible(false);
+        }
+        jPanel5.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 5, -1, -1));
+
+        try {
+            jLabel11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/twiter.png")));
+        } catch (Exception e) {
+            jLabel11.setVisible(false);
+        }
+        jPanel5.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 5, -1, -1));
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         txtIdent.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
         txtIdent.addActionListener(new java.awt.event.ActionListener() {
@@ -113,6 +389,7 @@ public class registro extends javax.swing.JFrame {
                 txtIdentActionPerformed(evt);
             }
         });
+        jPanel3.add(txtIdent, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 450, 230, 30));
 
         txtApellidos.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
         txtApellidos.addActionListener(new java.awt.event.ActionListener() {
@@ -120,19 +397,7 @@ public class registro extends javax.swing.JFrame {
                 txtApellidosActionPerformed(evt);
             }
         });
-
-        btnValidar.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
-        btnValidar.setForeground(new java.awt.Color(0, 0, 153));
-        btnValidar.setText("VALIDAR");
-        btnValidar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnValidarActionPerformed(evt);
-            }
-        });
-
-        jLabel1.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
-
-        jLabel2.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        jPanel3.add(txtApellidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 240, 400, 30));
 
         txtNombres.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
         txtNombres.addActionListener(new java.awt.event.ActionListener() {
@@ -140,6 +405,7 @@ public class registro extends javax.swing.JFrame {
                 txtNombresActionPerformed(evt);
             }
         });
+        jPanel3.add(txtNombres, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 170, 400, 30));
 
         txtContrasena.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
         txtContrasena.addActionListener(new java.awt.event.ActionListener() {
@@ -147,6 +413,7 @@ public class registro extends javax.swing.JFrame {
                 txtContrasenaActionPerformed(evt);
             }
         });
+        jPanel3.add(txtContrasena, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 380, 400, 30));
 
         txtUsuarios.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
         txtUsuarios.addActionListener(new java.awt.event.ActionListener() {
@@ -154,175 +421,135 @@ public class registro extends javax.swing.JFrame {
                 txtUsuariosActionPerformed(evt);
             }
         });
+        jPanel3.add(txtUsuarios, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 310, 400, 30));
 
-        jLabel12.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
-        jLabel12.setText("IDENTIFICACION:");
+        jLabel12.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        jLabel12.setText("Identificación");
+        jPanel3.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 420, -1, 20));
 
-        jLabel13.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
-        jLabel13.setText("NOMBRES:");
+        jLabel13.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        jLabel13.setText("Nombres");
+        jPanel3.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 140, -1, 20));
 
-        jLabel14.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
-        jLabel14.setText("APELLIDOS:");
+        jLabel14.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        jLabel14.setText("Apellidos");
+        jPanel3.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 210, -1, 20));
 
-        jLabel15.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
-        jLabel15.setText("USUARIO:");
+        jLabel15.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        jLabel15.setText("Usuario");
+        jPanel3.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 280, -1, 20));
 
-        jLabel16.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
-        jLabel16.setText("CONTRASEÑA:");
+        jLabel16.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        jLabel16.setText("Contraseña");
+        jPanel3.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 350, -1, 20));
 
         btnRegistrar.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
-        btnRegistrar.setForeground(new java.awt.Color(0, 0, 153));
-        btnRegistrar.setText("REGISTRAR");
+        btnRegistrar.setText("Registrate");
         btnRegistrar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRegistrarActionPerformed(evt);
             }
         });
+        jPanel3.add(btnRegistrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 430, 150, 46));
 
         btnRegresar.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
-        btnRegresar.setForeground(new java.awt.Color(0, 0, 153));
-        btnRegresar.setText("REGRESAR");
+        btnRegresar.setText("Iniciar Sesión");
         btnRegresar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRegresarActionPerformed(evt);
             }
         });
+        jPanel3.add(btnRegresar, new org.netbeans.lib.awtextra.AbsoluteConstraints(687, 430, 190, 46));
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(125, 125, 125)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(jLabel1)
-                                .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
-                                    .addGap(6, 6, 6)
-                                    .addComponent(jLabel14)))
-                            .addComponent(jLabel13)
-                            .addComponent(jLabel12)
-                            .addComponent(jLabel16)
-                            .addComponent(jLabel15))
-                        .addGap(86, 86, 86)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtApellidos)
-                            .addComponent(txtNombres)
-                            .addComponent(txtIdent, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(txtContrasena)
-                            .addComponent(txtUsuarios)))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(0, 356, Short.MAX_VALUE)
-                        .addComponent(btnRegresar, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnValidar, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnRegistrar)))
-                .addGap(28, 28, 28))
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(22, 22, 22)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtIdent, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel1)
-                        .addComponent(jLabel12)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel13)
-                    .addComponent(txtNombres, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(10, 10, 10)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtApellidos, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel2)
-                        .addComponent(jLabel14)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(txtUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtContrasena, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel15)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel16)))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnValidar, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnRegistrar, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnRegresar, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(15, Short.MAX_VALUE))
-        );
+        jLabel17.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        jLabel17.setText("Correo");
+        jLabel17.setPreferredSize(new java.awt.Dimension(40, 10));
+        jPanel3.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 70, 110, 20));
+        jPanel3.add(textCorreo, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 100, 400, 30));
 
-        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("Completa tus datos personales y disfruta una compra más fácil.");
+        jPanel3.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 40, -1, -1));
 
-        jLabel5.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
-        jLabel5.setText("INVOICE DAY");
+        jLabel4.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
+        jLabel4.setText("Inicia sesión o regístrate para comprar");
+        jPanel3.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 10, -1, -1));
 
-        jLabel6.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel6.setText("JULIAN DAVID CALAMBAS CHILO");
+        jLabel18.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        jLabel18.setText("Beneficios");
+        jPanel3.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 80, -1, -1));
 
-        jLabel7.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel7.setText("INVOICEDAY@CORREOUNIVALLE.EDU.CO");
+        jLabel19.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/sobre.png"))); // NOI18N
+        jPanel3.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 120, 40, 30));
 
-        jLabel8.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel8.setText("COPYRIGHT (C) 2025");
+        jLabel20.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jLabel20.setText("Recibir notificaciones en tiempo real de tus pedidos.");
+        jPanel3.add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 130, -1, -1));
 
-        jLabel9.setIcon(new javax.swing.ImageIcon("C:\\Users\\calam\\OneDrive\\Pictures\\insta.png")); // NOI18N
+        jLabel21.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/corazon.png"))); // NOI18N
+        jPanel3.add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 220, -1, -1));
 
-        jLabel10.setIcon(new javax.swing.ImageIcon("C:\\Users\\calam\\OneDrive\\Pictures\\face.png")); // NOI18N
+        jLabel22.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jLabel22.setText("Guardar medios de pago y direcciones favoritas.");
+        jPanel3.add(jLabel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 180, -1, -1));
 
-        jLabel11.setIcon(new javax.swing.ImageIcon("C:\\Users\\calam\\OneDrive\\Pictures\\twiter.png")); // NOI18N
+        jLabel23.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/banco.png"))); // NOI18N
+        jPanel3.add(jLabel23, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 170, -1, -1));
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel8)
-                            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 253, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel11)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel10)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel9)
-                        .addGap(20, 20, 20))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-        );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
-                .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel7)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel8)
-                .addContainerGap(28, Short.MAX_VALUE))
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(25, 25, 25)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel9)
-                    .addComponent(jLabel10)
-                    .addComponent(jLabel11))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        jLabel24.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jLabel24.setText("Promociones especiales, cupones de descuento y más.");
+        jPanel3.add(jLabel24, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 230, -1, -1));
+
+        jLabel25.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/comprobacion-de-lista.png"))); // NOI18N
+        jPanel3.add(jLabel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 270, -1, -1));
+
+        jLabel26.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jLabel26.setText("Revisar tus boletas online.");
+        jPanel3.add(jLabel26, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 280, -1, -1));
+
+        jTerminosCondicionesCheckBox.setText("  ");
+        jTerminosCondicionesCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTerminosCondicionesCheckBoxActionPerformed(evt);
+            }
+        });
+        jPanel3.add(jTerminosCondicionesCheckBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 340, -1, -1));
+
+        jTipoDeIdentificacionComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "CC (cédula de ciudadanía)", "CE (carnet de extranjería)" }));
+        jTipoDeIdentificacionComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTipoDeIdentificacionComboBoxActionPerformed(evt);
+            }
+        });
+        jPanel3.add(jTipoDeIdentificacionComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 450, 160, -1));
+
+        jButton1.setText("o");
+        jPanel3.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 440, -1, -1));
+
+        jLabel27.setText("Autorizo el tratamiento de mis datos personales.");
+        jPanel3.add(jLabel27, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 360, -1, -1));
+
+        LabelContraseñaInformacion.setText("-");
+        jPanel3.add(LabelContraseñaInformacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 350, 250, -1));
+
+        LabelUsuarioInforacion.setText("-");
+        jPanel3.add(LabelUsuarioInforacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 280, 250, -1));
+
+        LabelCorreoInformacion.setText("-");
+        jPanel3.add(LabelCorreoInformacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 70, 250, -1));
+
+        jLabel5.setText("Acepto los términos y condiciones.");
+        jLabel5.setForeground(Color.BLUE);
+        jLabel5.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        jLabel5.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                new Condiciones().setVisible(true);  
+            }
+        });
+        
+        jPanel3.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 340, -1, -1));
+
+        jScrollPane1.setViewportView(jPanel3);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -330,34 +557,24 @@ public class registro extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
+            .addComponent(jScrollPane1)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 505, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 933, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 912, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -365,120 +582,193 @@ public class registro extends javax.swing.JFrame {
         );
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>                        
 
-    private void txtIdentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIdentActionPerformed
+    private void txtIdentActionPerformed(java.awt.event.ActionEvent evt) {                                         
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtIdentActionPerformed
+    }                                        
 
-    private void txtApellidosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtApellidosActionPerformed
+    private void txtApellidosActionPerformed(java.awt.event.ActionEvent evt) {                                             
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtApellidosActionPerformed
+    }                                            
 
-    private void btnValidarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnValidarActionPerformed
-            String id = this.txtIdent.getText();
-    String nom = this.txtNombres.getText();
-    String apel = this.txtApellidos.getText();
-    String usu = this.txtUsuarios.getText();
-    String contra = this.txtContrasena.getText();
-    StringBuilder errores = new StringBuilder();
-
-    if (id.isEmpty()) {
-        errores.append("Identificación no puede estar vacía\n");
-    }
-    if (nom.isEmpty()) {
-        errores.append("Nombre no puede estar vacío\n");
-    }
-    if (apel.isEmpty()) {
-        errores.append("Apellidos no puede estar vacíos\n");
-    }
-    if (usu.isEmpty()) {
-        errores.append("Usuario no puede estar vacío\n");
-    }
-    if (contra.isEmpty()) {
-        errores.append("Contraseña no puede estar vacía\n");
-    }
-
-    if (errores.length() > 0) {
-        JOptionPane.showMessageDialog(rootPane, errores.toString());
-        btnRegistrar.setEnabled(false); 
-    } else {
-        JOptionPane.showMessageDialog(rootPane, "Validación correcta");
-        btnRegistrar.setEnabled(true); 
-    }
-
-    }//GEN-LAST:event_btnValidarActionPerformed
-
-    private void txtNombresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombresActionPerformed
+    private void txtNombresActionPerformed(java.awt.event.ActionEvent evt) {                                           
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtNombresActionPerformed
+    }                                          
 
-    private void txtContrasenaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtContrasenaActionPerformed
+    private void txtContrasenaActionPerformed(java.awt.event.ActionEvent evt) {                                              
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtContrasenaActionPerformed
+    }                                             
 
-    private void txtUsuariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsuariosActionPerformed
+    private void txtUsuariosActionPerformed(java.awt.event.ActionEvent evt) {                                            
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtUsuariosActionPerformed
+    }                                           
 
-    private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
-
-  {                                             
-    String identificacion = this.txtIdent.getText().trim();
-    String nombre = this.txtNombres.getText().trim();
-    String apellido = this.txtApellidos.getText().trim();
-    String usuario = this.txtUsuarios.getText().trim();
-    String contrasena = this.txtContrasena.getText().trim();
-
-    Connection con = null;
-    PreparedStatement ps = null;
-
-    try {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        con = DriverManager.getConnection(
-            "jdbc:mysql://localhost:3306/basedatos", "root", ""
-        );
-
-        String sql = "INSERT INTO usuariouiux (identificacion, nombre, apellido, usuario, contrasena) VALUES (?, ?, ?, ?, ?)";
-        ps = con.prepareStatement(sql);
-        ps.setString(1, identificacion);
-        ps.setString(2, nombre);
-        ps.setString(3, apellido);
-        ps.setString(4, usuario);
-        ps.setString(5, contrasena);
-
-        int filas = ps.executeUpdate();
-
-        if (filas > 0) {
-            JOptionPane.showMessageDialog(this, "Registro insertado correctamente");
-        } else {
-            JOptionPane.showMessageDialog(this, "No se pudo insertar el registro");
-        }
-
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Error: imaginate que" + e.getMessage());
-    } finally {
-        try {
-            if (ps != null) ps.close();
-            if (con != null) con.close();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-    
-
-      
-    }}
-    }//GEN-LAST:event_btnRegistrarActionPerformed
-
-    private void btnRegresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegresarActionPerformed
-        // TODO add your handling code here:
-            
-            UI.Inicio temp = new UI.Inicio();
-        temp.setVisible(true);
-        this.dispose();
+    private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {                                             
+        // IMPLEMENTACIÓN COMPLETA DEL REGISTRO CON VALIDACIONES
         
-    }//GEN-LAST:event_btnRegresarActionPerformed
-      
+        // 1. Verificar que se aceptaron los términos y condiciones
+        if (!jTerminosCondicionesCheckBox.isSelected()) {
+            JOptionPane.showMessageDialog(this, 
+                "Debe aceptar los términos y condiciones para continuar", 
+                "Términos y Condiciones", 
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        // 2. Obtener todos los campos
+        String correo = textCorreo.getText().trim();
+        String nombre = txtNombres.getText().trim();
+        String apellido = txtApellidos.getText().trim();
+        String usuario = txtUsuarios.getText().trim();
+        String contrasena = new String(txtContrasena.getPassword());
+        String identificacion = txtIdent.getText().trim();
+        String tipoIdentificacion = jTipoDeIdentificacionComboBox.getSelectedItem().toString();
+        
+        // 3. Validar campos obligatorios
+        if (correo.isEmpty() || nombre.isEmpty() || apellido.isEmpty() || 
+            usuario.isEmpty() || contrasena.isEmpty() || identificacion.isEmpty()) {
+            JOptionPane.showMessageDialog(this, 
+                "Por favor complete todos los campos obligatorios", 
+                "Campos incompletos", 
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        // 4. Validar formato de correo
+        String patronCorreo = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+        if (!Pattern.matches(patronCorreo, correo)) {
+            JOptionPane.showMessageDialog(this, 
+                "El formato del correo electrónico no es válido", 
+                "Correo inválido", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // 5. Verificar si el correo ya existe
+        if (Conexion.correoExiste(correo)) {
+            JOptionPane.showMessageDialog(this, 
+                "El correo electrónico ya está registrado en el sistema.\n" +
+                "Por favor, use otro correo o inicie sesión con su cuenta existente.", 
+                "Correo ya registrado", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // 6. Verificar si el usuario ya existe
+        if (Conexion.usuarioExiste(usuario)) {
+            String nuevoUsuario = Conexion.sugerirUsuario(usuario);
+            int respuesta = JOptionPane.showConfirmDialog(this,
+                "El nombre de usuario '" + usuario + "' ya está en uso.\n" +
+                "¿Desea usar '" + nuevoUsuario + "' como nombre de usuario?",
+                "Usuario existente",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+                
+            if (respuesta == JOptionPane.YES_OPTION) {
+                usuario = nuevoUsuario;
+                txtUsuarios.setText(usuario);
+            } else {
+                return;
+            }
+        }
+        
+        // 7. Verificar nivel de seguridad de la contraseña
+        ValidadorContrasena.NivelSeguridad nivel = ValidadorContrasena.evaluarContrasena(contrasena);
+        if (nivel == ValidadorContrasena.NivelSeguridad.FACIL) {
+            String sugerencias = ValidadorContrasena.obtenerSugerencias(contrasena);
+            int respuesta = JOptionPane.showConfirmDialog(this,
+                "Su contraseña es muy débil y podría ser fácilmente comprometida.\n\n" +
+                sugerencias + "\n" +
+                "¿Desea continuar con esta contraseña de todos modos?",
+                "Contraseña débil",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+                
+            if (respuesta == JOptionPane.NO_OPTION) {
+                txtContrasena.requestFocus();
+                return;
+            }
+        }
+        
+        // 8. Intentar registrar el usuario
+        boolean registroExitoso = Conexion.insertarUsuario(
+            apellido,
+            "", // cargo - vacío por defecto
+            contrasena,
+            correo,
+            "", // data - vacío por defecto
+            "", // descripcion - vacío por defecto
+            "", // foto - vacío por defecto
+            identificacion,
+            tipoIdentificacion.substring(0, 2), // Extraer solo "CC" o "CE"
+            nombre,
+            usuario
+        );
+        
+        if (registroExitoso) {
+            JOptionPane.showMessageDialog(this,
+                "¡Registro exitoso!\n" +
+                "Usuario: " + usuario + "\n" +
+                "Correo: " + correo + "\n\n" +
+                "Ya puede iniciar sesión con sus credenciales.",
+                "Registro completado",
+                JOptionPane.INFORMATION_MESSAGE);
+                
+            // Limpiar campos después del registro exitoso
+            limpiarCampos();
+            
+            // Opción: Ir directamente al login
+            int respuesta = JOptionPane.showConfirmDialog(this,
+                "¿Desea ir a la pantalla de inicio de sesión?",
+                "Ir a Login",
+                JOptionPane.YES_NO_OPTION);
+                
+            if (respuesta == JOptionPane.YES_OPTION) {
+                btnRegresarActionPerformed(evt);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this,
+                "Ocurrió un error al registrar el usuario.\n" +
+                "Por favor, intente nuevamente.",
+                "Error en registro",
+                JOptionPane.ERROR_MESSAGE);
+        }
+    }                                            
+    
+    // Método para limpiar los campos del formulario
+    private void limpiarCampos() {
+        textCorreo.setText("");
+        txtNombres.setText("");
+        txtApellidos.setText("");
+        txtUsuarios.setText("");
+            txtContrasena.setText(""); // JPasswordField también tiene setText()
+        txtIdent.setText("");
+        jTipoDeIdentificacionComboBox.setSelectedIndex(0);
+        jTerminosCondicionesCheckBox.setSelected(false);
+        LabelCorreoInformacion.setText("-");
+        LabelUsuarioInforacion.setText("-");
+        LabelContraseñaInformacion.setText("-");
+        LabelCorreoInformacion.setForeground(Color.BLACK);
+        LabelUsuarioInforacion.setForeground(Color.BLACK);
+        LabelContraseñaInformacion.setForeground(Color.BLACK);
+    }
+
+    private void btnRegresarActionPerformed(java.awt.event.ActionEvent evt) {                                            
+        // Aquí debes implementar la navegación a la pantalla de login
+        // Por ejemplo:
+         new Inicio().setVisible(true);
+         this.dispose();
+       
+    }                                           
+
+    private void jTerminosCondicionesCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {                                                             
+        // Puedes agregar alguna lógica aquí si necesitas hacer algo cuando se marca/desmarca
+    }                                                            
+
+    private void jTipoDeIdentificacionComboBoxActionPerformed(java.awt.event.ActionEvent evt) {                                                              
+        // Puedes agregar lógica para validar el formato según el tipo de identificación
+    }                                                             
 
     /**
      * @param args the command line arguments
@@ -505,10 +795,13 @@ public class registro extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(() -> new registro().setVisible(true));
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
+    private javax.swing.JLabel LabelContraseñaInformacion;
+    private javax.swing.JLabel LabelCorreoInformacion;
+    private javax.swing.JLabel LabelUsuarioInforacion;
     private javax.swing.JButton btnRegistrar;
     private javax.swing.JButton btnRegresar;
-    private javax.swing.JButton btnValidar;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -517,32 +810,36 @@ public class registro extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel25;
+    private javax.swing.JLabel jLabel26;
+    private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JCheckBox jTerminosCondicionesCheckBox;
+    private javax.swing.JComboBox<String> jTipoDeIdentificacionComboBox;
+    private javax.swing.JTextField textCorreo;
     private javax.swing.JTextField txtApellidos;
-    private javax.swing.JTextField txtContrasena;
+    private javax.swing.JPasswordField txtContrasena;
     private javax.swing.JTextField txtIdent;
     private javax.swing.JTextField txtNombres;
     private javax.swing.JTextField txtUsuarios;
-    // End of variables declaration//GEN-END:variables
-
-    private static class Inicio {
-
-        public Inicio() {
-        }
-
-        private void setVisible(boolean b) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-        }
-    }
+    // End of variables declaration                   
 }

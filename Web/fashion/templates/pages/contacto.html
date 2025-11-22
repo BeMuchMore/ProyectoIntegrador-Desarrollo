@@ -1,0 +1,36 @@
+{% extends 'pages/base_page.html' %}
+
+{% block title %}Contacto - {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}{% endblock %}
+
+{% block content %}
+<div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(212, 165, 199, 0.15);">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #c98bb8; margin-bottom: 30px; text-align: center;">Contacto</h1>
+    
+    <div style="max-width: 800px; margin: 0 auto;">
+        <p style="font-size: 1.1rem; line-height: 1.8; color: #666; margin-bottom: 30px; text-align: center;">
+            ¿Tienes alguna pregunta? Estamos aquí para ayudarte. Contáctanos a través de cualquiera de los siguientes medios:
+        </p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-top: 40px;">
+            <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px;">
+                <div style="font-size: 3rem; margin-bottom: 15px;">📧</div>
+                <h3 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin-bottom: 10px;">Email</h3>
+                <p style="color: #666;">{% if config and config.CorreoApp %}{{ config.CorreoApp }}{% else %}info@fashion.com{% endif %}</p>
+            </div>
+            
+            <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px;">
+                <div style="font-size: 3rem; margin-bottom: 15px;">📞</div>
+                <h3 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin-bottom: 10px;">Teléfono</h3>
+                <p style="color: #666;">+1 234 567 8900</p>
+            </div>
+            
+            <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px;">
+                <div style="font-size: 3rem; margin-bottom: 15px;">🕒</div>
+                <h3 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin-bottom: 10px;">Horario</h3>
+                <p style="color: #666;">Lun - Vie: 9:00 - 18:00<br>Sáb: 10:00 - 16:00</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

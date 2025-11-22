@@ -1,0 +1,71 @@
+{% extends 'pages/base_page.html' %}
+
+{% block title %}Guía de Tallas - {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}{% endblock %}
+
+{% block content %}
+<div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(212, 165, 199, 0.15);">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #c98bb8; margin-bottom: 30px; text-align: center;">Guía de Tallas</h1>
+    
+    <div style="max-width: 900px; margin: 0 auto;">
+        <p style="font-size: 1.1rem; line-height: 1.8; color: #666; margin-bottom: 30px; text-align: center;">
+            Encuentra tu talla perfecta con nuestra guía de medidas. Todas nuestras prendas están diseñadas pensando en la comodidad y el ajuste perfecto.
+        </p>
+        
+        <div style="overflow-x: auto; margin-top: 30px;">
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                <thead>
+                    <tr style="background: linear-gradient(135deg, #d4a5c7 0%, #c98bb8 100%); color: white;">
+                        <th style="padding: 15px; text-align: left; border: 1px solid rgba(255,255,255,0.3);">Talla</th>
+                        <th style="padding: 15px; text-align: left; border: 1px solid rgba(255,255,255,0.3);">Busto (cm)</th>
+                        <th style="padding: 15px; text-align: left; border: 1px solid rgba(255,255,255,0.3);">Cintura (cm)</th>
+                        <th style="padding: 15px; text-align: left; border: 1px solid rgba(255,255,255,0.3);">Cadera (cm)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background: #f9f9f9;">
+                        <td style="padding: 15px; border: 1px solid #ddd;"><strong>XS</strong></td>
+                        <td style="padding: 15px; border: 1px solid #ddd;">82-86</td>
+                        <td style="padding: 15px; border: 1px solid #ddd;">64-68</td>
+                        <td style="padding: 15px; border: 1px solid #ddd;">88-92</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 15px; border: 1px solid #ddd;"><strong>S</strong></td>
+                        <td style="padding: 15px; border: 1px solid #ddd;">86-90</td>
+                        <td style="padding: 15px; border: 1px solid #ddd;">68-72</td>
+                        <td style="padding: 15px; border: 1px solid #ddd;">92-96</td>
+                    </tr>
+                    <tr style="background: #f9f9f9;">
+                        <td style="padding: 15px; border: 1px solid #ddd;"><strong>M</strong></td>
+                        <td style="padding: 15px; border: 1px solid #ddd;">90-94</td>
+                        <td style="padding: 15px; border: 1px solid #ddd;">72-76</td>
+                        <td style="padding: 15px; border: 1px solid #ddd;">96-100</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 15px; border: 1px solid #ddd;"><strong>L</strong></td>
+                        <td style="padding: 15px; border: 1px solid #ddd;">94-98</td>
+                        <td style="padding: 15px; border: 1px solid #ddd;">76-80</td>
+                        <td style="padding: 15px; border: 1px solid #ddd;">100-104</td>
+                    </tr>
+                    <tr style="background: #f9f9f9;">
+                        <td style="padding: 15px; border: 1px solid #ddd;"><strong>XL</strong></td>
+                        <td style="padding: 15px; border: 1px solid #ddd;">98-102</td>
+                        <td style="padding: 15px; border: 1px solid #ddd;">80-84</td>
+                        <td style="padding: 15px; border: 1px solid #ddd;">104-108</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div style="margin-top: 40px; padding: 25px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px;">
+            <h3 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin-bottom: 15px;">💡 Consejos para Medir</h3>
+            <ul style="color: #666; line-height: 1.8;">
+                <li>Mide sobre ropa interior ligera</li>
+                <li>Mantén la cinta métrica paralela al suelo</li>
+                <li>No aprietes demasiado la cinta</li>
+                <li>Si estás entre dos tallas, te recomendamos la talla más grande</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

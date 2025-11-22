@@ -1,0 +1,64 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block content %}
+<h2 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin-bottom: 25px;">
+    {% if usuario %}✏️ Editar Usuario{% else %}➕ Nuevo Usuario{% endif %}
+</h2>
+
+<form method="post" class="form-admin">
+    {% csrf_token %}
+    
+    <div class="form-group">
+        <label for="nombre">Nombre *</label>
+        <input type="text" id="nombre" name="nombre" value="{{ usuario.nombre|default:'' }}" required>
+    </div>
+
+    <div class="form-group">
+        <label for="apellido">Apellido</label>
+        <input type="text" id="apellido" name="apellido" value="{{ usuario.apellido|default:'' }}">
+    </div>
+
+    <div class="form-group">
+        <label for="correo">Email *</label>
+        <input type="email" id="correo" name="correo" value="{{ usuario.correo|default:'' }}" required>
+    </div>
+
+    <div class="form-group">
+        <label for="usuario">Usuario *</label>
+        <input type="text" id="usuario" name="usuario" value="{{ usuario.usuario|default:'' }}" required>
+    </div>
+
+    <div class="form-group">
+        <label for="contrasena">{% if usuario %}Nueva Contraseña (dejar vacío para no cambiar){% else %}Contraseña *{% endif %}</label>
+        <input type="password" id="contrasena" name="contrasena" {% if not usuario %}required{% endif %}>
+    </div>
+
+    <div class="form-group">
+        <label for="identificacion">Identificación *</label>
+        <input type="number" id="identificacion" name="identificacion" value="{{ usuario.identificacion|default:'' }}" required>
+    </div>
+
+    <div class="form-group">
+        <label for="tipo_identificacion">Tipo de Identificación</label>
+        <select id="tipo_identificacion" name="tipo_identificacion">
+            <option value="CC" {% if usuario.TipoIdentificacion == 'CC' %}selected{% endif %}>Cédula de Ciudadanía</option>
+            <option value="CE" {% if usuario.TipoIdentificacion == 'CE' %}selected{% endif %}>Cédula de Extranjería</option>
+            <option value="PA" {% if usuario.TipoIdentificacion == 'PA' %}selected{% endif %}>Pasaporte</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="cargo">Cargo</label>
+        <select id="cargo" name="cargo">
+            <option value="cliente" {% if usuario.cargo == 'cliente' %}selected{% endif %}>Cliente</option>
+            <option value="admin" {% if usuario.cargo == 'admin' %}selected{% endif %}>Administrador</option>
+        </select>
+    </div>
+
+    <div style="display: flex; gap: 15px; margin-top: 30px;">
+        <button type="submit" class="btn-admin">💾 Guardar</button>
+        <a href="{% url 'admin_usuarios' %}" class="btn-admin" style="background: #999; text-decoration: none; display: inline-block;">❌ Cancelar</a>
+    </div>
+</form>
+{% endblock %}
+

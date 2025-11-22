@@ -10,10 +10,9 @@ import java.util.logging.Logger;
 
 public class ProductoDAO {
     private static final Logger logger = Logger.getLogger(ProductoDAO.class.getName());
-    private DatabaseConnection dbConnection;
     
     public ProductoDAO() {
-        this.dbConnection = DatabaseConnection.getInstance();
+        // Constructor
     }
     
     public boolean insertarProducto(Producto producto) {
@@ -21,7 +20,7 @@ public class ProductoDAO {
                      "Categorias, Color, FecheIngreso, Talla, Material, Colección) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
-        try (Connection conn = dbConnection.getConnection();
+        try (Connection conn = Conexion.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, producto.getNombre());

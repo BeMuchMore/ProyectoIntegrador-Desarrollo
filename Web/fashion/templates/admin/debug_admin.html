@@ -1,0 +1,32 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block content %}
+<h2>🔍 Información de Depuración</h2>
+
+<div style="background: #f9f9f9; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+    <h3>Información de Sesión</h3>
+    <p><strong>Usuario ID en sesión:</strong> {{ request.session.usuario_id|default:"No hay" }}</p>
+    <p><strong>Nombre en sesión:</strong> {{ request.session.usuario_nombre|default:"No hay" }}</p>
+    <p><strong>Cargo en sesión:</strong> {{ request.session.usuario_cargo|default:"No hay" }}</p>
+</div>
+
+<div style="background: #f9f9f9; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+    <h3>Información de Usuario Actual</h3>
+    {% if usuario_actual %}
+    <p><strong>ID:</strong> {{ usuario_actual.id }}</p>
+    <p><strong>Nombre:</strong> {{ usuario_actual.nombre }}</p>
+    <p><strong>Email:</strong> {{ usuario_actual.correo }}</p>
+    <p><strong>Cargo en DB:</strong> {{ usuario_actual.cargo }}</p>
+    <p><strong>Es Admin:</strong> {% if usuario_actual.cargo == 'admin' %}✅ SÍ{% else %}❌ NO{% endif %}</p>
+    {% else %}
+    <p>No hay usuario logueado</p>
+    {% endif %}
+</div>
+
+<div style="background: #f9f9f9; padding: 20px; border-radius: 10px;">
+    <h3>Acciones</h3>
+    <a href="{% url 'admin_dashboard' %}" class="btn-admin">Intentar Acceder al Dashboard</a>
+    <a href="{% url 'home' %}" class="btn-admin" style="background: #999;">Volver al Inicio</a>
+</div>
+{% endblock %}
+

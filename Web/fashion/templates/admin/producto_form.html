@@ -1,0 +1,62 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block content %}
+<h2 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin-bottom: 25px;">
+    {% if producto %}✏️ Editar Producto{% else %}➕ Nuevo Producto{% endif %}
+</h2>
+
+<form method="post" class="form-admin">
+    {% csrf_token %}
+    
+    <div class="form-group">
+        <label for="nombre">Nombre del Producto *</label>
+        <input type="text" id="nombre" name="nombre" value="{{ producto.Nombre|default:'' }}" required>
+    </div>
+
+    <div class="form-group">
+        <label for="descripcion">Descripción</label>
+        <textarea id="descripcion" name="descripcion" rows="4">{{ producto.Descripcion|default:'' }}</textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="categorias">Categoría</label>
+        <input type="text" id="categorias" name="categorias" value="{{ producto.Categorias|default:'' }}" placeholder="Ej: Vestidos, Blusas, etc.">
+    </div>
+
+    <div class="form-group">
+        <label for="coleccion">Colección</label>
+        <input type="text" id="coleccion" name="coleccion" value="{{ producto.Coleccion|default:'' }}">
+    </div>
+
+    <div class="form-group">
+        <label for="color">Color</label>
+        <input type="text" id="color" name="color" value="{{ producto.Color|default:'' }}">
+    </div>
+
+    <div class="form-group">
+        <label for="material_base">Material Base</label>
+        <input type="text" id="material_base" name="material_base" value="{{ producto.MaterialBase|default:'' }}">
+    </div>
+
+    <div class="form-group">
+        <label for="img_url">URL de Imagen</label>
+        <input type="text" id="img_url" name="img_url" value="{{ producto.ImgUrl|default:'' }}" placeholder="...Z-Global-Img/imagen.jpg">
+    </div>
+
+    {% if producto %}
+    <div class="form-group">
+        <label for="estado">Estado</label>
+        <select id="estado" name="estado">
+            <option value="vigente" {% if producto.estado == 'vigente' %}selected{% endif %}>Vigente</option>
+            <option value="Eliminado" {% if producto.estado == 'Eliminado' %}selected{% endif %}>Eliminado</option>
+        </select>
+    </div>
+    {% endif %}
+
+    <div style="display: flex; gap: 15px; margin-top: 30px;">
+        <button type="submit" class="btn-admin">💾 Guardar</button>
+        <a href="{% url 'admin_productos' %}" class="btn-admin" style="background: #999; text-decoration: none; display: inline-block;">❌ Cancelar</a>
+    </div>
+</form>
+{% endblock %}
+

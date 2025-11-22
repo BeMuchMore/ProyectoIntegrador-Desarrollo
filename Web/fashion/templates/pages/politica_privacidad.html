@@ -1,0 +1,46 @@
+{% extends 'pages/base_page.html' %}
+
+{% block title %}Política de Privacidad - {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}{% endblock %}
+
+{% block content %}
+<div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(212, 165, 199, 0.15);">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #c98bb8; margin-bottom: 30px; text-align: center;">Política de Privacidad</h1>
+    
+    <div style="max-width: 800px; margin: 0 auto;">
+        <div style="margin-bottom: 30px;">
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #c98bb8; margin-bottom: 20px;">Información que Recopilamos</h2>
+            <p style="font-size: 1.1rem; line-height: 1.8; color: #666;">
+                Recopilamos información que nos proporcionas directamente, como nombre, dirección de correo electrónico, dirección postal y número de teléfono cuando realizas una compra o te registras en nuestro sitio.
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 30px;">
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #c98bb8; margin-bottom: 20px;">Uso de la Información</h2>
+            <p style="font-size: 1.1rem; line-height: 1.8; color: #666;">
+                Utilizamos tu información para procesar pedidos, mejorar nuestros servicios, comunicarnos contigo sobre productos y ofertas, y personalizar tu experiencia de compra.
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 30px;">
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #c98bb8; margin-bottom: 20px;">Protección de Datos</h2>
+            <p style="font-size: 1.1rem; line-height: 1.8; color: #666;">
+                Implementamos medidas de seguridad técnicas y organizativas para proteger tu información personal contra acceso no autorizado, alteración, divulgación o destrucción.
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 30px;">
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #c98bb8; margin-bottom: 20px;">Cookies</h2>
+            <p style="font-size: 1.1rem; line-height: 1.8; color: #666;">
+                Utilizamos cookies para mejorar tu experiencia en nuestro sitio web. Puedes configurar tu navegador para rechazar cookies, aunque esto puede afectar algunas funcionalidades del sitio.
+            </p>
+        </div>
+        
+        <div style="padding: 25px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px;">
+            <p style="color: #666; line-height: 1.8;">
+                Si tienes preguntas sobre esta política de privacidad, contáctanos en {% if config and config.CorreoApp %}{{ config.CorreoApp }}{% else %}info@fashion.com{% endif %}.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

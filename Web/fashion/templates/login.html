@@ -1,0 +1,156 @@
+{% load static %}
+{% load image_tags %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %} Moda Femenina</title>
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+</head>
+<body {% if config and config.fondoPrincipal %}style="background: {{ config.fondoPrincipal }};"{% endif %}>
+    <!-- Header Top -->
+    <div class="header-top" {% if config and config.fondoPrincipal %}style="background: {{ config.fondoPrincipal }};"{% endif %}>
+        <div class="header-top-content">
+            <span>📞 +1 234 567 8900 | 📧 {% if config and config.CorreoApp %}{{ config.CorreoApp }}{% else %}info@fashion.com{% endif %}</span>
+            <span>Envío Gratis en Pedidos Superiores a $100</span>
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <header class="header-main">
+        <div class="header-content">
+            <div class="logo">
+                <a href="{% url 'home' %}" style="text-decoration: none; color: inherit;">
+                    {% if config and config.Logo %}
+                        <img src="{{ config.Logo|fix_image_url }}" alt="{% if config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}" style="max-height: 50px; vertical-align: middle;">
+                    {% endif %}
+                    <span style="{% if config and config.Logo %}margin-left: 10px;{% endif %}">
+                        {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}
+                    </span>
+                </a>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'home' %}">Inicio</a></li>
+                    <li><a href="{% url 'shop' %}">Tienda</a></li>
+                    {% for categoria in categorias|slice:":5" %}
+                    <li><a href="{% url 'shop' %}?categoria={{ categoria }}">{{ categoria }}</a></li>
+                    {% endfor %}
+                </ul>
+            </nav>
+            <div class="header-icons">
+                <a href="{% url 'shop' %}" class="header-icon" title="Buscar">🔍</a>
+                {% if request.session.usuario_id %}
+                    <a href="{% url 'perfil' %}" class="header-icon" title="Mi Perfil">👤</a>
+                    <a href="{% url 'logout' %}" class="header-icon" title="Cerrar Sesión">🚪</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="header-icon" title="Iniciar Sesión">👤</a>
+                {% endif %}
+                <a href="{% url 'carrito' %}" class="header-icon" title="Carrito">
+                    🛒
+                    <span class="cart-badge" id="cart-count">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Login Section -->
+    <main class="auth-container">
+        <div class="auth-card fade-in">
+            <div class="auth-header">
+                <h1>Bienvenido de Nuevo</h1>
+                <p>Inicia sesión en tu cuenta FASHION - Moda Femenina Premium</p>
+            </div>
+            
+            <!-- Messages -->
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post" class="auth-form">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="email">Correo Electrónico</label>
+                    <input 
+                        type="text" 
+                        id="email" 
+                        name="email" 
+                        class="form-control" 
+                        placeholder="Ingresa tu correo electrónico"
+                        required
+                        value="{{ form.email.value|default:'' }}"
+                    >
+                    {% if form.email.errors %}
+                        <div class="field-error">
+                            {% for error in form.email.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-control" 
+                        placeholder="Ingresa tu contraseña"
+                        required
+                    >
+                    {% if form.password.errors %}
+                        <div class="field-error">
+                            {% for error in form.password.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">Recordarme</label>
+                </div>
+
+                <button type="submit" class="btn-auth">Iniciar Sesión</button>
+
+                <div class="auth-link">
+                    <a href="#" onclick="alert('Funcionalidad de recuperación de contraseña próximamente'); return false;">¿Olvidaste tu contraseña?</a>
+                </div>
+            </form>
+
+            <div class="auth-divider">
+                <span>o</span>
+            </div>
+
+            <div class="social-login">
+                <button class="btn-social btn-google" onclick="alert('Inicio de sesión con Google próximamente'); return false;">
+                    <span>🔍</span>
+                    Continuar con Google
+                </button>
+                <button class="btn-social btn-facebook" onclick="alert('Inicio de sesión con Facebook próximamente'); return false;">
+                    <span>f</span>
+                    Continuar con Facebook
+                </button>
+            </div>
+
+            <div class="auth-link">
+                <p>¿No tienes una cuenta? <a href="{% url 'register' %}">Crea una aquí</a></p>
+            </div>
+        </div>
+    </main>
+
+    {% include 'base_footer.html' %}
+
+    <script src="{% static 'js/auth.js' %}"></script>
+</body>
+</html>

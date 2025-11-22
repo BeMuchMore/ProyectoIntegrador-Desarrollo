@@ -1,0 +1,49 @@
+{% extends 'pages/base_page.html' %}
+
+{% block title %}Tarjetas de Regalo - {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}{% endblock %}
+
+{% block content %}
+<div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(212, 165, 199, 0.15);">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #c98bb8; margin-bottom: 30px; text-align: center;">Tarjetas de Regalo</h1>
+    
+    <div style="max-width: 800px; margin: 0 auto;">
+        <p style="font-size: 1.1rem; line-height: 1.8; color: #666; margin-bottom: 40px; text-align: center;">
+            Regala estilo y elegancia con nuestras tarjetas de regalo. Perfectas para cualquier ocasión especial.
+        </p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 25px; margin-bottom: 40px;">
+            <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #d4a5c7 0%, #c98bb8 100%); border-radius: 15px; color: white;">
+                <div style="font-size: 2.5rem; margin-bottom: 15px;">$50</div>
+                <p style="font-size: 0.9rem; opacity: 0.9;">Tarjeta de Regalo</p>
+            </div>
+            
+            <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #d4a5c7 0%, #c98bb8 100%); border-radius: 15px; color: white;">
+                <div style="font-size: 2.5rem; margin-bottom: 15px;">$100</div>
+                <p style="font-size: 0.9rem; opacity: 0.9;">Tarjeta de Regalo</p>
+            </div>
+            
+            <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #d4a5c7 0%, #c98bb8 100%); border-radius: 15px; color: white;">
+                <div style="font-size: 2.5rem; margin-bottom: 15px;">$200</div>
+                <p style="font-size: 0.9rem; opacity: 0.9;">Tarjeta de Regalo</p>
+            </div>
+        </div>
+        
+        <div style="padding: 25px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px; margin-bottom: 30px;">
+            <h3 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin-bottom: 15px;">✨ Características</h3>
+            <ul style="color: #666; line-height: 1.8;">
+                <li>Sin fecha de vencimiento</li>
+                <li>Válidas para todos los productos</li>
+                <li>Se pueden combinar con otras promociones</li>
+                <li>Enviadas por email o correo físico</li>
+            </ul>
+        </div>
+        
+        <div style="text-align: center;">
+            <a href="{% url 'contacto' %}" class="btn-primary" style="display: inline-block; padding: 15px 40px; text-decoration: none; font-size: 1.1rem;">
+                Comprar Tarjeta de Regalo
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

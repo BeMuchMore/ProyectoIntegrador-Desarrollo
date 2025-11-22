@@ -1,0 +1,50 @@
+{% load static %}
+{% load image_tags %}
+<!-- Footer -->
+<footer>
+    <div class="footer-content">
+        <div class="footer-section">
+            <h3>Acerca de {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}</h3>
+            <p>Tu destino premium para las últimas tendencias de moda femenina y clásicos atemporales. Creemos en la calidad, el estilo y la sostenibilidad. Diseñado exclusivamente para mujeres que buscan expresar su personalidad única.</p>
+            <div class="social-icons">
+                <a href="#" class="social-icon">f</a>
+                <a href="#" class="social-icon">t</a>
+                <a href="#" class="social-icon">i</a>
+                <a href="#" class="social-icon">p</a>
+            </div>
+        </div>
+        <div class="footer-section">
+            <h3>Enlaces Rápidos</h3>
+            <ul>
+                <li><a href="{% url 'sobre_nosotros' %}">Sobre Nosotros</a></li>
+                <li><a href="{% url 'contacto' %}">Contacto</a></li>
+                <li><a href="{% url 'guia_tallas' %}">Guía de Tallas</a></li>
+                <li><a href="{% url 'info_envio' %}">Información de Envío</a></li>
+                <li><a href="{% url 'devoluciones' %}">Devoluciones</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h3>Categorías</h3>
+            <ul>
+                <li><a href="{% url 'shop' %}">Mujer</a></li>
+                <li><a href="{% url 'shop' %}?categoria=Accesorios">Accesorios</a></li>
+                <li><a href="{% url 'shop' %}">Nuevos Llegados</a></li>
+                <li><a href="{% url 'shop' %}">Ofertas</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h3>Atención al Cliente</h3>
+            <ul>
+                <li><a href="{% url 'rastrear_pedido' %}">Rastrear Pedido</a></li>
+                <li><a href="{% url 'preguntas_frecuentes' %}">Preguntas Frecuentes</a></li>
+                <li><a href="{% url 'metodos_pago' %}">Métodos de Pago</a></li>
+                <li><a href="{% url 'tarjetas_regalo' %}">Tarjetas de Regalo</a></li>
+                <li><a href="{% url 'ubicacion_tiendas' %}">Ubicación de Tiendas</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2025 {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}. Todos los derechos reservados. | <a href="{% url 'politica_privacidad' %}">Política de Privacidad</a> | <a href="{% url 'terminos_condiciones' %}">Términos y Condiciones</a></p>
+    </div>
+</footer>
+

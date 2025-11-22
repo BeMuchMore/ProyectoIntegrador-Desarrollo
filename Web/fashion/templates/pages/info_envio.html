@@ -1,0 +1,42 @@
+{% extends 'pages/base_page.html' %}
+
+{% block title %}Información de Envío - {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}{% endblock %}
+
+{% block content %}
+<div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(212, 165, 199, 0.15);">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #c98bb8; margin-bottom: 30px; text-align: center;">Información de Envío</h1>
+    
+    <div style="max-width: 800px; margin: 0 auto;">
+        <div style="margin-bottom: 40px;">
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #c98bb8; margin-bottom: 20px;">🚚 Envío Gratis</h2>
+            <p style="font-size: 1.1rem; line-height: 1.8; color: #666;">
+                Ofrecemos <strong>envío gratis</strong> en todos los pedidos superiores a $100. Para pedidos menores, el costo de envío es de $10.
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 40px;">
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #c98bb8; margin-bottom: 20px;">⏱️ Tiempos de Entrega</h2>
+            <ul style="font-size: 1.1rem; line-height: 1.8; color: #666; margin-left: 20px;">
+                <li style="margin-bottom: 10px;"><strong>Envío Estándar:</strong> 5-7 días hábiles</li>
+                <li style="margin-bottom: 10px;"><strong>Envío Express:</strong> 2-3 días hábiles (+$15)</li>
+                <li style="margin-bottom: 10px;"><strong>Envío Overnight:</strong> 1 día hábil (+$25)</li>
+            </ul>
+        </div>
+        
+        <div style="margin-bottom: 40px;">
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #c98bb8; margin-bottom: 20px;">🌍 Zonas de Envío</h2>
+            <p style="font-size: 1.1rem; line-height: 1.8; color: #666;">
+                Realizamos envíos a toda Colombia. Los tiempos pueden variar según la ubicación.
+            </p>
+        </div>
+        
+        <div style="padding: 25px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px;">
+            <h3 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin-bottom: 15px;">📦 Seguimiento de Pedidos</h3>
+            <p style="color: #666; line-height: 1.8;">
+                Una vez que tu pedido sea despachado, recibirás un email con el número de seguimiento para que puedas rastrear tu paquete en tiempo real.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

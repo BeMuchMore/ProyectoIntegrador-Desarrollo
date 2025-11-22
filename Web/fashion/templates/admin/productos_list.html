@@ -1,0 +1,56 @@
+{% extends 'admin/base_admin.html' %}
+{% load image_tags %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+    <h2 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin: 0;">👕 Gestión de Productos</h2>
+    <a href="{% url 'admin_producto_nuevo' %}" class="btn-admin">➕ Nuevo Producto</a>
+</div>
+
+<table class="table-admin">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Imagen</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Colección</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for producto in productos %}
+        <tr>
+            <td>{{ producto.id }}</td>
+            <td>
+                {% if producto.ImgUrl|fix_image_url %}
+                <img src="{{ producto.ImgUrl|fix_image_url }}" alt="{{ producto.Nombre }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px;">
+                {% else %}
+                <div style="width: 60px; height: 60px; background: #f0f0f0; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #999; font-size: 0.8rem;">Sin img</div>
+                {% endif %}
+            </td>
+            <td><strong>{{ producto.Nombre|default:"Sin nombre" }}</strong></td>
+            <td>{{ producto.Categorias|default:"N/A" }}</td>
+            <td>{{ producto.Coleccion|default:"N/A" }}</td>
+            <td>
+                <span style="padding: 5px 10px; border-radius: 5px; font-size: 0.85rem; {% if producto.estado == 'vigente' %}background: #d4edda; color: #155724;{% else %}background: #f8d7da; color: #721c24;{% endif %}">
+                    {{ producto.estado|default:"vigente" }}
+                </span>
+            </td>
+            <td>
+                <a href="{% url 'admin_producto_editar' producto.id %}" class="btn-admin" style="padding: 8px 15px; font-size: 0.9rem; margin-right: 5px;">✏️ Editar</a>
+                <a href="{% url 'admin_producto_eliminar' producto.id %}" class="btn-admin btn-danger" style="padding: 8px 15px; font-size: 0.9rem;" onclick="return confirm('¿Estás seguro de eliminar este producto?');">🗑️ Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7" style="text-align: center; padding: 40px; color: #999;">
+                No hay productos registrados.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+

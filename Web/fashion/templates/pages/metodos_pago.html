@@ -1,0 +1,43 @@
+{% extends 'pages/base_page.html' %}
+
+{% block title %}Métodos de Pago - {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}{% endblock %}
+
+{% block content %}
+<div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(212, 165, 199, 0.15);">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #c98bb8; margin-bottom: 30px; text-align: center;">Métodos de Pago</h1>
+    
+    <div style="max-width: 800px; margin: 0 auto;">
+        <p style="font-size: 1.1rem; line-height: 1.8; color: #666; margin-bottom: 40px; text-align: center;">
+            Aceptamos múltiples métodos de pago para tu comodidad y seguridad.
+        </p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 25px; margin-bottom: 40px;">
+            <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px;">
+                <div style="font-size: 3rem; margin-bottom: 15px;">💳</div>
+                <h3 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin-bottom: 10px;">Tarjetas</h3>
+                <p style="color: #666; font-size: 0.9rem;">Visa, Mastercard, Amex</p>
+            </div>
+            
+            <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px;">
+                <div style="font-size: 3rem; margin-bottom: 15px;">🏦</div>
+                <h3 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin-bottom: 10px;">Transferencia</h3>
+                <p style="color: #666; font-size: 0.9rem;">Bancaria</p>
+            </div>
+            
+            <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px;">
+                <div style="font-size: 3rem; margin-bottom: 15px;">💵</div>
+                <h3 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin-bottom: 10px;">Efectivo</h3>
+                <p style="color: #666; font-size: 0.9rem;">Contra entrega</p>
+            </div>
+        </div>
+        
+        <div style="padding: 25px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px;">
+            <h3 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin-bottom: 15px;">🔒 Seguridad</h3>
+            <p style="color: #666; line-height: 1.8;">
+                Todos los pagos son procesados de forma segura mediante sistemas de encriptación SSL. No almacenamos información de tu tarjeta de crédito.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

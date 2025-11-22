@@ -1,0 +1,45 @@
+{% extends 'pages/base_page.html' %}
+
+{% block title %}Devoluciones - {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}{% endblock %}
+
+{% block content %}
+<div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(212, 165, 199, 0.15);">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #c98bb8; margin-bottom: 30px; text-align: center;">Política de Devoluciones</h1>
+    
+    <div style="max-width: 800px; margin: 0 auto;">
+        <div style="margin-bottom: 40px;">
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #c98bb8; margin-bottom: 20px;">⏰ Plazo para Devoluciones</h2>
+            <p style="font-size: 1.1rem; line-height: 1.8; color: #666;">
+                Tienes <strong>30 días</strong> desde la fecha de recepción para devolver cualquier artículo que no te haya gustado o que no se ajuste correctamente.
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 40px;">
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #c98bb8; margin-bottom: 20px;">✅ Condiciones</h2>
+            <ul style="font-size: 1.1rem; line-height: 1.8; color: #666; margin-left: 20px;">
+                <li style="margin-bottom: 10px;">Los artículos deben estar sin usar, con etiquetas originales</li>
+                <li style="margin-bottom: 10px;">Deben estar en su empaque original</li>
+                <li style="margin-bottom: 10px;">No se aceptan devoluciones de productos personalizados o de oferta</li>
+            </ul>
+        </div>
+        
+        <div style="margin-bottom: 40px;">
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #c98bb8; margin-bottom: 20px;">💳 Reembolsos</h2>
+            <p style="font-size: 1.1rem; line-height: 1.8; color: #666;">
+                Una vez recibida y verificada tu devolución, procesaremos el reembolso en un plazo de 5-7 días hábiles al método de pago original.
+            </p>
+        </div>
+        
+        <div style="padding: 25px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px;">
+            <h3 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin-bottom: 15px;">📝 Cómo Devolver</h3>
+            <ol style="color: #666; line-height: 1.8;">
+                <li>Contacta a nuestro servicio al cliente</li>
+                <li>Recibirás una etiqueta de envío prepagada</li>
+                <li>Empaqueta el artículo y envíalo de vuelta</li>
+                <li>Te notificaremos cuando recibamos tu devolución</li>
+            </ol>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

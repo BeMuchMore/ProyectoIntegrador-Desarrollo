@@ -1,0 +1,33 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>Total Productos</h3>
+        <div class="stat-value">{{ total_productos }}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Total Usuarios</h3>
+        <div class="stat-value">{{ total_usuarios }}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Total Pedidos</h3>
+        <div class="stat-value">{{ total_pedidos }}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Carros Activos</h3>
+        <div class="stat-value">{{ total_carros }}</div>
+    </div>
+</div>
+
+<div style="margin-top: 40px;">
+    <h2 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin-bottom: 20px;">Acciones Rápidas</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        <a href="{% url 'admin_producto_nuevo' %}" class="btn-admin">➕ Nuevo Producto</a>
+        <a href="{% url 'admin_usuario_nuevo' %}" class="btn-admin">➕ Nuevo Usuario</a>
+        <a href="{% url 'admin_inventario_nuevo' %}" class="btn-admin">➕ Nuevo Inventario</a>
+        <a href="{% url 'admin_productos' %}" class="btn-admin">📋 Ver Productos</a>
+    </div>
+</div>
+{% endblock %}
+

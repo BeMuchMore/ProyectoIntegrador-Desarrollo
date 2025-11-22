@@ -1,0 +1,140 @@
+{% load static %}
+{% load image_tags %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}</title>
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+</head>
+<body {% if config and config.fondoPrincipal %}style="background: {{ config.fondoPrincipal }} !important; background-attachment: fixed !important;"{% else %}style="background: linear-gradient(135deg, #e8d5e3 0%, #f0e0eb 50%, #f5e6f0 100%) !important; background-attachment: fixed !important;"{% endif %}>
+    {% include 'base_header.html' %}
+
+    <!-- Profile Section -->
+    <main style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
+        <h1 style="margin-bottom: 30px;">Mi Perfil</h1>
+
+        {% if messages %}
+        <div style="margin-bottom: 20px;">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" style="padding: 15px; margin-bottom: 10px; border-radius: 5px; background: {% if message.tags == 'error' %}#f8d7da{% elif message.tags == 'success' %}#d4edda{% else %}#d1ecf1{% endif %}; color: {% if message.tags == 'error' %}#721c24{% elif message.tags == 'success' %}#155724{% else %}#0c5460{% endif %};">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
+            <!-- Profile Info -->
+            <div>
+                <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                    <h2 style="margin-bottom: 20px;">Información Personal</h2>
+                    
+                    <form method="post" action="{% url 'actualizar_perfil' %}">
+                        {% csrf_token %}
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label for="nombre" style="display: block; margin-bottom: 5px; font-weight: bold;">Nombre:</label>
+                            <input type="text" id="nombre" name="nombre" value="{{ usuario.nombre }}" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label for="apellido" style="display: block; margin-bottom: 5px; font-weight: bold;">Apellido:</label>
+                            <input type="text" id="apellido" name="apellido" value="{{ usuario.apellido|default:'' }}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label for="correo" style="display: block; margin-bottom: 5px; font-weight: bold;">Email:</label>
+                            <input type="email" id="correo" name="correo" value="{{ usuario.correo|default:'' }}" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label for="descripcion" style="display: block; margin-bottom: 5px; font-weight: bold;">Descripción:</label>
+                            <textarea id="descripcion" name="descripcion" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">{{ usuario.descripcion|default:'' }}</textarea>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label for="password" style="display: block; margin-bottom: 5px; font-weight: bold;">Nueva Contraseña (opcional):</label>
+                            <input type="password" id="password" name="password" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                            <small style="color: #666;">Deja en blanco si no deseas cambiar la contraseña</small>
+                        </div>
+
+                        <button type="submit" class="btn-primary" style="width: 100%; padding: 15px;">
+                            Actualizar Perfil
+                        </button>
+                    </form>
+                </div>
+
+                <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <h3 style="margin-bottom: 15px;">Información de Cuenta</h3>
+                    <p><strong>Usuario:</strong> {{ usuario.usuario }}</p>
+                    <p><strong>Identificación:</strong> {{ usuario.identificacion }}</p>
+                    <p><strong>Tipo de Identificación:</strong> {{ usuario.TipoIdentificacion|default:"N/A" }}</p>
+                    <p><strong>Cargo:</strong> 
+                        <span style="padding: 5px 10px; border-radius: 5px; {% if usuario.cargo == 'admin' %}background: linear-gradient(135deg, #d4a5c7 0%, #c98bb8 100%); color: white;{% else %}background: #e0e0e0; color: #333;{% endif %}">
+                            {{ usuario.cargo|upper }}
+                        </span>
+                    </p>
+                    
+                    {% if usuario.cargo == 'admin' %}
+                    <div style="margin-top: 25px; padding: 20px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 10px; border: 2px solid #c98bb8;">
+                        <h4 style="margin-bottom: 15px; color: #c98bb8; font-family: 'Playfair Display', serif;">⚙️ Panel de Administración</h4>
+                        <p style="margin-bottom: 15px; color: #666;">Accede al panel de administración para gestionar productos, usuarios e inventario.</p>
+                        <a href="{% url 'admin_dashboard' %}" style="display: inline-block; padding: 15px 30px; background: linear-gradient(135deg, #d4a5c7 0%, #c98bb8 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(212, 165, 199, 0.4);">
+                            🚀 Ir al Panel Admin
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Order History -->
+            <div>
+                <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <h2 style="margin-bottom: 20px;">Historial de Pedidos</h2>
+                    
+                    {% if pagos %}
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        {% for pago in pagos %}
+                        <div style="border: 1px solid #ddd; border-radius: 10px; padding: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                                <div>
+                                    <h3 style="margin-bottom: 5px;">Pedido #{{ pago.id_pago }}</h3>
+                                    <p style="color: #666; font-size: 0.9rem;">{{ pago.fecha_pago|date:"d/m/Y H:i" }}</p>
+                                </div>
+                                <div style="text-align: right;">
+                                    <p style="font-size: 1.2rem; font-weight: bold; color: #667eea;">${{ pago.total|floatformat:0 }}</p>
+                                    <span style="padding: 5px 10px; background: {% if pago.estado == 'Completado' %}#d4edda{% elif pago.estado == 'Pendiente' %}#fff3cd{% else %}#f8d7da{% endif %}; color: {% if pago.estado == 'Completado' %}#155724{% elif pago.estado == 'Pendiente' %}#856404{% else %}#721c24{% endif %}; border-radius: 5px; font-size: 0.8rem;">
+                                        {{ pago.estado }}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
+                                <p><strong>Método de pago:</strong> {{ pago.metodo_pago }}</p>
+                                <p><strong>Subtotal:</strong> {{ pago.subtotal|precio_colombiano }}</p>
+                                <p><strong>Impuestos:</strong> {{ pago.impuestos|precio_colombiano }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div style="text-align: center; padding: 40px;">
+                        <p style="color: #666; margin-bottom: 20px;">No tienes pedidos aún.</p>
+                        <a href="{% url 'shop' %}" class="btn-primary" style="display: inline-block; padding: 15px 30px; text-decoration: none;">
+                            Comenzar a Comprar
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    {% include 'base_footer.html' %}
+
+    <script src="{% static 'js/index.js' %}"></script>
+</body>
+</html>
+

@@ -2,1461 +2,1475 @@
 package UI;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import javax.swing.border.LineBorder;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.MediaTracker;
-import javax.swing.BorderFactory;
-import java.awt.Cursor;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.util.logging.Logger;
+import java.util.logging.Level;
+import UI.util.ErrorHandler;
+import UI.util.ModernStyles;
+import UI.ConfigImagenes;
 
-
-
-
+/**
+ * Página principal de la aplicación - Diseño basado en index.html
+ * Replica el diseño moderno de la página web
+ */
 public class principal extends javax.swing.JFrame {
     
-      private static SessionManager instance;
-    
-    // Información del usuario actual
+    // Información del usuario
     private int userId;
     private String username;
     private String cargo;
     private boolean isLoggedIn;
     
+    // Complementos de la aplicación
+    private String nombreApp = "FASHION";
+    private String correoApp = "info@fashion.com";
+    private String rutaFondoPrincipal = "";
+    private String rutaLogo = "";
     
-  
+    // Componentes principales
+    private JPanel mainPanel;
+    private JPanel headerTopPanel;
+    private JPanel headerMainPanel;
+    private JPanel heroPanel;
+    private JPanel categoriesPanel;
+    private JPanel featuredProductsPanel;
+    private JPanel newsletterPanel;
+    private JPanel footerPanel;
+    private JScrollPane scrollPane;
+    
+    // Colores del diseño web
+    private static final Color COLOR_PRIMARY = new Color(212, 165, 199); // #d4a5c7
+    private static final Color COLOR_SECONDARY = new Color(201, 139, 184); // #c98bb8
+    private static final Color COLOR_ACCENT = new Color(255, 107, 157); // #ff6b9d
+    private static final Color COLOR_BG_GRADIENT_START = new Color(232, 213, 227); // #e8d5e3
+    private static final Color COLOR_BG_GRADIENT_MID = new Color(240, 224, 235); // #f0e0eb
+    private static final Color COLOR_BG_GRADIENT_END = new Color(245, 230, 240); // #f5e6f0
+    
+    private static final Logger logger = Logger.getLogger(principal.class.getName());
+    
     public principal(int userId) {
-         this.userId = userId;
+        this.userId = userId;
         this.isLoggedIn = (userId > 0);
-      
+        
+        // Obtener información de sesión
+        if (isLoggedIn) {
+            SessionManager session = SessionManager.getInstance();
+            this.username = session.getUsername();
+            this.cargo = session.getCargo();
+        }
+        
+        ModernStyles.applyModernLookAndFeel();
         initComponents();
-         configurarImagenFondo();
-       
-        setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-          configurarSesion();
+        // Cargar complementos
+        cargarComplementos();
         
-        // Cargar productos en los paneles
-        cargarCategorias();
-        cargarProductosAleatorios();
-        cargarProductosConMayorCantidad();
+        // Construir interfaz
+        construirInterfaz();
         
-        // Configurar imagen principal
-        cargarImagenPrincipal();
-         cargarCategorias();
-    cargarProductosAleatorios();
-    cargarProductosConMayorCantidad();
-        
-        
-     }
-private void configurarImagenFondo() {
-    try {
-        // Cargar la imagen desde src/Img/fondo.jpg
-        ImageIcon iconoFondo = new ImageIcon(getClass().getResource("/Img/fondo.jpg"));
-        Color fondoSemiTransparente = new Color(255, 255, 255, 100);
-    
-        // Obtener las dimensiones del panel
-        int anchoPanel = 1340;
-        int altoPanel = 430;
-        
-        // Escalar la imagen al tamaño del panel
-        Image img = iconoFondo.getImage();
-        Image imgEscalada = img.getScaledInstance(anchoPanel, altoPanel, Image.SCALE_SMOOTH);
-        
-        // Establecer la imagen escalada en el label
-        jFondoLabel.setIcon(new ImageIcon(imgEscalada));
-        jFondoLabel.setText(""); // Quitar el texto "Fondo"
-        jFondoLabel.setBounds(0, 0, anchoPanel, altoPanel);
-        jFondoLabel.setOpaque(true);
-        jFondoLabel.setBackground(fondoSemiTransparente);
-        
-        // Enviar el label al fondo (atrás de todos los componentes)
-        jFondoPanel.setComponentZOrder(jFondoLabel, jFondoPanel.getComponentCount() - 1);
-        
-        //esto pa que se vean las letras
-        jLabel4.setOpaque(true);
-       jLabel4.setBackground(fondoSemiTransparente);
-        jLabel7.setOpaque(true);
-       jLabel7.setBackground(fondoSemiTransparente);
-     jLabel26.setOpaque(true);
-       jLabel26.setBackground(fondoSemiTransparente);
-        
-    } catch (Exception e) {
-        System.err.println("Error al cargar imagen de fondo: " + e.getMessage());
-        jFondoLabel.setText("No se pudo cargar la imagen de fondo");
-    }
-}
-
-
- private void configurarSesion() {
-     
-     
-   if (isLoggedIn && userId > 0) {
-    System.err.println("Referencias: " + isLoggedIn + " o " + userId);
-    try (Connection conn = Conexion.getConnection()) {
-        String query = "SELECT nombre FROM usuariouiux WHERE id = ?";
-        PreparedStatement pstmt = conn.prepareStatement(query);
-        pstmt.setInt(1, userId);
-        ResultSet rs = pstmt.executeQuery();
-
-        if (rs.next()) {
-            String username = rs.getString("nombre"); // ← aquí el cambio
-
-            jIniciarButton.setVisible(false);
-            jRegistrarButton.setVisible(false);
-            jTextField1.setVisible(false);
-            jLabel2.setVisible(false);
-
-            JLabel lblUsuario = new JLabel("Bienvenido, " + username);
-            lblUsuario.setFont(new Font("Arial", Font.BOLD, 14));
-            lblUsuario.setBounds(1040, 50, 200, 23);
-            jPanel15.add(lblUsuario);
-
-            JButton btnCerrarSesion = new JButton("Cerrar Sesión");
-            btnCerrarSesion.setBounds(1250, 50, 120, 23);
-            btnCerrarSesion.addActionListener(e -> cerrarSesion());
-            jPanel15.add(btnCerrarSesion);
-        }
-    } catch (SQLException e) {
-        System.err.println("Error al obtener datos del usuario: " + e.getMessage());
-    }
-}
+        // Cargar datos
+        cargarDatos();
     }
     
-    
-    private void cerrarSesion() {
-        int respuesta = JOptionPane.showConfirmDialog(this, 
-            "¿Está seguro de cerrar sesión?", 
-            "Confirmar", 
-            JOptionPane.YES_NO_OPTION);
-            
-        if (respuesta == JOptionPane.YES_OPTION) {
-            this.dispose();
-            new principal(0).setVisible(true);
-        }
-    }
-    
-   
-    private void cargarCategorias() {
-        // Configurar panel Blusas & Tops
-        configurarPanelCategoria(jBlusasTopsPanel, "Blusas & Tops", 
-            obtenerImagenCategoria("Blusas & Tops"), "blusas-tops");
+    /**
+     * Inicializa los componentes básicos
+     * Este método es llamado automáticamente por NetBeans cuando se usa el editor visual
+     * También puede ser llamado manualmente si se ejecuta el código sin el .form
+     */
+    private void initComponents() {
+        setTitle(nombreApp + " - Moda Femenina Premium");
+        setBackground(COLOR_BG_GRADIENT_START);
         
-        
-        // Configurar panel Pantalones
-        configurarPanelCategoria(jPantalonesPanel, "Pantalones", 
-            obtenerImagenCategoria("Pantalones"), "pantalones");
-        
-        // Configurar panel Vestidos
-        configurarPanelCategoria(jVestidosPanel, "Vestidos", 
-            obtenerImagenCategoria("Vestidos"), "vestidos");
-        System.out.println("url arriba " + obtenerImagenCategoria("Vestidos"));
-        // Configurar panel Calzado
-        configurarPanelCategoria(jCalzadoPanel, "Calzado", 
-            obtenerImagenCategoria("Calzado"), "calzado");
-        
-        // Configurar panel Accesorios
-        configurarPanelCategoria(jAccesoriosPanel, "Accesorios", 
-            obtenerImagenCategoria("Accesorios"), "accesorios");
-    }
-    
-   
-    private void configurarPanelCategoria(JPanel panel, String nombreCategoria, 
-                                           String rutaImagen, String categoriaId) {
-        panel.removeAll();
-        panel.setLayout(new BorderLayout());
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
-        
-        // Cargar imagen
-        ImageIcon imagen = null;
-          System.out.println("url que necesito" + rutaImagen  );
-        
-        if (rutaImagen != null && !rutaImagen.isEmpty()) {
-            imagen = ConfigImagenes.cargarImagenEscalada(rutaImagen, 
-                panel.getWidth() > 0 ? panel.getWidth() : 210, 
-                panel.getHeight() > 0 ? panel.getHeight() - 30 : 190);
-        }
-        
-        if (imagen == null) {
-            // Si no hay imagen, usar un color de fondo
-            JPanel imagenPanel = new JPanel();
-            imagenPanel.setBackground(new Color(240, 240, 240));
-            JLabel noImagen = new JLabel("Sin imagen", SwingConstants.CENTER);
-            noImagen.setForeground(Color.GRAY);
-            imagenPanel.add(noImagen);
-            panel.add(imagenPanel, BorderLayout.CENTER);
+        // Si los componentes ya fueron creados por NetBeans (desde .form), no los recreamos
+        if (mainPanel == null) {
+            mainPanel = new JPanel();
+            mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+            mainPanel.setBackground(COLOR_BG_GRADIENT_START);
         } else {
-            JLabel lblImagen = new JLabel(imagen);
-            lblImagen.setHorizontalAlignment(SwingConstants.CENTER);
-            panel.add(lblImagen, BorderLayout.CENTER);
+            // Si ya existe, solo configuramos sus propiedades
+            mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+            mainPanel.setBackground(COLOR_BG_GRADIENT_START);
         }
         
-        // Agregar etiqueta de categoría
-        JLabel lblCategoria = new JLabel(nombreCategoria, SwingConstants.CENTER);
-        lblCategoria.setFont(new Font("Arial", Font.BOLD, 14));
-        lblCategoria.setBackground(new Color(245, 245, 245));
-        lblCategoria.setOpaque(true);
-        lblCategoria.setPreferredSize(new Dimension(panel.getWidth(), 30));
-        panel.add(lblCategoria, BorderLayout.SOUTH);
+        if (scrollPane == null) {
+            scrollPane = new JScrollPane(mainPanel);
+            scrollPane.setBorder(null);
+            scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+            scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        } else {
+            // Si ya existe, solo configuramos sus propiedades
+            scrollPane.setViewportView(mainPanel);
+            scrollPane.setBorder(null);
+            scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+            scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        }
         
-        // Agregar efecto hover y click
-        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        panel.addMouseListener(new MouseAdapter() {
+        // Layout principal: header sticky arriba, contenido scrolleable abajo
+        getContentPane().setLayout(new BorderLayout());
+        
+        // El header se agregará después en construirInterfaz()
+        // Por ahora solo agregamos el scroll
+        getContentPane().add(scrollPane, BorderLayout.CENTER);
+    }
+    
+    /**
+     * Construye toda la interfaz basada en el diseño web
+     */
+    private void construirInterfaz() {
+        // Crear panel contenedor del header sticky
+        JPanel headerContainer = new JPanel();
+        headerContainer.setLayout(new BoxLayout(headerContainer, BoxLayout.Y_AXIS));
+        headerContainer.setBackground(Color.WHITE);
+        
+        // Header Top
+        crearHeaderTop();
+        headerContainer.add(headerTopPanel);
+        
+        // Header Principal
+        crearHeaderMain();
+        headerContainer.add(headerMainPanel);
+        
+        // Agregar header sticky al frame (fuera del scroll)
+        getContentPane().add(headerContainer, BorderLayout.NORTH);
+        
+        // Hero Section (dentro del scroll)
+        crearHeroSection();
+        
+        // Sección de Recién Llegados
+        crearRecienLlegadosSection();
+        
+        // Sección de Categorías
+        crearCategoriesSection();
+        
+        // Productos Destacados
+        crearFeaturedProductsSection();
+        
+        // Newsletter
+        crearNewsletterSection();
+        
+        // Footer
+        crearFooter();
+    }
+    
+    /**
+     * Crea el header top (barra superior con contacto)
+     */
+    private void crearHeaderTop() {
+        headerTopPanel = new JPanel();
+       
+        headerTopPanel.setBackground(new Color(212, 165, 199));
+        headerTopPanel.setPreferredSize(new Dimension(Integer.MAX_VALUE, 25));
+       
+        
+        JLabel contactInfo = new JLabel("📞 +1 234 567 8900 | 📧 " + correoApp);
+        contactInfo.setForeground(Color.WHITE);
+        contactInfo.setFont(new Font("Poppins", Font.PLAIN, 13));
+        
+        JLabel shippingInfo = new JLabel("Envío Gratis en Pedidos Superiores a $100");
+        shippingInfo.setForeground(Color.WHITE);
+        shippingInfo.setFont(new Font("Poppins", Font.PLAIN, 13));
+        
+        headerTopPanel.add(contactInfo);
+        headerTopPanel.add(Box.createHorizontalStrut(50));
+        headerTopPanel.add(shippingInfo);
+        
+        // No agregar al mainPanel, se agregará al headerContainer
+    }
+    
+    /**
+     * Crea el header principal con logo, navegación e iconos
+     */
+    private void crearHeaderMain() {
+        
+        headerMainPanel = new JPanel();
+        
+        headerMainPanel.setLayout(new BorderLayout(200, 0));
+        headerMainPanel.setBackground(Color.WHITE);
+        headerMainPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(240, 240, 240)),
+            new EmptyBorder(15, 50, 15, 50)
+        ));
+        headerMainPanel.setPreferredSize(new Dimension(Integer.MAX_VALUE, 80));
+        headerMainPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
+        
+        // Logo
+        JPanel logoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        logoPanel.setOpaque(false);
+        
+        // Cargar logo si existe
+        if (rutaLogo != null && !rutaLogo.isEmpty()) {
+            try {
+                String rutaAbsoluta = ConfigImagenes.obtenerRutaAbsoluta(rutaLogo);
+                File archivo = new File(rutaAbsoluta);
+                if (archivo.exists()) {
+                    ImageIcon icon = new ImageIcon(rutaAbsoluta);
+                    Image img = icon.getImage();
+                    Image imgEscalada = img.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+                    JLabel logoImage = new JLabel(new ImageIcon(imgEscalada));
+                    logoPanel.add(logoImage);
+                }
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error al cargar logo", e);
+            }
+        }
+        
+        JLabel logoLabel = new JLabel(nombreApp);
+        logoLabel.setFont(new Font("Playfair Display", Font.BOLD, 28));
+        logoLabel.setForeground(new Color(139, 69, 69));
+        logoLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        logoLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                scrollToTop();
+            }
+        });
+        logoPanel.add(logoLabel);
+        
+        // Navegación
+        JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 0));
+        navPanel.setOpaque(false);
+        
+        JLabel navInicio = crearNavLink("Inicio", e -> scrollToTop());
+        JLabel navTienda = crearNavLink("Tienda", e -> abrirTienda());
+        JLabel navMujer = crearNavLink("Mujer", e -> abrirCategoria("Mujer"));
+        JLabel navAccesorios = crearNavLink("Accesorios", e -> abrirCategoria("Accesorios"));
+        
+        navPanel.add(navInicio);
+        navPanel.add(navTienda);
+        navPanel.add(navMujer);
+        navPanel.add(navAccesorios);
+        
+        // Iconos del header
+        JPanel iconsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
+        iconsPanel.setOpaque(false);
+        
+        JLabel searchIcon = crearHeaderIcon("🔍", "Buscar", e -> mostrarBusqueda());
+        
+        // Icono de usuario con información si está logueado
+        JPanel userPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+        userPanel.setOpaque(false);
+        
+        if (isLoggedIn && username != null) {
+            // Mostrar nombre de usuario
+            JLabel userNameLabel = new JLabel(username);
+            userNameLabel.setFont(new Font("Poppins", Font.PLAIN, 12));
+            userNameLabel.setForeground(new Color(51, 51, 51));
+            userNameLabel.setBorder(new EmptyBorder(0, 0, 0, 5));
+            userPanel.add(userNameLabel);
+            
+            // Icono de usuario
+            JLabel userIcon = crearHeaderIcon("👤", "Mi Perfil", e -> manejarUsuario());
+            userPanel.add(userIcon);
+            
+            // Botón de cerrar sesión si es admin
+            if ("admin".equalsIgnoreCase(cargo)) {
+                JLabel adminBadge = new JLabel("⚙️");
+                adminBadge.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
+                adminBadge.setToolTipText("Administrador");
+                adminBadge.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                userPanel.add(adminBadge);
+            }
+            
+            // Botón cerrar sesión
+            JLabel logoutIcon = crearHeaderIcon("🚪", "Cerrar Sesión", e -> cerrarSesion());
+            userPanel.add(logoutIcon);
+        } else {
+            JLabel userIcon = crearHeaderIcon("👤", "Iniciar Sesión", e -> manejarUsuario());
+            userPanel.add(userIcon);
+        }
+        
+        JLabel cartIcon = crearHeaderIcon("🛒", "Carrito", e -> abrirCarrito());
+        
+        iconsPanel.add(searchIcon);
+        iconsPanel.add(userPanel);
+        iconsPanel.add(cartIcon);
+        
+        headerMainPanel.add(logoPanel, BorderLayout.WEST);
+        headerMainPanel.add(navPanel, BorderLayout.CENTER);
+        headerMainPanel.add(iconsPanel, BorderLayout.EAST);
+        
+        // No agregar al mainPanel, se agregará al headerContainer
+    }
+    
+    /**
+     * Crea un link de navegación
+     */
+    private JLabel crearNavLink(String texto, ActionListener action) {
+        JLabel link = new JLabel(texto);
+        link.setFont(new Font("Poppins", Font.PLAIN, 14));
+        link.setForeground(Color.BLACK);
+        link.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        link.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                action.actionPerformed(new ActionEvent(link, 0, ""));
+            }
+            
             @Override
             public void mouseEntered(MouseEvent e) {
-                panel.setBorder(new LineBorder(Color.BLUE, 2));
+                link.setForeground(COLOR_SECONDARY);
             }
             
             @Override
             public void mouseExited(MouseEvent e) {
-                panel.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
-            }
-            
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                mostrarProductosCategoria(categoriaId, nombreCategoria);
+                link.setForeground(Color.BLACK);
             }
         });
-        
-        panel.revalidate();
-        panel.repaint();
+        return link;
     }
     
     /**
-     * Obtiene la imagen de un producto de una categoría específica
+     * Crea un icono del header
      */
-    private String obtenerImagenCategoria(String categoria) {
+    private JLabel crearHeaderIcon(String icono, String tooltip, ActionListener action) {
+        JLabel icon = new JLabel(icono);
+        icon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20));
+        icon.setToolTipText(tooltip);
+        icon.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        icon.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                action.actionPerformed(new ActionEvent(icon, 0, ""));
+            }
+            
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                icon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 24));
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                icon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20));
+            }
+        });
+        return icon;
+    }
+    
+    /**
+     * Crea la sección Hero
+     */
+    private void crearHeroSection() {
+        heroPanel = new JPanel();
+        heroPanel.setLayout(new BorderLayout(40, 0));
+        heroPanel.setOpaque(false);
+        heroPanel.setBorder(new EmptyBorder(80, 50, 80, 50));
+        
+        // Texto del hero
+        JPanel textPanel = new JPanel();
+        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
+        textPanel.setOpaque(false);
+        
+        JLabel title = new JLabel("<html><div style='text-align: center;'>" +
+            "Descubre Tu <span style='color: #8b4a6b;'>Estilo Femenino Perfecto</span></div></html>");
+        title.setFont(new Font("Playfair Display", Font.BOLD, 48));
+        title.setForeground(Color.WHITE);
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        JLabel subtitle = new JLabel("<html><div style='text-align: center; width: 500px;'>" +
+            "Eleva tu guardarropa con nuestra colección exclusiva de moda femenina premium " +
+            "diseñada para empoderarte y hacerte brillar en cada ocasión.</div></html>");
+        subtitle.setFont(new Font("Poppins", Font.PLAIN, 16));
+        subtitle.setForeground(new Color(26, 26, 26));
+        subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+        subtitle.setBorder(new EmptyBorder(20, 0, 30, 0));
+        
+        JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
+        buttonsPanel.setOpaque(false);
+        
+        JButton btnComprar = crearBotonPrimario("Comprar Ahora", e -> abrirTienda());
+        buttonsPanel.add(btnComprar);
+        
+        if (isLoggedIn && "admin".equalsIgnoreCase(cargo)) {
+            JButton btnAdmin = crearBotonSecundario("⚙️ Panel Admin", e -> abrirPanelAdmin());
+            buttonsPanel.add(btnAdmin);
+        }
+        
+        textPanel.add(Box.createVerticalGlue());
+        textPanel.add(title);
+        textPanel.add(subtitle);
+        textPanel.add(buttonsPanel);
+        textPanel.add(Box.createVerticalGlue());
+        
+        // Imagen del hero
+        JLabel heroImage = new JLabel();
+        heroImage.setPreferredSize(new Dimension(400, 500));
+        heroImage.setMaximumSize(new Dimension(400, 500));
+        heroImage.setOpaque(true);
+        heroImage.setBackground(Color.WHITE);
+        heroImage.setHorizontalAlignment(JLabel.CENTER);
+        
+        // Intentar cargar imagen del hero desde complementos o usar placeholder
+        cargarImagenHero(heroImage);
+        
+        heroPanel.add(textPanel, BorderLayout.CENTER);
+        heroPanel.add(heroImage, BorderLayout.EAST);
+        
+        mainPanel.add(heroPanel);
+    }
+    
+    /**
+     * Crea un botón primario
+     */
+    private JButton crearBotonPrimario(String texto, ActionListener action) {
+        JButton btn = new JButton(texto);
+        btn.setFont(new Font("Poppins", Font.BOLD, 16));
+        btn.setForeground(Color.WHITE);
+        btn.setBackground(COLOR_PRIMARY);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setPreferredSize(new Dimension(180, 50));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.addActionListener(action);
+        
+        btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setBackground(COLOR_SECONDARY);
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(COLOR_PRIMARY);
+            }
+        });
+        
+        return btn;
+    }
+    
+    /**
+     * Crea un botón secundario
+     */
+    private JButton crearBotonSecundario(String texto, ActionListener action) {
+        JButton btn = new JButton(texto);
+        btn.setFont(new Font("Poppins", Font.BOLD, 16));
+        btn.setForeground(Color.WHITE);
+        btn.setBackground(COLOR_ACCENT);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setPreferredSize(new Dimension(180, 50));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.addActionListener(action);
+        
+        return btn;
+    }
+    
+    /**
+     * Crea la sección de Recién Llegados
+     */
+    private void crearRecienLlegadosSection() {
+        JPanel recienLlegadosPanel = new JPanel();
+        recienLlegadosPanel.setLayout(new BoxLayout(recienLlegadosPanel, BoxLayout.Y_AXIS));
+        recienLlegadosPanel.setBackground(new Color(248, 249, 250));
+        recienLlegadosPanel.setBorder(new EmptyBorder(60, 50, 60, 50));
+        
+        // Título con badge
+        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        titlePanel.setOpaque(false);
+        
+        JLabel badge = new JLabel("🆕");
+        badge.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 24));
+        
+        JLabel title = new JLabel("Recién Llegados");
+        title.setFont(new Font("Playfair Display", Font.BOLD, 36));
+        title.setForeground(new Color(51, 51, 51));
+        
+        titlePanel.add(badge);
+        titlePanel.add(title);
+        
+        JLabel subtitle = new JLabel("Descubre las últimas incorporaciones a nuestra colección");
+        subtitle.setFont(new Font("Poppins", Font.PLAIN, 14));
+        subtitle.setForeground(new Color(102, 102, 102));
+        subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+        subtitle.setBorder(new EmptyBorder(10, 0, 40, 0));
+        
+        // Panel de productos con scroll horizontal
+        JPanel productsContainer = new JPanel();
+        productsContainer.setLayout(new BoxLayout(productsContainer, BoxLayout.X_AXIS));
+        productsContainer.setOpaque(false);
+        productsContainer.setBorder(new EmptyBorder(0, 0, 20, 0));
+        
+        JScrollPane horizontalScroll = new JScrollPane(productsContainer);
+        horizontalScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        horizontalScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        horizontalScroll.setBorder(null);
+        horizontalScroll.setOpaque(false);
+        horizontalScroll.getViewport().setOpaque(false);
+        horizontalScroll.setPreferredSize(new Dimension(1200, 400));
+        horizontalScroll.setMaximumSize(new Dimension(1200, 400));
+        
+        // Cargar productos recién llegados
+        recienLlegadosProductsPanel = productsContainer;
+        cargarRecienLlegados();
+        
+        JButton verTodosBtn = crearBotonPrimario("Ver Todos los Recién Llegados", e -> abrirCategoria("Nuevas Llegadas"));
+        verTodosBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        recienLlegadosPanel.add(titlePanel);
+        recienLlegadosPanel.add(subtitle);
+        recienLlegadosPanel.add(horizontalScroll);
+        recienLlegadosPanel.add(Box.createVerticalStrut(20));
+        recienLlegadosPanel.add(verTodosBtn);
+        
+        mainPanel.add(recienLlegadosPanel);
+    }
+    
+    private JPanel recienLlegadosProductsPanel;
+    
+    /**
+     * Crea la sección de categorías con diseño mejorado
+     */
+    private void crearCategoriesSection() {
+        categoriesPanel = new JPanel();
+        categoriesPanel.setLayout(new BoxLayout(categoriesPanel, BoxLayout.Y_AXIS));
+        categoriesPanel.setBackground(Color.WHITE);
+        categoriesPanel.setBorder(new EmptyBorder(60, 50, 60, 50));
+        
+        JLabel title = new JLabel("Comprar por Categoría");
+        title.setFont(new Font("Playfair Display", Font.BOLD, 36));
+        title.setForeground(new Color(51, 51, 51));
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        title.setBorder(new EmptyBorder(0, 0, 10, 0));
+        
+        JLabel subtitle = new JLabel("Explora nuestras colecciones cuidadosamente seleccionadas");
+        subtitle.setFont(new Font("Poppins", Font.PLAIN, 14));
+        subtitle.setForeground(new Color(102, 102, 102));
+        subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+        subtitle.setBorder(new EmptyBorder(0, 0, 40, 0));
+        
+        JPanel gridPanel = new JPanel(new GridLayout(2, 2, 25, 25));
+        gridPanel.setOpaque(false);
+        gridPanel.setMaximumSize(new Dimension(1200, 550));
+        gridPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        // Crear cards de categorías mejorados
+        gridPanel.add(crearCategoryCardMejorado("Colección de Mujer", "Elegante y Moderna", "Mujer"));
+        gridPanel.add(crearCategoryCardMejorado("Nueva Colección", "Clásico y Moderno", "Nueva Colección"));
+        gridPanel.add(crearCategoryCardMejorado("Accesorios", "Completa Tu Look", "Accesorios"));
+        gridPanel.add(crearCategoryCardMejorado("Ofertas Especiales", "Ahorra hasta 50%", "Ofertas"));
+        
+        categoriesPanel.add(title);
+        categoriesPanel.add(subtitle);
+        categoriesPanel.add(gridPanel);
+        
+        mainPanel.add(categoriesPanel);
+    }
+    
+    /**
+     * Crea un card de categoría mejorado con mejor diseño
+     */
+    private JPanel crearCategoryCardMejorado(String titulo, String subtitulo, String categoria) {
+        JPanel card = new JPanel();
+        card.setLayout(new BorderLayout());
+        card.setBackground(Color.WHITE);
+        card.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(240, 240, 240), 1),
+            BorderFactory.createEmptyBorder(0, 0, 0, 0)
+        ));
+        card.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        card.setPreferredSize(new Dimension(300, 260));
+        card.setMaximumSize(new Dimension(300, 260));
+        
+        // Panel de imagen con overlay
+        JPanel imageContainer = new JPanel(new BorderLayout());
+        imageContainer.setPreferredSize(new Dimension(300, 180));
+        imageContainer.setMaximumSize(new Dimension(300, 180));
+        imageContainer.setOpaque(false);
+        
+        // Imagen de categoría
+        JLabel imageLabel = new JLabel();
+        imageLabel.setPreferredSize(new Dimension(300, 180));
+        imageLabel.setMaximumSize(new Dimension(300, 180));
+        imageLabel.setOpaque(true);
+        imageLabel.setBackground(Color.WHITE);
+        imageLabel.setHorizontalAlignment(JLabel.CENTER);
+        imageLabel.setVerticalAlignment(JLabel.CENTER);
+        
+        // Intentar cargar imagen de categoría desde productos o usar gradiente
+        cargarImagenCategoria(imageLabel, categoria);
+        
+        // Overlay con efecto hover
+        JPanel overlay = new JPanel();
+        overlay.setOpaque(false);
+        overlay.setBackground(new Color(0, 0, 0, 0));
+        overlay.setPreferredSize(new Dimension(300, 180));
+        overlay.setMaximumSize(new Dimension(300, 180));
+        
+        JLabel overlayText = new JLabel("Explorar →");
+        overlayText.setFont(new Font("Poppins", Font.BOLD, 14));
+        overlayText.setForeground(Color.WHITE);
+        overlayText.setHorizontalAlignment(JLabel.CENTER);
+        overlayText.setVerticalAlignment(JLabel.CENTER);
+        overlayText.setVisible(false);
+        overlay.add(overlayText);
+        
+        imageContainer.add(imageLabel, BorderLayout.CENTER);
+        imageContainer.add(overlay, BorderLayout.CENTER);
+        
+        // Info panel mejorado
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        infoPanel.setOpaque(false);
+        
+        JLabel titleLabel = new JLabel(titulo);
+        titleLabel.setFont(new Font("Playfair Display", Font.BOLD, 20));
+        titleLabel.setForeground(new Color(51, 51, 51));
+        
+        JLabel subtitleLabel = new JLabel(subtitulo);
+        subtitleLabel.setFont(new Font("Poppins", Font.PLAIN, 13));
+        subtitleLabel.setForeground(new Color(102, 102, 102));
+        subtitleLabel.setBorder(new EmptyBorder(5, 0, 0, 0));
+        
+        infoPanel.add(titleLabel);
+        infoPanel.add(subtitleLabel);
+        
+        card.add(imageContainer, BorderLayout.CENTER);
+        card.add(infoPanel, BorderLayout.SOUTH);
+        
+        card.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                abrirCategoria(categoria);
+            }
+            
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                card.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(COLOR_PRIMARY, 3),
+                    BorderFactory.createEmptyBorder(0, 0, 0, 0)
+                ));
+                overlay.setBackground(new Color(212, 165, 199, 200));
+                overlayText.setVisible(true);
+                card.setBackground(new Color(252, 252, 252));
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                card.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(240, 240, 240), 1),
+                    BorderFactory.createEmptyBorder(0, 0, 0, 0)
+                ));
+                overlay.setBackground(new Color(0, 0, 0, 0));
+                overlayText.setVisible(false);
+                card.setBackground(Color.WHITE);
+            }
+        });
+        
+        return card;
+    }
+    
+    /**
+     * Crea la sección de productos destacados
+     */
+    private void crearFeaturedProductsSection() {
+        featuredProductsPanel = new JPanel();
+        featuredProductsPanel.setLayout(new BoxLayout(featuredProductsPanel, BoxLayout.Y_AXIS));
+        featuredProductsPanel.setBackground(new Color(248, 249, 250));
+        featuredProductsPanel.setBorder(new EmptyBorder(60, 50, 60, 50));
+        
+        JLabel title = new JLabel("Productos Destacados");
+        title.setFont(new Font("Playfair Display", Font.BOLD, 36));
+        title.setForeground(new Color(51, 51, 51));
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        title.setBorder(new EmptyBorder(0, 0, 40, 0));
+        
+        JPanel gridPanel = new JPanel(new GridLayout(2, 4, 20, 20));
+        gridPanel.setOpaque(false);
+        gridPanel.setMaximumSize(new Dimension(1200, 600));
+        gridPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        // Los productos se cargarán dinámicamente
+        productosGridPanel = gridPanel;
+        
+        featuredProductsPanel.add(title);
+        featuredProductsPanel.add(gridPanel);
+        
+        JButton verTodosBtn = crearBotonPrimario("Ver Todos los Productos", e -> abrirTienda());
+        verTodosBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        verTodosBtn.setBorder(new EmptyBorder(30, 0, 0, 0));
+        featuredProductsPanel.add(verTodosBtn);
+        
+        mainPanel.add(featuredProductsPanel);
+    }
+    
+    private JPanel productosGridPanel;
+    
+    /**
+     * Crea la sección de newsletter
+     */
+    private void crearNewsletterSection() {
+        newsletterPanel = new JPanel();
+        newsletterPanel.setLayout(new BoxLayout(newsletterPanel, BoxLayout.Y_AXIS));
+        newsletterPanel.setBackground(new Color(102, 126, 234));
+        newsletterPanel.setBorder(new EmptyBorder(60, 50, 60, 50));
+        
+        JLabel title = new JLabel("Mantente a la Moda");
+        title.setFont(new Font("Playfair Display", Font.BOLD, 36));
+        title.setForeground(Color.WHITE);
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        JLabel subtitle = new JLabel("Suscríbete a nuestro boletín y obtén 20% de descuento en tu primera compra");
+        subtitle.setFont(new Font("Poppins", Font.PLAIN, 16));
+        subtitle.setForeground(Color.WHITE);
+        subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+        subtitle.setBorder(new EmptyBorder(15, 0, 30, 0));
+        
+        JPanel formPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        formPanel.setOpaque(false);
+        formPanel.setMaximumSize(new Dimension(500, 50));
+        formPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        JTextField emailField = new JTextField(25);
+        emailField.setFont(new Font("Poppins", Font.PLAIN, 14));
+        emailField.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(Color.WHITE, 2),
+            new EmptyBorder(10, 15, 10, 15)
+        ));
+        emailField.setPreferredSize(new Dimension(300, 45));
+        
+        JButton suscribirBtn = new JButton("Suscribirse");
+        suscribirBtn.setFont(new Font("Poppins", Font.BOLD, 14));
+        suscribirBtn.setForeground(new Color(102, 126, 234));
+        suscribirBtn.setBackground(Color.WHITE);
+        suscribirBtn.setBorderPainted(false);
+        suscribirBtn.setFocusPainted(false);
+        suscribirBtn.setPreferredSize(new Dimension(150, 45));
+        suscribirBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        suscribirBtn.addActionListener(e -> {
+            String email = emailField.getText().trim();
+            if (email.isEmpty() || !email.contains("@")) {
+                JOptionPane.showMessageDialog(this, "Por favor ingrese un email válido", 
+                    "Newsletter", JOptionPane.WARNING_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "¡Gracias por suscribirte!", 
+                    "Newsletter", JOptionPane.INFORMATION_MESSAGE);
+                emailField.setText("");
+            }
+        });
+        
+        formPanel.add(emailField);
+        formPanel.add(suscribirBtn);
+        
+        newsletterPanel.add(title);
+        newsletterPanel.add(subtitle);
+        newsletterPanel.add(formPanel);
+        
+        mainPanel.add(newsletterPanel);
+    }
+    
+    /**
+     * Crea el footer
+     */
+    private void crearFooter() {
+        footerPanel = new JPanel();
+        footerPanel.setLayout(new BoxLayout(footerPanel, BoxLayout.Y_AXIS));
+        footerPanel.setBackground(new Color(10, 10, 10));
+        footerPanel.setBorder(new EmptyBorder(50, 50, 20, 50));
+        
+        JPanel contentPanel = new JPanel(new GridLayout(1, 4, 30, 0));
+        contentPanel.setOpaque(false);
+        contentPanel.setMaximumSize(new Dimension(1200, Integer.MAX_VALUE));
+        
+        // Sección 1: Acerca de
+        JPanel section1 = crearFooterSection("Acerca de " + nombreApp,
+            "Tu destino premium para las últimas tendencias de moda femenina y clásicos atemporales.");
+        contentPanel.add(section1);
+        
+        // Sección 2: Enlaces Rápidos
+        JPanel section2 = crearFooterSection("Enlaces Rápidos", null);
+        section2.add(crearFooterLink("Sobre Nosotros"));
+        section2.add(crearFooterLink("Contacto"));
+        section2.add(crearFooterLink("Guía de Tallas"));
+        section2.add(crearFooterLink("Información de Envío"));
+        section2.add(crearFooterLink("Devoluciones"));
+        contentPanel.add(section2);
+        
+        // Sección 3: Categorías
+        JPanel section3 = crearFooterSection("Categorías", null);
+        section3.add(crearFooterLink("Mujer"));
+        section3.add(crearFooterLink("Accesorios"));
+        section3.add(crearFooterLink("Nuevos Llegados"));
+        section3.add(crearFooterLink("Ofertas"));
+        contentPanel.add(section3);
+        
+        // Sección 4: Atención al Cliente
+        JPanel section4 = crearFooterSection("Atención al Cliente", null);
+        section4.add(crearFooterLink("Rastrear Pedido"));
+        section4.add(crearFooterLink("Preguntas Frecuentes"));
+        section4.add(crearFooterLink("Métodos de Pago"));
+        section4.add(crearFooterLink("Tarjetas de Regalo"));
+        contentPanel.add(section4);
+        
+        footerPanel.add(contentPanel);
+        
+        // Footer bottom
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        bottomPanel.setOpaque(false);
+        bottomPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(255, 255, 255, 25)));
+        bottomPanel.setBorder(new EmptyBorder(20, 0, 0, 0));
+        
+        JLabel copyright = new JLabel("© 2025 " + nombreApp + ". Todos los derechos reservados.");
+        copyright.setFont(new Font("Poppins", Font.PLAIN, 12));
+        copyright.setForeground(new Color(224, 224, 224));
+        
+        bottomPanel.add(copyright);
+        
+        footerPanel.add(Box.createVerticalStrut(20));
+        footerPanel.add(bottomPanel);
+        
+        mainPanel.add(footerPanel);
+    }
+    
+    /**
+     * Crea una sección del footer
+     */
+    private JPanel crearFooterSection(String titulo, String descripcion) {
+        JPanel section = new JPanel();
+        section.setLayout(new BoxLayout(section, BoxLayout.Y_AXIS));
+        section.setOpaque(false);
+        section.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        JLabel title = new JLabel(titulo);
+        title.setFont(new Font("Playfair Display", Font.BOLD, 18));
+        title.setForeground(Color.WHITE);
+        title.setBorder(new EmptyBorder(0, 0, 15, 0));
+        
+        section.add(title);
+        
+        if (descripcion != null) {
+            JLabel desc = new JLabel("<html><div style='width: 200px;'>" + descripcion + "</div></html>");
+            desc.setFont(new Font("Poppins", Font.PLAIN, 12));
+            desc.setForeground(new Color(224, 224, 224));
+            desc.setBorder(new EmptyBorder(0, 0, 15, 0));
+            section.add(desc);
+        }
+        
+        return section;
+    }
+    
+    /**
+     * Crea un link del footer
+     */
+    private JLabel crearFooterLink(String texto) {
+        JLabel link = new JLabel(texto);
+        link.setFont(new Font("Poppins", Font.PLAIN, 12));
+        link.setForeground(new Color(224, 224, 224));
+        link.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        link.setBorder(new EmptyBorder(5, 0, 5, 0));
+        
+        link.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Acción según el link
+            }
+            
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                link.setForeground(COLOR_PRIMARY);
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                link.setForeground(new Color(224, 224, 224));
+            }
+        });
+        
+        return link;
+    }
+    
+    /**
+     * Carga los complementos desde la base de datos
+     */
+    private void cargarComplementos() {
         try (Connection conn = Conexion.getConnection()) {
-            String query = "SELECT ImgUrl FROM tb_productos WHERE Categorias LIKE ? LIMIT 1";
-            PreparedStatement pstmt = conn.prepareStatement(query);
-           
-            pstmt.setString(1, "%" + categoria + "%");
+            String sql = "SELECT * FROM tb_complementos ORDER BY id DESC LIMIT 1";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
             
             if (rs.next()) {
+                String nombre = rs.getString("NombreDeApp");
+                String correo = rs.getString("CorreoApp");
+                String fondo = rs.getString("fondoPrincipal");
+                String logo = rs.getString("Logo");
                 
-                return rs.getString("ImgUrl");
-                
+                if (nombre != null && !nombre.isEmpty()) {
+                    nombreApp = nombre;
+                }
+                if (correo != null && !correo.isEmpty()) {
+                    correoApp = correo;
+                }
+                if (fondo != null && !fondo.isEmpty()) {
+                    rutaFondoPrincipal = fondo;
+                }
+                if (logo != null && !logo.isEmpty()) {
+                    rutaLogo = logo;
+                }
             }
         } catch (SQLException e) {
-            System.err.println("Error al obtener imagen de categoría: " + e.getMessage());
+            ErrorHandler.logWarning("Error al cargar complementos", e);
         }
-        return null;
     }
     
     /**
-     * Carga productos aleatorios
+     * Carga los datos (productos, categorías, etc.)
      */
-    private void cargarProductosAleatorios() {
-        List<Producto> productos = obtenerProductosAleatorios(5);
+    private void cargarDatos() {
+        cargarProductosDestacados();
+        // cargarRecienLlegados se llama desde crearRecienLlegadosSection
+    }
+    
+    /**
+     * Carga los productos recién llegados
+     */
+    private void cargarRecienLlegados() {
+        if (recienLlegadosProductsPanel == null) return;
         
-        if (productos.size() > 0) configurarPanelProducto(jProductoAletorio1Panel, productos.get(0));
-        if (productos.size() > 1) configurarPanelProducto(jProductoAletorio2Panel, productos.get(1));
-        if (productos.size() > 2) configurarPanelProducto(jProductoAletorio3Panel, productos.get(2));
-        if (productos.size() > 3) configurarPanelProducto(jProductoAletorio4Panel, productos.get(3));
-        if (productos.size() > 4) configurarPanelProducto(jProductoAletorio5Panel, productos.get(4));
-    }
-    
-    /**
-     * Obtiene productos aleatorios de la base de datos
-     */
-    private List<Producto> obtenerProductosAleatorios(int cantidad) {
-        List<Producto> productos = new ArrayList<>();
+        recienLlegadosProductsPanel.removeAll();
         
         try (Connection conn = Conexion.getConnection()) {
-            String query = "SELECT * FROM tb_productos ORDER BY RAND() LIMIT ?";
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setInt(1, cantidad);
+            String sql = """
+                SELECT p.*, 
+                       (SELECT SUM(cantidad) FROM tb_inventario WHERE id_producto = p.id) as total_cantidad,
+                       (SELECT AVG(precio) FROM tb_inventario WHERE id_producto = p.id) as precio_promedio
+                FROM tb_productos p 
+                WHERE p.estado = 'vigente'
+                ORDER BY p.FecheIngreso DESC, p.id DESC
+                LIMIT 10
+                """;
+            
+            PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
             
-            while (rs.next()) {
-                Producto p = new Producto();
-                p.setId(rs.getInt("id"));
-                p.setNombre(rs.getString("Nombre"));
-                p.setImgUrl(rs.getString("ImgUrl"));
-                p.setPrecio(rs.getDouble("Precio"));
-                p.setColor(rs.getString("Color"));
-                p.setTalla(rs.getString("Talla"));
-                p.setCantidad(rs.getInt("Cantidad"));
-                productos.add(p);
+            int count = 0;
+            while (rs.next() && count < 10) {
+                UI.Producto producto = new UI.Producto();
+                producto.setId(rs.getInt("id"));
+                producto.setNombre(rs.getString("Nombre"));
+                producto.setImgUrl(rs.getString("ImgUrl"));
+                producto.setPrecio(rs.getDouble("precio_promedio"));
+                producto.setCategorias(rs.getString("Categorias"));
+                producto.setCantidad(rs.getInt("total_cantidad"));
+                
+                recienLlegadosProductsPanel.add(Box.createHorizontalStrut(15));
+                recienLlegadosProductsPanel.add(crearProductCardRecienLlegado(producto));
+                count++;
             }
+            
+            if (count == 0) {
+                JLabel noProducts = new JLabel("<html><div style='text-align: center; padding: 50px; color: #999;'>" +
+                    "No hay productos recién llegados</div></html>");
+                noProducts.setHorizontalAlignment(JLabel.CENTER);
+                recienLlegadosProductsPanel.add(noProducts);
+            }
+            
         } catch (SQLException e) {
-            System.err.println("Error al obtener productos aleatorios: " + e.getMessage());
+            ErrorHandler.logWarning("Error al cargar productos recién llegados", e);
+            JLabel errorLabel = new JLabel("<html><div style='text-align: center; padding: 50px; color: #999;'>" +
+                "Error al cargar productos</div></html>");
+            errorLabel.setHorizontalAlignment(JLabel.CENTER);
+            recienLlegadosProductsPanel.add(errorLabel);
         }
         
-        return productos;
+        recienLlegadosProductsPanel.revalidate();
+        recienLlegadosProductsPanel.repaint();
     }
     
     /**
-     * Configura un panel de producto con toda la información
+     * Crea un card de producto para la sección de recién llegados
      */
-    private void configurarPanelProducto(JPanel panel, Producto producto) {
-        if (producto == null) return;
+    private JPanel crearProductCardRecienLlegado(UI.Producto producto) {
+        JPanel card = new JPanel();
+        card.setLayout(new BorderLayout());
+        card.setBackground(Color.WHITE);
+        card.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(240, 240, 240), 1),
+            BorderFactory.createEmptyBorder(0, 0, 0, 0)
+        ));
+        card.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        card.setPreferredSize(new Dimension(240, 350));
+        card.setMaximumSize(new Dimension(240, 350));
         
-        panel.removeAll();
-        panel.setLayout(new BorderLayout());
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
+        // Panel de imagen con badge "NUEVO"
+        JPanel imageContainer = new JPanel(new BorderLayout());
+        imageContainer.setPreferredSize(new Dimension(240, 240));
+        imageContainer.setMaximumSize(new Dimension(240, 240));
+        imageContainer.setOpaque(false);
         
-        // Panel principal con BoxLayout para organizar verticalmente
-        JPanel contenido = new JPanel();
-        contenido.setLayout(new BoxLayout(contenido, BoxLayout.Y_AXIS));
-        contenido.setBackground(Color.WHITE);
+        // Badge "NUEVO"
+        JLabel badge = new JLabel("NUEVO");
+        badge.setFont(new Font("Poppins", Font.BOLD, 10));
+        badge.setForeground(Color.WHITE);
+        badge.setBackground(new Color(255, 107, 107));
+        badge.setOpaque(true);
+        badge.setBorder(new EmptyBorder(4, 8, 4, 8));
+        badge.setHorizontalAlignment(JLabel.CENTER);
+        badge.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         // Imagen del producto
-        ImageIcon imagen = null;
+        JLabel imageLabel = new JLabel();
+        imageLabel.setPreferredSize(new Dimension(240, 240));
+        imageLabel.setMaximumSize(new Dimension(240, 240));
+        imageLabel.setOpaque(true);
+        imageLabel.setBackground(Color.WHITE);
+        imageLabel.setHorizontalAlignment(JLabel.CENTER);
+        imageLabel.setVerticalAlignment(JLabel.CENTER);
+        
+        // Cargar imagen
         if (producto.getImgUrl() != null && !producto.getImgUrl().isEmpty()) {
-            imagen = ConfigImagenes.cargarImagenEscalada(producto.getImgUrl(), 180, 120);
-        }
-        
-        if (imagen != null) {
-            JLabel lblImagen = new JLabel(imagen);
-            lblImagen.setAlignmentX(Component.CENTER_ALIGNMENT);
-            contenido.add(lblImagen);
+            try {
+                String rutaAbsoluta = ConfigImagenes.obtenerRutaAbsoluta(producto.getImgUrl());
+                File archivo = new File(rutaAbsoluta);
+                if (archivo.exists()) {
+                    ImageIcon icon = new ImageIcon(rutaAbsoluta);
+                    Image img = icon.getImage();
+                    Image imgEscalada = img.getScaledInstance(240, 240, Image.SCALE_SMOOTH);
+                    imageLabel.setIcon(new ImageIcon(imgEscalada));
+                    imageLabel.setText("");
+                } else {
+                    ImageIcon icon = ConfigImagenes.cargarImagenEscalada(producto.getImgUrl(), 240, 240);
+                    if (icon != null) {
+                        imageLabel.setIcon(icon);
+                        imageLabel.setText("");
+                    } else {
+                        imageLabel.setText("<html><div style='text-align: center; padding-top: 100px; color: #999;'>" +
+                            "Sin imagen</div></html>");
+                    }
+                }
+            } catch (Exception e) {
+                imageLabel.setText("<html><div style='text-align: center; padding-top: 100px; color: #999;'>" +
+                    "Sin imagen</div></html>");
+            }
         } else {
-            JLabel lblNoImagen = new JLabel("Sin imagen");
-            lblNoImagen.setAlignmentX(Component.CENTER_ALIGNMENT);
-            lblNoImagen.setPreferredSize(new Dimension(180, 120));
-            lblNoImagen.setHorizontalAlignment(SwingConstants.CENTER);
-            lblNoImagen.setBackground(new Color(240, 240, 240));
-            lblNoImagen.setOpaque(true);
-            contenido.add(lblNoImagen);
+            imageLabel.setText("<html><div style='text-align: center; padding-top: 100px; color: #999;'>" +
+                "Sin imagen</div></html>");
         }
         
-        // Espacio
-        contenido.add(Box.createRigidArea(new Dimension(0, 5)));
+        // Panel para el badge (arriba a la izquierda)
+        JPanel badgePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        badgePanel.setOpaque(false);
+        badgePanel.add(badge);
         
-        // Nombre del producto
-        JLabel lblNombre = new JLabel(producto.getNombre());
-        lblNombre.setFont(new Font("Arial", Font.BOLD, 12));
-        lblNombre.setAlignmentX(Component.CENTER_ALIGNMENT);
-        contenido.add(lblNombre);
+        imageContainer.add(badgePanel, BorderLayout.NORTH);
+        imageContainer.add(imageLabel, BorderLayout.CENTER);
         
-        // Precio
-        JLabel lblPrecio = new JLabel("$" + String.format("%.2f", producto.getPrecio()));
-        lblPrecio.setFont(new Font("Arial", Font.BOLD, 14));
-        lblPrecio.setForeground(new Color(0, 100, 0));
-        lblPrecio.setAlignmentX(Component.CENTER_ALIGNMENT);
-        contenido.add(lblPrecio);
+        // Info del producto
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setBorder(new EmptyBorder(15, 15, 15, 15));
+        infoPanel.setOpaque(false);
         
-        // Color y Talla
-        JLabel lblDetalles = new JLabel(
-            "<html><center>Color: " + (producto.getColor() != null ? producto.getColor() : "N/A") + 
-            "<br>Talla: " + (producto.getTalla() != null ? producto.getTalla() : "N/A") + "</center></html>"
-        );
-        lblDetalles.setFont(new Font("Arial", Font.PLAIN, 10));
-        lblDetalles.setAlignmentX(Component.CENTER_ALIGNMENT);
-        contenido.add(lblDetalles);
+        JLabel nameLabel = new JLabel(producto.getNombre() != null ? producto.getNombre() : "Sin nombre");
+        nameLabel.setFont(new Font("Poppins", Font.BOLD, 13));
+        nameLabel.setForeground(new Color(51, 51, 51));
         
-        // Espacio
-        contenido.add(Box.createRigidArea(new Dimension(0, 5)));
+        JLabel priceLabel = new JLabel("$" + String.format("%.2f", producto.getPrecio()));
+        priceLabel.setFont(new Font("Poppins", Font.BOLD, 15));
+        priceLabel.setForeground(COLOR_PRIMARY);
+        priceLabel.setBorder(new EmptyBorder(5, 0, 0, 0));
         
-        // Botón Ver Detalles
-        JButton btnVer = new JButton("Ver Detalles");
-        btnVer.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnVer.setFont(new Font("Arial", Font.PLAIN, 11));
-        btnVer.addActionListener(e -> mostrarDetallesProducto(producto));
-        contenido.add(btnVer);
+        infoPanel.add(nameLabel);
+        infoPanel.add(priceLabel);
         
-        panel.add(contenido, BorderLayout.CENTER);
+        card.add(imageContainer, BorderLayout.CENTER);
+        card.add(infoPanel, BorderLayout.SOUTH);
         
-        // Efecto hover
-        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        panel.addMouseListener(new MouseAdapter() {
+        card.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                mostrarDetallesProducto(producto);
+            }
+            
             @Override
             public void mouseEntered(MouseEvent e) {
-                panel.setBorder(new LineBorder(Color.BLUE, 2));
+                card.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(COLOR_PRIMARY, 2),
+                    BorderFactory.createEmptyBorder(0, 0, 0, 0)
+                ));
+                card.setBackground(new Color(252, 252, 252));
             }
             
             @Override
             public void mouseExited(MouseEvent e) {
-                panel.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
+                card.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(240, 240, 240), 1),
+                    BorderFactory.createEmptyBorder(0, 0, 0, 0)
+                ));
+                card.setBackground(Color.WHITE);
             }
         });
         
-        panel.revalidate();
-        panel.repaint();
+        return card;
     }
     
     /**
-     * Carga productos con mayor cantidad
+     * Carga los productos destacados
      */
-    private void cargarProductosConMayorCantidad() {
-        List<Producto> productos = obtenerProductosConMayorCantidad(4);
-        
-        if (productos.size() > 0) configurarPanelProducto(jProductosConMayorCantidadPanel, productos.get(0));
-        if (productos.size() > 1) configurarPanelProducto(jProductosConMayorCantidad2Panel, productos.get(1));
-        if (productos.size() > 2) configurarPanelProducto(jProductosConMayorCantidad3Panel, productos.get(2));
-        if (productos.size() > 3) configurarPanelProducto(jProductosConMayorCantidad4Panel, productos.get(3));
-    }
-    
-    /**
-     * Obtiene productos con mayor cantidad en stock
-     */
-    private List<Producto> obtenerProductosConMayorCantidad(int limite) {
-        List<Producto> productos = new ArrayList<>();
+    private void cargarProductosDestacados() {
+        productosGridPanel.removeAll();
         
         try (Connection conn = Conexion.getConnection()) {
-            String query = "SELECT * FROM tb_productos ORDER BY Cantidad DESC LIMIT ?";
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setInt(1, limite);
+            String sql = """
+                SELECT p.*, 
+                       (SELECT SUM(cantidad) FROM tb_inventario WHERE id_producto = p.id) as total_cantidad,
+                       (SELECT AVG(precio) FROM tb_inventario WHERE id_producto = p.id) as precio_promedio
+                FROM tb_productos p 
+                WHERE p.estado = 'vigente'
+                ORDER BY p.FecheIngreso DESC
+                LIMIT 8
+                """;
+            
+            PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
             
-            while (rs.next()) {
-                Producto p = new Producto();
-                p.setId(rs.getInt("id"));
-                p.setNombre(rs.getString("Nombre"));
-                p.setImgUrl(rs.getString("ImgUrl"));
-                p.setPrecio(rs.getDouble("Precio"));
-                p.setColor(rs.getString("Color"));
-                p.setTalla(rs.getString("Talla"));
-                p.setCantidad(rs.getInt("Cantidad"));
-                productos.add(p);
+            int count = 0;
+            while (rs.next() && count < 8) {
+                UI.Producto producto = new UI.Producto();
+                producto.setId(rs.getInt("id"));
+                producto.setNombre(rs.getString("Nombre"));
+                producto.setImgUrl(rs.getString("ImgUrl"));
+                producto.setPrecio(rs.getDouble("precio_promedio"));
+                producto.setCategorias(rs.getString("Categorias"));
+                producto.setCantidad(rs.getInt("total_cantidad"));
+                
+                productosGridPanel.add(crearProductCard(producto));
+                count++;
             }
+            
+            // Rellenar con placeholders si hay menos de 8 productos
+            while (count < 8) {
+                productosGridPanel.add(crearProductCardPlaceholder());
+                count++;
+            }
+            
         } catch (SQLException e) {
-            System.err.println("Error al obtener productos con mayor cantidad: " + e.getMessage());
+            ErrorHandler.logWarning("Error al cargar productos destacados", e);
+            // Agregar placeholders en caso de error
+            for (int i = 0; i < 8; i++) {
+                productosGridPanel.add(crearProductCardPlaceholder());
+            }
         }
         
-        return productos;
+        productosGridPanel.revalidate();
+        productosGridPanel.repaint();
     }
     
     /**
-     * Carga la imagen principal
+     * Crea un card de producto
      */
-    private void cargarImagenPrincipal() {
-        // Intentar cargar una imagen destacada
+    private JPanel crearProductCard(UI.Producto producto) {
+        JPanel card = new JPanel();
+        card.setLayout(new BorderLayout());
+        card.setBackground(Color.WHITE);
+        card.setBorder(BorderFactory.createLineBorder(new Color(240, 240, 240), 1));
+        card.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        card.setPreferredSize(new Dimension(280, 350));
+        card.setMaximumSize(new Dimension(280, 350));
+        
+        // Imagen del producto
+        JLabel imageLabel = new JLabel();
+        imageLabel.setPreferredSize(new Dimension(280, 280));
+        imageLabel.setMaximumSize(new Dimension(280, 280));
+        imageLabel.setOpaque(true);
+        imageLabel.setBackground(Color.WHITE);
+        imageLabel.setHorizontalAlignment(JLabel.CENTER);
+        
+        // Cargar imagen del producto
+        if (producto.getImgUrl() != null && !producto.getImgUrl().isEmpty()) {
+            try {
+                String rutaAbsoluta = ConfigImagenes.obtenerRutaAbsoluta(producto.getImgUrl());
+                File archivo = new File(rutaAbsoluta);
+                if (archivo.exists()) {
+                    ImageIcon icon = new ImageIcon(rutaAbsoluta);
+                    Image img = icon.getImage();
+                    Image imgEscalada = img.getScaledInstance(280, 280, Image.SCALE_SMOOTH);
+                    imageLabel.setIcon(new ImageIcon(imgEscalada));
+                    imageLabel.setText("");
+                } else {
+                    // Intentar cargar con método alternativo
+                    ImageIcon icon = ConfigImagenes.cargarImagenEscalada(producto.getImgUrl(), 280, 280);
+                    if (icon != null) {
+                        imageLabel.setIcon(icon);
+                        imageLabel.setText("");
+                    } else {
+                        imageLabel.setText("<html><div style='text-align: center; padding-top: 120px; color: #999;'>" +
+                            "Sin imagen</div></html>");
+                    }
+                }
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error al cargar imagen de producto: " + producto.getNombre(), e);
+                imageLabel.setText("<html><div style='text-align: center; padding-top: 120px; color: #999;'>" +
+                    "Sin imagen</div></html>");
+            }
+        } else {
+            imageLabel.setText("<html><div style='text-align: center; padding-top: 120px; color: #999;'>" +
+                "Sin imagen</div></html>");
+        }
+        
+        // Info del producto
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setBorder(new EmptyBorder(15, 15, 15, 15));
+        infoPanel.setOpaque(false);
+        
+        JLabel nameLabel = new JLabel(producto.getNombre() != null ? producto.getNombre() : "Sin nombre");
+        nameLabel.setFont(new Font("Poppins", Font.BOLD, 14));
+        nameLabel.setForeground(new Color(51, 51, 51));
+        
+        JLabel priceLabel = new JLabel("$" + String.format("%.2f", producto.getPrecio()));
+        priceLabel.setFont(new Font("Poppins", Font.BOLD, 16));
+        priceLabel.setForeground(new Color(51, 51, 51));
+        
+        JLabel categoryLabel = new JLabel(producto.getCategorias() != null ? producto.getCategorias() : "");
+        categoryLabel.setFont(new Font("Poppins", Font.PLAIN, 11));
+        categoryLabel.setForeground(new Color(102, 102, 102));
+        
+        infoPanel.add(nameLabel);
+        infoPanel.add(Box.createVerticalStrut(5));
+        infoPanel.add(priceLabel);
+        infoPanel.add(Box.createVerticalStrut(3));
+        infoPanel.add(categoryLabel);
+        
+        card.add(imageLabel, BorderLayout.CENTER);
+        card.add(infoPanel, BorderLayout.SOUTH);
+        
+        card.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                mostrarDetallesProducto(producto);
+            }
+            
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                card.setBorder(BorderFactory.createLineBorder(COLOR_PRIMARY, 2));
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                card.setBorder(BorderFactory.createLineBorder(new Color(240, 240, 240), 1));
+            }
+        });
+        
+        return card;
+    }
+    
+    /**
+     * Crea un placeholder para producto
+     */
+    private JPanel crearProductCardPlaceholder() {
+        JPanel card = new JPanel();
+        card.setLayout(new BorderLayout());
+        card.setBackground(Color.WHITE);
+        card.setBorder(BorderFactory.createLineBorder(new Color(240, 240, 240), 1));
+        card.setPreferredSize(new Dimension(280, 350));
+        card.setMaximumSize(new Dimension(280, 350));
+        
+        JLabel placeholder = new JLabel("<html><div style='text-align: center; padding-top: 150px; color: #999;'>" +
+            "Producto<br/>No disponible</div></html>");
+        placeholder.setHorizontalAlignment(JLabel.CENTER);
+        placeholder.setOpaque(true);
+        placeholder.setBackground(Color.WHITE);
+        
+        card.add(placeholder, BorderLayout.CENTER);
+        return card;
+    }
+    
+    // ========== MÉTODOS DE NAVEGACIÓN ==========
+    
+    private void scrollToTop() {
+        SwingUtilities.invokeLater(() -> {
+            scrollPane.getVerticalScrollBar().setValue(0);
+        });
+    }
+    
+    private void abrirTienda() {
+        this.dispose();
+        new Categorias(userId, "").setVisible(true);
+    }
+    
+    private void abrirCategoria(String categoria) {
+        this.dispose();
+        new Categorias(userId, categoria).setVisible(true);
+    }
+    
+    private void mostrarBusqueda() {
+        String busqueda = JOptionPane.showInputDialog(this, "Ingrese su búsqueda:", "Buscar Productos", 
+            JOptionPane.QUESTION_MESSAGE);
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            this.dispose();
+            new Categorias(userId, busqueda.trim()).setVisible(true);
+        }
+    }
+    
+    private void manejarUsuario() {
+        if (isLoggedIn) {
+            // Abrir perfil
+            JOptionPane.showMessageDialog(this, "Funcionalidad de perfil en desarrollo", 
+                "Perfil", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            // Abrir login
+            this.dispose();
+            new Inicio().setVisible(true);
+        }
+    }
+    
+    private void abrirCarrito() {
+        JOptionPane.showMessageDialog(this, "Funcionalidad de carrito en desarrollo", 
+            "Carrito", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    private void abrirPanelAdmin() {
+        if (isLoggedIn && "admin".equalsIgnoreCase(cargo)) {
+            this.dispose();
+            try {
+                UX.Usuario adminPanel = new UX.Usuario(userId, username);
+                adminPanel.setVisible(true);
+            } catch (Exception e) {
+                ErrorHandler.logWarning("Error al abrir panel admin", e);
+            }
+        }
+    }
+    
+    private void mostrarDetallesProducto(UI.Producto producto) {
+        this.dispose();
+        new DetalleProducto(userId, producto).setVisible(true);
+    }
+    
+    /**
+     * Carga la imagen del hero desde complementos o usa placeholder
+     */
+    private void cargarImagenHero(JLabel heroImage) {
         try {
-            String rutaImagen = "Z-Global-Img/banner-principal.jpg"; // Ajusta según tu imagen
-            ImageIcon imagen = ConfigImagenes.cargarImagenEscalada(rutaImagen, 450, 120);
-            if (imagen != null) {
-                // Quitar el texto si hay imagen
+            // Intentar cargar imagen de fondo principal desde complementos
+            if (rutaFondoPrincipal != null && !rutaFondoPrincipal.isEmpty()) {
+                String rutaAbsoluta = ConfigImagenes.obtenerRutaAbsoluta(rutaFondoPrincipal);
+                File archivo = new File(rutaAbsoluta);
+                if (archivo.exists()) {
+                    ImageIcon icon = new ImageIcon(rutaAbsoluta);
+                    Image img = icon.getImage();
+                    Image imgEscalada = img.getScaledInstance(400, 500, Image.SCALE_SMOOTH);
+                    heroImage.setIcon(new ImageIcon(imgEscalada));
+                    heroImage.setText("");
+                    return;
+                }
             }
+            
+            // Si no hay imagen, buscar una imagen de producto destacado
+            try (Connection conn = Conexion.getConnection()) {
+                String sql = """
+                    SELECT ImgUrl FROM tb_productos 
+                    WHERE estado = 'vigente' AND ImgUrl IS NOT NULL AND ImgUrl != ''
+                    ORDER BY FecheIngreso DESC LIMIT 1
+                    """;
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery();
+                
+                if (rs.next()) {
+                    String imgUrl = rs.getString("ImgUrl");
+                    String rutaAbsoluta = ConfigImagenes.obtenerRutaAbsoluta(imgUrl);
+                    File archivo = new File(rutaAbsoluta);
+                    if (archivo.exists()) {
+                        ImageIcon icon = new ImageIcon(rutaAbsoluta);
+                    Image img = icon.getImage();
+                    Image imgEscalada = img.getScaledInstance(400, 500, Image.SCALE_SMOOTH);
+                    heroImage.setIcon(new ImageIcon(imgEscalada));
+                        heroImage.setText("");
+                        return;
+                    }
+                }
+            } catch (SQLException e) {
+                logger.log(Level.WARNING, "Error al cargar imagen hero desde BD", e);
+            }
+            
+            // Placeholder si no hay imagen
+            heroImage.setText("<html><div style='text-align: center; padding-top: 220px; color: #999;'>" +
+                "Imagen Hero<br/>400x500</div></html>");
         } catch (Exception e) {
-            System.err.println("No se pudo cargar la imagen principal: " + e.getMessage());
+            logger.log(Level.WARNING, "Error al cargar imagen hero", e);
+            heroImage.setText("<html><div style='text-align: center; padding-top: 220px; color: #999;'>" +
+                "Imagen Hero<br/>400x500</div></html>");
         }
     }
     
     /**
-     * Muestra los detalles de un producto
+     * Carga imagen de categoría desde productos o usa gradiente
      */
-    private void mostrarDetallesProducto(Producto producto) {
-        String mensaje = String.format(
-            "Producto: %s\n" +
-            "Precio: $%.2f\n" +
-            "Color: %s\n" +
-            "Talla: %s\n" +
-            "Stock disponible: %d unidades",
-            producto.getNombre(),
-            producto.getPrecio(),
-            producto.getColor() != null ? producto.getColor() : "N/A",
-            producto.getTalla() != null ? producto.getTalla() : "N/A",
-            producto.getCantidad()
-        );
-        
-        JOptionPane.showMessageDialog(this, mensaje, 
-            "Detalles del Producto", JOptionPane.INFORMATION_MESSAGE);
+    private void cargarImagenCategoria(JLabel imageLabel, String categoria) {
+        try {
+            // Buscar una imagen de producto de esta categoría
+            try (Connection conn = Conexion.getConnection()) {
+                String sql = """
+                    SELECT ImgUrl FROM tb_productos 
+                    WHERE estado = 'vigente' 
+                    AND (Categorias LIKE ? OR Categorias = ?)
+                    AND ImgUrl IS NOT NULL AND ImgUrl != ''
+                    ORDER BY FecheIngreso DESC LIMIT 1
+                    """;
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, "%" + categoria + "%");
+                pstmt.setString(2, categoria);
+                ResultSet rs = pstmt.executeQuery();
+                
+                if (rs.next()) {
+                    String imgUrl = rs.getString("ImgUrl");
+                    String rutaAbsoluta = ConfigImagenes.obtenerRutaAbsoluta(imgUrl);
+                    File archivo = new File(rutaAbsoluta);
+                    if (archivo.exists()) {
+                        ImageIcon icon = new ImageIcon(rutaAbsoluta);
+                    Image img = icon.getImage();
+                    Image imgEscalada = img.getScaledInstance(300, 180, Image.SCALE_SMOOTH);
+                    imageLabel.setIcon(new ImageIcon(imgEscalada));
+                        imageLabel.setText("");
+                        return;
+                    }
+                }
+            } catch (SQLException e) {
+                logger.log(Level.WARNING, "Error al cargar imagen de categoría", e);
+            }
+            
+            // Si no hay imagen, usar texto sobre fondo blanco
+            imageLabel.setText("<html><div style='text-align: center; padding-top: 60px; color: #666; font-size: 18px; font-weight: bold;'>" +
+                categoria + "</div></html>");
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Error al cargar imagen de categoría", e);
+            imageLabel.setText("<html><div style='text-align: center; padding-top: 60px; color: #666; font-size: 18px; font-weight: bold;'>" +
+                categoria + "</div></html>");
+        }
     }
     
     /**
-     * Muestra productos de una categoría específica
+     * Cierra la sesión del usuario
      */
-    private void mostrarProductosCategoria(String categoriaId, String nombreCategoria) {
-        JOptionPane.showMessageDialog(this, 
-            "Mostrando productos de la categoría: " + nombreCategoria,
-            "Categoría", 
-            JOptionPane.INFORMATION_MESSAGE);
-        // Aquí puedes abrir una nueva ventana con los productos de esa categoría
-    }
-    
-    // Clase interna para manejar productos
-    private class Producto {
-        private int id;
-        private String nombre;
-        private String imgUrl;
-        private double precio;
-        private String color;
-        private String talla;
-        private int cantidad;
+    private void cerrarSesion() {
+        int respuesta = JOptionPane.showConfirmDialog(
+            this,
+            "¿Está seguro que desea cerrar sesión?",
+            "Cerrar Sesión",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
+        );
         
-        // Getters y Setters
-        public int getId() { return id; }
-        public void setId(int id) { this.id = id; }
-        
-        public String getNombre() { return nombre; }
-        public void setNombre(String nombre) { this.nombre = nombre; }
-        
-        public String getImgUrl() { return imgUrl; }
-        public void setImgUrl(String imgUrl) { this.imgUrl = imgUrl; }
-        
-        public double getPrecio() { return precio; }
-        public void setPrecio(double precio) { this.precio = precio; }
-        
-        public String getColor() { return color; }
-        public void setColor(String color) { this.color = color; }
-        
-        public String getTalla() { return talla; }
-        public void setTalla(String talla) { this.talla = talla; }
-        
-        public int getCantidad() { return cantidad; }
-        public void setCantidad(int cantidad) { this.cantidad = cantidad; }
-    }
-    
-    // Clase para paneles redondeados (si no existe)
-    class RoundedPanel extends JPanel {
-        private int cornerRadius;
-        
-        public RoundedPanel(int radius) {
-            this.cornerRadius = radius;
-            setOpaque(false);
-        }
-        
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            Graphics2D g2 = (Graphics2D) g;
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(getBackground());
-            g2.fillRoundRect(0, 0, getWidth(), getHeight(), cornerRadius, cornerRadius);
+        if (respuesta == JOptionPane.YES_OPTION) {
+            SessionManager.getInstance().logout();
+            this.dispose();
+            new principal(0).setVisible(true); // Volver a página principal sin sesión
         }
     }
     
-    
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
-
-        jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jPanel15 = new javax.swing.JPanel();
-        jPanel18 = new javax.swing.JPanel();
-        jLabel27 = new javax.swing.JLabel();
-        jPanel19 = new javax.swing.JPanel();
-        jLabel5 = new javax.swing.JLabel();
-        jPanel20 = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
-        jPanel21 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        jPanel22 = new javax.swing.JPanel();
-        jLabel55 = new javax.swing.JLabel();
-        jRegistrarButton = new javax.swing.JButton();
-        jLabel2 = new javax.swing.JLabel();
-        jIniciarButton = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jPanel10 = new RoundedPanel(30);
-        jFondoPanel = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel26 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jFondoLabel = new javax.swing.JLabel();
-        jComprarButton = new javax.swing.JButton();
-        jLabel8 = new javax.swing.JLabel();
-        jBlusasTopsPanel = new javax.swing.JPanel();
-        jPantalonesPanel = new javax.swing.JPanel();
-        jVestidosPanel = new javax.swing.JPanel();
-        jCalzadoPanel = new javax.swing.JPanel();
-        jAccesoriosPanel = new javax.swing.JPanel();
-        jLabel14 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
-        jLabel16 = new javax.swing.JLabel();
-        jPanel11 = new javax.swing.JPanel();
-        jLabel18 = new javax.swing.JLabel();
-        jPanel12 = new javax.swing.JPanel();
-        jLabel19 = new javax.swing.JLabel();
-        jPanel13 = new javax.swing.JPanel();
-        jLabel20 = new javax.swing.JLabel();
-        jPanel14 = new javax.swing.JPanel();
-        jLabel23 = new javax.swing.JLabel();
-        jProductoAletorio5Panel = new javax.swing.JPanel();
-        jProductoAletorio1Panel = new javax.swing.JPanel();
-        jProductoAletorio2Panel = new javax.swing.JPanel();
-        jProductoAletorio3Panel = new javax.swing.JPanel();
-        jProductoAletorio4Panel = new javax.swing.JPanel();
-        jNuevasLlegadas1Button = new javax.swing.JButton();
-        jPanel26 = new javax.swing.JPanel();
-        jLabel31 = new javax.swing.JLabel();
-        jButton3 = new javax.swing.JButton();
-        jLabel37 = new javax.swing.JLabel();
-        jLabel44 = new javax.swing.JLabel();
-        jLabel45 = new javax.swing.JLabel();
-        jOfertasButton = new javax.swing.JButton();
-        jLabel34 = new javax.swing.JLabel();
-        jLabel35 = new javax.swing.JLabel();
-        jLabel36 = new javax.swing.JLabel();
-        jProductosConMayorCantidadPanel = new javax.swing.JPanel();
-        jProductosConMayorCantidad2Panel = new javax.swing.JPanel();
-        jProductosConMayorCantidad3Panel = new javax.swing.JPanel();
-        jProductosConMayorCantidad4Panel = new javax.swing.JPanel();
-        jPanel31 = new javax.swing.JPanel();
-        jLabel42 = new javax.swing.JLabel();
-        jLabel43 = new javax.swing.JLabel();
-        jButton4 = new javax.swing.JButton();
-        jBuscarTextField = new javax.swing.JTextField();
-        jPanel32 = new javax.swing.JPanel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jLabel17 = new javax.swing.JLabel();
-        jLabel21 = new javax.swing.JLabel();
-        jLabel22 = new javax.swing.JLabel();
-        jLabel24 = new javax.swing.JLabel();
-        jLabel25 = new javax.swing.JLabel();
-        jContactoButton = new javax.swing.JButton();
-        jGuiaTallasButton = new javax.swing.JButton();
-        jEnviosDevolucionesButton = new javax.swing.JButton();
-        jPegruntasFrecuentesButton = new javax.swing.JButton();
-        jMujerButton = new javax.swing.JButton();
-        jNuevasLlegadasButton = new javax.swing.JButton();
-        jOfertas2Button = new javax.swing.JButton();
-        jSobreNosotrosButton = new javax.swing.JButton();
-        jCarrerasButton = new javax.swing.JButton();
-        jPoliticaPrivacidadButton = new javax.swing.JButton();
-        jTerminosServicioButton = new javax.swing.JButton();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel1.setMaximumSize(new java.awt.Dimension(1404, 650));
-        jPanel1.setMinimumSize(new java.awt.Dimension(1404, 650));
-        jPanel1.setPreferredSize(new java.awt.Dimension(1404, 650));
-
-        jPanel15.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel15.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel15.setMaximumSize(new java.awt.Dimension(70, 120));
-        jPanel15.setMinimumSize(new java.awt.Dimension(70, 120));
-        jPanel15.setName(""); // NOI18N
-
-        jPanel18.setBackground(new java.awt.Color(255, 255, 255));
-
-        jLabel27.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jLabel27.setText("Mujer");
-
-        javax.swing.GroupLayout jPanel18Layout = new javax.swing.GroupLayout(jPanel18);
-        jPanel18.setLayout(jPanel18Layout);
-        jPanel18Layout.setHorizontalGroup(
-            jPanel18Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel18Layout.createSequentialGroup()
-                .addContainerGap(47, Short.MAX_VALUE)
-                .addComponent(jLabel27)
-                .addContainerGap())
-        );
-        jPanel18Layout.setVerticalGroup(
-            jPanel18Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel18Layout.createSequentialGroup()
-                .addContainerGap(17, Short.MAX_VALUE)
-                .addComponent(jLabel27)
-                .addContainerGap())
-        );
-
-        jPanel19.setBackground(new java.awt.Color(255, 255, 255));
-
-        jLabel5.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jLabel5.setText("Nuevas Llegadas ");
-
-        javax.swing.GroupLayout jPanel19Layout = new javax.swing.GroupLayout(jPanel19);
-        jPanel19.setLayout(jPanel19Layout);
-        jPanel19Layout.setHorizontalGroup(
-            jPanel19Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel19Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel5)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel19Layout.setVerticalGroup(
-            jPanel19Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel19Layout.createSequentialGroup()
-                .addContainerGap(17, Short.MAX_VALUE)
-                .addComponent(jLabel5)
-                .addContainerGap())
-        );
-
-        jPanel20.setBackground(new java.awt.Color(255, 255, 255));
-
-        jLabel6.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jLabel6.setText("Ofertas");
-
-        javax.swing.GroupLayout jPanel20Layout = new javax.swing.GroupLayout(jPanel20);
-        jPanel20.setLayout(jPanel20Layout);
-        jPanel20Layout.setHorizontalGroup(
-            jPanel20Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel20Layout.createSequentialGroup()
-                .addContainerGap(29, Short.MAX_VALUE)
-                .addComponent(jLabel6)
-                .addGap(25, 25, 25))
-        );
-        jPanel20Layout.setVerticalGroup(
-            jPanel20Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel20Layout.createSequentialGroup()
-                .addContainerGap(17, Short.MAX_VALUE)
-                .addComponent(jLabel6)
-                .addContainerGap())
-        );
-
-        jPanel21.setBackground(new java.awt.Color(255, 255, 255));
-
-        jLabel3.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel3.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
-        jLabel3.setText("FASHION");
-
-        javax.swing.GroupLayout jPanel21Layout = new javax.swing.GroupLayout(jPanel21);
-        jPanel21.setLayout(jPanel21Layout);
-        jPanel21Layout.setHorizontalGroup(
-            jPanel21Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel21Layout.createSequentialGroup()
-                .addGap(33, 33, 33)
-                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(27, Short.MAX_VALUE))
-        );
-        jPanel21Layout.setVerticalGroup(
-            jPanel21Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel21Layout.createSequentialGroup()
-                .addContainerGap(12, Short.MAX_VALUE)
-                .addComponent(jLabel3)
-                .addContainerGap())
-        );
-
-        jPanel22.setBackground(new java.awt.Color(248, 244, 220));
-
-        jLabel55.setText("Envío gratis en pedidos superiores a $100");
-
-        javax.swing.GroupLayout jPanel22Layout = new javax.swing.GroupLayout(jPanel22);
-        jPanel22.setLayout(jPanel22Layout);
-        jPanel22Layout.setHorizontalGroup(
-            jPanel22Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel22Layout.createSequentialGroup()
-                .addGap(512, 512, 512)
-                .addComponent(jLabel55)
-                .addContainerGap(633, Short.MAX_VALUE))
-        );
-        jPanel22Layout.setVerticalGroup(
-            jPanel22Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel22Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel55)
-                .addContainerGap(8, Short.MAX_VALUE))
-        );
-
-        jRegistrarButton.setText("Registrar");
-        jRegistrarButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRegistrarButtonActionPerformed(evt);
-            }
-        });
-
-        jLabel2.setText("o");
-
-        jIniciarButton.setText("Iniciar");
-        jIniciarButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jIniciarButtonActionPerformed(evt);
-            }
-        });
-
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
-        jPanel15.setLayout(jPanel15Layout);
-        jPanel15Layout.setHorizontalGroup(
-            jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel22, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addGroup(jPanel15Layout.createSequentialGroup()
-                .addGap(10, 10, 10)
-                .addComponent(jPanel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(60, 60, 60)
-                .addComponent(jPanel18, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(26, 26, 26)
-                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel15Layout.createSequentialGroup()
-                        .addGap(120, 120, 120)
-                        .addComponent(jPanel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel19, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(107, 107, 107)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(69, 69, 69)
-                .addComponent(jIniciarButton)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jRegistrarButton))
-        );
-        jPanel15Layout.setVerticalGroup(
-            jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel15Layout.createSequentialGroup()
-                .addComponent(jPanel22, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel18, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel19, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel15Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jRegistrarButton)
-                            .addComponent(jLabel2)
-                            .addComponent(jIniciarButton)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(10, 10, 10))
-        );
-
-        jPanel10.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel10.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel10.setMaximumSize(new java.awt.Dimension(0, 423));
-        jPanel10.setMinimumSize(new java.awt.Dimension(0, 423));
-        jPanel10.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jFondoPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jLabel4.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
-        jLabel4.setText("Descubre nuestras últimas piezas de moda diseñadas para la mujer ");
-        jFondoPanel.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(338, 250, 730, 40));
-
-        jLabel26.setFont(new java.awt.Font("Arial", 1, 36)); // NOI18N
-        jLabel26.setText("Nueva Colección ");
-        jFondoPanel.add(jLabel26, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 140, -1, -1));
-
-        jLabel7.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
-        jLabel7.setText("moderna. Elegantes, atemporales y elaboradas con cuidado.");
-        jFondoPanel.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 310, -1, -1));
-
-        jFondoLabel.setText("Fondo");
-        jFondoPanel.add(jFondoLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
-
-        jComprarButton.setText("Comprar Ahora");
-        jFondoPanel.add(jComprarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 370, -1, -1));
-
-        jPanel10.add(jFondoPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(3, 10, 1340, 430));
-
-        jLabel8.setFont(new java.awt.Font("Arial", 1, 36)); // NOI18N
-        jLabel8.setText("Comprar por Categoría");
-        jPanel10.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 580, -1, -1));
-
-        javax.swing.GroupLayout jBlusasTopsPanelLayout = new javax.swing.GroupLayout(jBlusasTopsPanel);
-        jBlusasTopsPanel.setLayout(jBlusasTopsPanelLayout);
-        jBlusasTopsPanelLayout.setHorizontalGroup(
-            jBlusasTopsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 210, Short.MAX_VALUE)
-        );
-        jBlusasTopsPanelLayout.setVerticalGroup(
-            jBlusasTopsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
-        );
-
-        jPanel10.add(jBlusasTopsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 710, 210, 220));
-
-        jPantalonesPanel.setPreferredSize(new java.awt.Dimension(190, 220));
-
-        javax.swing.GroupLayout jPantalonesPanelLayout = new javax.swing.GroupLayout(jPantalonesPanel);
-        jPantalonesPanel.setLayout(jPantalonesPanelLayout);
-        jPantalonesPanelLayout.setHorizontalGroup(
-            jPantalonesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
-        );
-        jPantalonesPanelLayout.setVerticalGroup(
-            jPantalonesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
-        );
-
-        jPanel10.add(jPantalonesPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 710, 220, 220));
-
-        jVestidosPanel.setPreferredSize(new java.awt.Dimension(190, 220));
-
-        javax.swing.GroupLayout jVestidosPanelLayout = new javax.swing.GroupLayout(jVestidosPanel);
-        jVestidosPanel.setLayout(jVestidosPanelLayout);
-        jVestidosPanelLayout.setHorizontalGroup(
-            jVestidosPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
-        );
-        jVestidosPanelLayout.setVerticalGroup(
-            jVestidosPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
-        );
-
-        jPanel10.add(jVestidosPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 710, 220, 220));
-
-        jCalzadoPanel.setPreferredSize(new java.awt.Dimension(190, 220));
-
-        javax.swing.GroupLayout jCalzadoPanelLayout = new javax.swing.GroupLayout(jCalzadoPanel);
-        jCalzadoPanel.setLayout(jCalzadoPanelLayout);
-        jCalzadoPanelLayout.setHorizontalGroup(
-            jCalzadoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 200, Short.MAX_VALUE)
-        );
-        jCalzadoPanelLayout.setVerticalGroup(
-            jCalzadoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
-        );
-
-        jPanel10.add(jCalzadoPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 710, 200, 220));
-
-        javax.swing.GroupLayout jAccesoriosPanelLayout = new javax.swing.GroupLayout(jAccesoriosPanel);
-        jAccesoriosPanel.setLayout(jAccesoriosPanelLayout);
-        jAccesoriosPanelLayout.setHorizontalGroup(
-            jAccesoriosPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 190, Short.MAX_VALUE)
-        );
-        jAccesoriosPanelLayout.setVerticalGroup(
-            jAccesoriosPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
-        );
-
-        jPanel10.add(jAccesoriosPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 710, 190, 220));
-
-        jLabel14.setText("Nuevas Llegadas");
-        jPanel10.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 1040, -1, -1));
-
-        jLabel15.setText("Mantente a la vanguardia de las tendencias con nuestras últimas piezas de moda,");
-        jPanel10.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 1080, -1, -1));
-
-        jLabel16.setText("cuidadosamente seleccionadas por estilo y calidad.");
-        jPanel10.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 1100, -1, -1));
-
-        jPanel11.setPreferredSize(new java.awt.Dimension(190, 220));
-
-        jLabel18.setText("Calzado");
-
-        javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
-        jPanel11.setLayout(jPanel11Layout);
-        jPanel11Layout.setHorizontalGroup(
-            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel11Layout.createSequentialGroup()
-                .addGap(57, 57, 57)
-                .addComponent(jLabel18)
-                .addContainerGap(101, Short.MAX_VALUE))
-        );
-        jPanel11Layout.setVerticalGroup(
-            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel11Layout.createSequentialGroup()
-                .addContainerGap(198, Short.MAX_VALUE)
-                .addComponent(jLabel18)
-                .addContainerGap())
-        );
-
-        jPanel10.add(jPanel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 710, 200, 220));
-
-        jPanel12.setPreferredSize(new java.awt.Dimension(190, 220));
-
-        jLabel19.setText("Vestidos");
-
-        javax.swing.GroupLayout jPanel12Layout = new javax.swing.GroupLayout(jPanel12);
-        jPanel12.setLayout(jPanel12Layout);
-        jPanel12Layout.setHorizontalGroup(
-            jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel12Layout.createSequentialGroup()
-                .addGap(60, 60, 60)
-                .addComponent(jLabel19)
-                .addContainerGap(116, Short.MAX_VALUE))
-        );
-        jPanel12Layout.setVerticalGroup(
-            jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel12Layout.createSequentialGroup()
-                .addContainerGap(198, Short.MAX_VALUE)
-                .addComponent(jLabel19)
-                .addContainerGap())
-        );
-
-        jPanel10.add(jPanel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 710, 220, 220));
-
-        jPanel13.setPreferredSize(new java.awt.Dimension(190, 220));
-
-        jLabel20.setText("Pantalones");
-
-        javax.swing.GroupLayout jPanel13Layout = new javax.swing.GroupLayout(jPanel13);
-        jPanel13.setLayout(jPanel13Layout);
-        jPanel13Layout.setHorizontalGroup(
-            jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel13Layout.createSequentialGroup()
-                .addGap(52, 52, 52)
-                .addComponent(jLabel20)
-                .addContainerGap(110, Short.MAX_VALUE))
-        );
-        jPanel13Layout.setVerticalGroup(
-            jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel13Layout.createSequentialGroup()
-                .addContainerGap(198, Short.MAX_VALUE)
-                .addComponent(jLabel20)
-                .addContainerGap())
-        );
-
-        jPanel10.add(jPanel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 710, 220, 220));
-
-        jLabel23.setText("Accesorios");
-
-        javax.swing.GroupLayout jPanel14Layout = new javax.swing.GroupLayout(jPanel14);
-        jPanel14.setLayout(jPanel14Layout);
-        jPanel14Layout.setHorizontalGroup(
-            jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel14Layout.createSequentialGroup()
-                .addGap(53, 53, 53)
-                .addComponent(jLabel23)
-                .addContainerGap(80, Short.MAX_VALUE))
-        );
-        jPanel14Layout.setVerticalGroup(
-            jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel14Layout.createSequentialGroup()
-                .addContainerGap(198, Short.MAX_VALUE)
-                .addComponent(jLabel23)
-                .addContainerGap())
-        );
-
-        jPanel10.add(jPanel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 710, 190, 220));
-
-        javax.swing.GroupLayout jProductoAletorio5PanelLayout = new javax.swing.GroupLayout(jProductoAletorio5Panel);
-        jProductoAletorio5Panel.setLayout(jProductoAletorio5PanelLayout);
-        jProductoAletorio5PanelLayout.setHorizontalGroup(
-            jProductoAletorio5PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 190, Short.MAX_VALUE)
-        );
-        jProductoAletorio5PanelLayout.setVerticalGroup(
-            jProductoAletorio5PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
-        );
-
-        jPanel10.add(jProductoAletorio5Panel, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 1160, -1, -1));
-
-        javax.swing.GroupLayout jProductoAletorio1PanelLayout = new javax.swing.GroupLayout(jProductoAletorio1Panel);
-        jProductoAletorio1Panel.setLayout(jProductoAletorio1PanelLayout);
-        jProductoAletorio1PanelLayout.setHorizontalGroup(
-            jProductoAletorio1PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 190, Short.MAX_VALUE)
-        );
-        jProductoAletorio1PanelLayout.setVerticalGroup(
-            jProductoAletorio1PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
-        );
-
-        jPanel10.add(jProductoAletorio1Panel, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 1160, -1, -1));
-
-        jProductoAletorio2Panel.setPreferredSize(new java.awt.Dimension(190, 220));
-
-        javax.swing.GroupLayout jProductoAletorio2PanelLayout = new javax.swing.GroupLayout(jProductoAletorio2Panel);
-        jProductoAletorio2Panel.setLayout(jProductoAletorio2PanelLayout);
-        jProductoAletorio2PanelLayout.setHorizontalGroup(
-            jProductoAletorio2PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
-        );
-        jProductoAletorio2PanelLayout.setVerticalGroup(
-            jProductoAletorio2PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
-        );
-
-        jPanel10.add(jProductoAletorio2Panel, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 1160, 220, -1));
-
-        jProductoAletorio3Panel.setPreferredSize(new java.awt.Dimension(190, 220));
-
-        javax.swing.GroupLayout jProductoAletorio3PanelLayout = new javax.swing.GroupLayout(jProductoAletorio3Panel);
-        jProductoAletorio3Panel.setLayout(jProductoAletorio3PanelLayout);
-        jProductoAletorio3PanelLayout.setHorizontalGroup(
-            jProductoAletorio3PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
-        );
-        jProductoAletorio3PanelLayout.setVerticalGroup(
-            jProductoAletorio3PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
-        );
-
-        jPanel10.add(jProductoAletorio3Panel, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 1160, 220, -1));
-
-        jProductoAletorio4Panel.setPreferredSize(new java.awt.Dimension(190, 220));
-
-        javax.swing.GroupLayout jProductoAletorio4PanelLayout = new javax.swing.GroupLayout(jProductoAletorio4Panel);
-        jProductoAletorio4Panel.setLayout(jProductoAletorio4PanelLayout);
-        jProductoAletorio4PanelLayout.setHorizontalGroup(
-            jProductoAletorio4PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 200, Short.MAX_VALUE)
-        );
-        jProductoAletorio4PanelLayout.setVerticalGroup(
-            jProductoAletorio4PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
-        );
-
-        jPanel10.add(jProductoAletorio4Panel, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 1160, 200, -1));
-
-        jNuevasLlegadas1Button.setText("Ver Todas Las Nuevas Llegadas");
-        jPanel10.add(jNuevasLlegadas1Button, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 1430, -1, -1));
-
-        jPanel26.setBackground(new java.awt.Color(245, 245, 220));
-        jPanel26.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jLabel31.setText("Oferta Especial");
-        jPanel26.add(jLabel31, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 50, -1, -1));
-
-        jButton3.setText("jButton3");
-        jPanel26.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(1684, 216, -1, -1));
-
-        jLabel37.setText("todos aman.");
-        jPanel26.add(jLabel37, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 1830, -1, -1));
-
-        jLabel44.setText("Obtén 20% de descuento en todos los artículos de nuestra Colección de Otoño. ¡Oferta por");
-        jPanel26.add(jLabel44, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 80, -1, -1));
-
-        jLabel45.setText("tiempo limitado!");
-        jPanel26.add(jLabel45, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 110, -1, -1));
-
-        jOfertasButton.setText("Comprar Ofertas");
-        jPanel26.add(jOfertasButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 190, -1, -1));
-
-        jPanel10.add(jPanel26, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 1500, 1340, 290));
-
-        jLabel34.setText("Productos Destacados");
-        jPanel10.add(jLabel34, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 1830, -1, -1));
-
-        jLabel35.setText("Selecciones cuidadosamente elegidas de nuestros artículos más populares. Descubre lo que");
-        jPanel10.add(jLabel35, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 1860, -1, -1));
-
-        jLabel36.setText("todos aman.");
-        jPanel10.add(jLabel36, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 1890, -1, -1));
-
-        jProductosConMayorCantidadPanel.setPreferredSize(new java.awt.Dimension(190, 220));
-
-        javax.swing.GroupLayout jProductosConMayorCantidadPanelLayout = new javax.swing.GroupLayout(jProductosConMayorCantidadPanel);
-        jProductosConMayorCantidadPanel.setLayout(jProductosConMayorCantidadPanelLayout);
-        jProductosConMayorCantidadPanelLayout.setHorizontalGroup(
-            jProductosConMayorCantidadPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
-        );
-        jProductosConMayorCantidadPanelLayout.setVerticalGroup(
-            jProductosConMayorCantidadPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
-        );
-
-        jPanel10.add(jProductosConMayorCantidadPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 1960, 220, -1));
-
-        jProductosConMayorCantidad2Panel.setPreferredSize(new java.awt.Dimension(190, 220));
-
-        javax.swing.GroupLayout jProductosConMayorCantidad2PanelLayout = new javax.swing.GroupLayout(jProductosConMayorCantidad2Panel);
-        jProductosConMayorCantidad2Panel.setLayout(jProductosConMayorCantidad2PanelLayout);
-        jProductosConMayorCantidad2PanelLayout.setHorizontalGroup(
-            jProductosConMayorCantidad2PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
-        );
-        jProductosConMayorCantidad2PanelLayout.setVerticalGroup(
-            jProductosConMayorCantidad2PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
-        );
-
-        jPanel10.add(jProductosConMayorCantidad2Panel, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 1960, 220, -1));
-
-        jProductosConMayorCantidad3Panel.setPreferredSize(new java.awt.Dimension(190, 220));
-
-        javax.swing.GroupLayout jProductosConMayorCantidad3PanelLayout = new javax.swing.GroupLayout(jProductosConMayorCantidad3Panel);
-        jProductosConMayorCantidad3Panel.setLayout(jProductosConMayorCantidad3PanelLayout);
-        jProductosConMayorCantidad3PanelLayout.setHorizontalGroup(
-            jProductosConMayorCantidad3PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 200, Short.MAX_VALUE)
-        );
-        jProductosConMayorCantidad3PanelLayout.setVerticalGroup(
-            jProductosConMayorCantidad3PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
-        );
-
-        jPanel10.add(jProductosConMayorCantidad3Panel, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 1960, 200, -1));
-
-        javax.swing.GroupLayout jProductosConMayorCantidad4PanelLayout = new javax.swing.GroupLayout(jProductosConMayorCantidad4Panel);
-        jProductosConMayorCantidad4Panel.setLayout(jProductosConMayorCantidad4PanelLayout);
-        jProductosConMayorCantidad4PanelLayout.setHorizontalGroup(
-            jProductosConMayorCantidad4PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 190, Short.MAX_VALUE)
-        );
-        jProductosConMayorCantidad4PanelLayout.setVerticalGroup(
-            jProductosConMayorCantidad4PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
-        );
-
-        jPanel10.add(jProductosConMayorCantidad4Panel, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 1960, 190, 220));
-
-        jPanel31.setBackground(new java.awt.Color(245, 245, 220));
-
-        jLabel42.setText("Mantente con Estilo");
-
-        jLabel43.setText("Suscríbete a nuestro boletín para conocer las últimas tendencias de moda y ofertas exclusivas.");
-
-        jButton4.setText("Buscar");
-
-        javax.swing.GroupLayout jPanel31Layout = new javax.swing.GroupLayout(jPanel31);
-        jPanel31.setLayout(jPanel31Layout);
-        jPanel31Layout.setHorizontalGroup(
-            jPanel31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel31Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel42)
-                .addGap(553, 553, 553))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel31Layout.createSequentialGroup()
-                .addGroup(jPanel31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel31Layout.createSequentialGroup()
-                        .addContainerGap(491, Short.MAX_VALUE)
-                        .addComponent(jBuscarTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 389, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel31Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jLabel43)))
-                .addGap(356, 356, 356))
-        );
-        jPanel31Layout.setVerticalGroup(
-            jPanel31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel31Layout.createSequentialGroup()
-                .addGroup(jPanel31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel31Layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPanel31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton4)
-                            .addComponent(jBuscarTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel31Layout.createSequentialGroup()
-                        .addGap(46, 46, 46)
-                        .addComponent(jLabel42)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel43)
-                        .addGap(0, 58, Short.MAX_VALUE)))
-                .addGap(36, 36, 36))
-        );
-
-        jPanel10.add(jPanel31, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 2280, 1340, 190));
-
-        jPanel32.setBackground(new java.awt.Color(204, 204, 255));
-        jPanel32.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jLabel9.setText("FASHION ");
-        jPanel32.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 50, -1, -1));
-
-        jLabel10.setText("Descubre las últimas tendencias en");
-        jPanel32.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 70, -1, -1));
-
-        jLabel11.setText("moda con nuestra colección curada");
-        jPanel32.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, -1, -1));
-
-        jLabel12.setText("de ropa y accesorios de alta calidad.");
-        jPanel32.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 110, -1, -1));
-
-        jLabel13.setText("jLabel13");
-        jPanel32.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 170, -1, -1));
-
-        jLabel17.setText("jLabel17");
-        jPanel32.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 170, -1, -1));
-
-        jLabel21.setText("jLabel21");
-        jPanel32.add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 170, -1, -1));
-
-        jLabel22.setText("Atención al Cliente ");
-        jPanel32.add(jLabel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 50, -1, -1));
-
-        jLabel24.setText("Compras");
-        jPanel32.add(jLabel24, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 60, -1, -1));
-
-        jLabel25.setText("Empresa");
-        jPanel32.add(jLabel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 60, -1, -1));
-
-        jContactoButton.setText("Contáctanos");
-        jPanel32.add(jContactoButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 90, -1, -1));
-
-        jGuiaTallasButton.setText("Guía de Tallas");
-        jPanel32.add(jGuiaTallasButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 120, -1, -1));
-
-        jEnviosDevolucionesButton.setText("Envíos y Devoluciones ");
-        jPanel32.add(jEnviosDevolucionesButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 150, -1, -1));
-
-        jPegruntasFrecuentesButton.setText("Preguntas Frecuentes");
-        jPanel32.add(jPegruntasFrecuentesButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 180, -1, -1));
-
-        jMujerButton.setText("Mujer");
-        jPanel32.add(jMujerButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 90, -1, -1));
-
-        jNuevasLlegadasButton.setText("Nuevas Llegadas");
-        jPanel32.add(jNuevasLlegadasButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 120, -1, -1));
-
-        jOfertas2Button.setText("Ofertas");
-        jPanel32.add(jOfertas2Button, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 150, -1, -1));
-
-        jSobreNosotrosButton.setText("Sobre Nosotros");
-        jPanel32.add(jSobreNosotrosButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 90, -1, -1));
-
-        jCarrerasButton.setText("Carreras");
-        jPanel32.add(jCarrerasButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 120, -1, -1));
-
-        jPoliticaPrivacidadButton.setText("Política de Privacidad");
-        jPanel32.add(jPoliticaPrivacidadButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 150, -1, -1));
-
-        jTerminosServicioButton.setText("Términos de Servicio");
-        jPanel32.add(jTerminosServicioButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 180, -1, -1));
-
-        jPanel10.add(jPanel32, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 2470, 1340, 250));
-
-        jScrollPane1.setViewportView(jPanel10);
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1359, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(jLabel1))
-                            .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap(139, Short.MAX_VALUE)
-                        .addComponent(jLabel1))
-                    .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 549, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 1378, javax.swing.GroupLayout.PREFERRED_SIZE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 700, Short.MAX_VALUE)
-        );
-
-        pack();
-    }// </editor-fold>//GEN-END:initComponents
-
-    private void jRegistrarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRegistrarButtonActionPerformed
-        // TODO add your handling code here:
-        registro temp = new registro();
-        temp.setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_jRegistrarButtonActionPerformed
-
-    private void jIniciarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jIniciarButtonActionPerformed
-        // TODO add your handling code here:
-        
-         Inicio temp = new Inicio();
-        temp.setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_jIniciarButtonActionPerformed
-
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
-
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-    java.awt.EventQueue.invokeLater(() -> {
-        new principal(1).setVisible(true); // Usar ID temporal para testing
-    });
-}
-
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jAccesoriosPanel;
-    private javax.swing.JPanel jBlusasTopsPanel;
-    private javax.swing.JTextField jBuscarTextField;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JPanel jCalzadoPanel;
-    private javax.swing.JButton jCarrerasButton;
-    private javax.swing.JButton jComprarButton;
-    private javax.swing.JButton jContactoButton;
-    private javax.swing.JButton jEnviosDevolucionesButton;
-    private javax.swing.JLabel jFondoLabel;
-    private javax.swing.JPanel jFondoPanel;
-    private javax.swing.JButton jGuiaTallasButton;
-    private javax.swing.JButton jIniciarButton;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel18;
-    private javax.swing.JLabel jLabel19;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel20;
-    private javax.swing.JLabel jLabel21;
-    private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel23;
-    private javax.swing.JLabel jLabel24;
-    private javax.swing.JLabel jLabel25;
-    private javax.swing.JLabel jLabel26;
-    private javax.swing.JLabel jLabel27;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel31;
-    private javax.swing.JLabel jLabel34;
-    private javax.swing.JLabel jLabel35;
-    private javax.swing.JLabel jLabel36;
-    private javax.swing.JLabel jLabel37;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel42;
-    private javax.swing.JLabel jLabel43;
-    private javax.swing.JLabel jLabel44;
-    private javax.swing.JLabel jLabel45;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel55;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JButton jMujerButton;
-    private javax.swing.JButton jNuevasLlegadas1Button;
-    private javax.swing.JButton jNuevasLlegadasButton;
-    private javax.swing.JButton jOfertas2Button;
-    private javax.swing.JButton jOfertasButton;
-    public javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel11;
-    private javax.swing.JPanel jPanel12;
-    private javax.swing.JPanel jPanel13;
-    private javax.swing.JPanel jPanel14;
-    private javax.swing.JPanel jPanel15;
-    private javax.swing.JPanel jPanel18;
-    private javax.swing.JPanel jPanel19;
-    private javax.swing.JPanel jPanel20;
-    private javax.swing.JPanel jPanel21;
-    private javax.swing.JPanel jPanel22;
-    private javax.swing.JPanel jPanel26;
-    private javax.swing.JPanel jPanel31;
-    private javax.swing.JPanel jPanel32;
-    private javax.swing.JPanel jPantalonesPanel;
-    private javax.swing.JButton jPegruntasFrecuentesButton;
-    private javax.swing.JButton jPoliticaPrivacidadButton;
-    private javax.swing.JPanel jProductoAletorio1Panel;
-    private javax.swing.JPanel jProductoAletorio2Panel;
-    private javax.swing.JPanel jProductoAletorio3Panel;
-    private javax.swing.JPanel jProductoAletorio4Panel;
-    private javax.swing.JPanel jProductoAletorio5Panel;
-    private javax.swing.JPanel jProductosConMayorCantidad2Panel;
-    private javax.swing.JPanel jProductosConMayorCantidad3Panel;
-    private javax.swing.JPanel jProductosConMayorCantidad4Panel;
-    private javax.swing.JPanel jProductosConMayorCantidadPanel;
-    private javax.swing.JButton jRegistrarButton;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JButton jSobreNosotrosButton;
-    private javax.swing.JButton jTerminosServicioButton;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JPanel jVestidosPanel;
-    // End of variables declaration//GEN-END:variables
+        java.awt.EventQueue.invokeLater(() -> {
+            new principal(0).setVisible(true);
+        });
+    }
 }

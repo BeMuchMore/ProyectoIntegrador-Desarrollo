@@ -1,0 +1,49 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+    <h2 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin: 0;">👥 Gestión de Usuarios</h2>
+    <a href="{% url 'admin_usuario_nuevo' %}" class="btn-admin">➕ Nuevo Usuario</a>
+</div>
+
+<table class="table-admin">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Usuario</th>
+            <th>Cargo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for usuario in usuarios %}
+        <tr>
+            <td>{{ usuario.id }}</td>
+            <td><strong>{{ usuario.nombre }} {{ usuario.apellido|default:'' }}</strong></td>
+            <td>{{ usuario.correo|default:"N/A" }}</td>
+            <td>{{ usuario.usuario }}</td>
+            <td>
+                <span style="padding: 5px 10px; border-radius: 5px; font-size: 0.85rem; {% if usuario.cargo == 'admin' %}background: #d4a5c7; color: white;{% else %}background: #e0e0e0; color: #333;{% endif %}">
+                    {{ usuario.cargo|upper }}
+                </span>
+            </td>
+            <td>
+                <a href="{% url 'admin_usuario_editar' usuario.id %}" class="btn-admin" style="padding: 8px 15px; font-size: 0.9rem; margin-right: 5px;">✏️ Editar</a>
+                {% if usuario.id != request.session.usuario_id %}
+                <a href="{% url 'admin_usuario_eliminar' usuario.id %}" class="btn-admin btn-danger" style="padding: 8px 15px; font-size: 0.9rem;" onclick="return confirm('¿Estás seguro de eliminar este usuario?');">🗑️ Eliminar</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" style="text-align: center; padding: 40px; color: #999;">
+                No hay usuarios registrados.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+

@@ -1,0 +1,23 @@
+{% load static %}
+{% load image_tags %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+</head>
+<body {% if config and config.fondoPrincipal %}style="background: {{ config.fondoPrincipal }};"{% endif %}>
+    {% include 'base_header.html' %}
+    
+    <main style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
+        {% block content %}{% endblock %}
+    </main>
+    
+    {% include 'base_footer.html' %}
+    
+    <script src="{% static 'js/index.js' %}"></script>
+</body>
+</html>
+

@@ -1,0 +1,58 @@
+{% load static %}
+{% load image_tags %}
+<!-- Header Top -->
+<div class="header-top" {% if config and config.fondoPrincipal %}style="background: {{ config.fondoPrincipal }};"{% endif %}>
+    <div class="header-top-content">
+        <span>📞 +1 234 567 8900 | 📧 {% if config and config.CorreoApp %}{{ config.CorreoApp }}{% else %}info@fashion.com{% endif %}</span>
+        <span>Envío gratis en pedidos superiores a $100</span>
+    </div>
+</div>
+
+<!-- Main Header -->
+<header class="header-main">
+    <div class="header-content">
+        <div class="logo">
+            <a href="{% url 'home' %}" style="text-decoration: none; color: inherit;">
+                {% if config and config.Logo %}
+                    <img src="{{ config.Logo|fix_image_url }}" alt="{% if config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}" style="max-height: 50px; vertical-align: middle;">
+                {% endif %}
+                <span style="{% if config and config.Logo %}margin-left: 10px;{% endif %}">
+                    {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}
+                </span>
+            </a>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="{% url 'home' %}">Inicio</a></li>
+                <li><a href="{% url 'shop' %}">Tienda</a></li>
+                {% for categoria in categorias|slice:":5" %}
+                <li><a href="{% url 'shop' %}?categoria={{ categoria }}">{{ categoria }}</a></li>
+                {% endfor %}
+            </ul>
+        </nav>
+        <div class="header-icons">
+            <a href="{% url 'shop' %}" class="header-icon" title="Buscar">🔍</a>
+            {% if esta_logueado and usuario_actual %}
+                {% if usuario_actual.cargo == 'admin' or request.session.usuario_cargo == 'admin' %}
+                    <a href="{% url 'admin_dashboard' %}" class="header-icon" title="Panel Admin" style="background: linear-gradient(135deg, #ff6b9d 0%, #c98bb8 100%); color: white; padding: 8px 15px; border-radius: 8px; font-weight: 600; box-shadow: 0 2px 8px rgba(255, 107, 157, 0.3); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(255, 107, 157, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(255, 107, 157, 0.3)';">
+                        ⚙️ Admin
+                    </a>
+                    <a href="{% url 'admin_debug' %}" class="header-icon" title="Debug Admin" style="background: #999; color: white; padding: 8px 15px; border-radius: 8px; font-weight: 600; font-size: 0.8rem;">
+                        🔍
+                    </a>
+                {% endif %}
+                <a href="{% url 'perfil' %}" class="header-icon" title="Mi Perfil">
+                    👤 <span style="font-size: 0.85rem; margin-left: 3px;">{{ usuario_actual.nombre|truncatewords:1 }}</span>
+                </a>
+                <a href="{% url 'logout' %}" class="header-icon" title="Cerrar Sesión">🚪</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="header-icon" title="Iniciar Sesión">👤</a>
+            {% endif %}
+            <a href="{% url 'carrito' %}" class="header-icon" title="Carrito">
+                🛒
+                <span class="cart-badge" id="cart-count">0</span>
+            </a>
+        </div>
+    </div>
+</header>
+

@@ -1,0 +1,200 @@
+{% load static %}
+{% load image_tags %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %} - Moda Femenina Premium</title>
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+
+</head>
+<body {% if config and config.fondoPrincipal %}style="background: {{ config.fondoPrincipal }} !important; background-attachment: fixed !important;"{% else %}style="background: linear-gradient(135deg, #e8d5e3 0%, #f0e0eb 50%, #f5e6f0 100%) !important; background-attachment: fixed !important;"{% endif %}>
+    <!-- Header Top -->
+    <div class="header-top" {% if config and config.fondoPrincipal %}style="background: {{ config.fondoPrincipal }};"{% endif %}>
+        <div class="header-top-content">
+            <span>📞 +1 234 567 8900 | 📧 {% if config and config.CorreoApp %}{{ config.CorreoApp }}{% else %}info@fashion.com{% endif %}</span>
+            <span>Envío Gratis en Pedidos Superiores a $100</span>
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <header class="header-main">
+        <div class="header-content">
+            <div class="logo">
+                <a href="{% url 'home' %}" style="text-decoration: none; color: inherit;">
+                    {% if config and config.Logo %}
+                        <img src="{{ config.Logo|fix_image_url }}" alt="{% if config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}" style="max-height: 50px; vertical-align: middle;">
+                    {% endif %}
+                    <span style="{% if config and config.Logo %}margin-left: 10px;{% endif %}">
+                        {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}
+                    </span>
+                </a>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'home' %}">Inicio</a></li>
+                    <li><a href="{% url 'shop' %}">Tienda</a></li>
+                    {% for categoria in categorias|slice:":5" %}
+                    <li><a href="{% url 'shop' %}?categoria={{ categoria }}">{{ categoria }}</a></li>
+                    {% endfor %}
+                </ul>
+            </nav>
+            <div class="header-icons">
+                <a href="{% url 'shop' %}" class="header-icon" title="Buscar">🔍</a>
+                {% if request.session.usuario_id %}
+                <a href="{% url 'perfil' %}" class="header-icon" title="Mi Perfil">👤</a>
+                <a href="{% url 'logout' %}" class="header-icon" title="Cerrar Sesión">🚪</a>
+                {% else %}
+                <a href="{% url 'login' %}" class="header-icon" title="Iniciar Sesión">👤</a>
+                {% endif %}
+                <a href="{% url 'carrito' %}" class="header-icon" title="Carrito">
+                    🛒 <span id="cart-count" class="cart-badge">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div style="max-width: 1200px; margin: 20px auto; padding: 0 20px;">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" style="padding: 15px; margin-bottom: 10px; border-radius: 5px; background: {% if message.tags == 'error' %}#f8d7da{% elif message.tags == 'success' %}#d4edda{% else %}#d1ecf1{% endif %}; color: {% if message.tags == 'error' %}#721c24{% elif message.tags == 'success' %}#155724{% else %}#0c5460{% endif %};">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Descubre Tu <span class="highlight">Estilo Femenino Perfecto</span></h1>
+                <p>Eleva tu guardarropa con nuestra colección exclusiva de moda femenina premium diseñada para empoderarte y hacerte brillar en cada ocasión.</p>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 20px;">
+                    <a href="{% url 'shop' %}" class="btn-primary">Comprar Ahora</a>
+                    {% if esta_logueado and usuario_actual and usuario_actual.cargo == 'admin' %}
+                    <a href="{% url 'admin_dashboard' %}" style="display: inline-block; padding: 15px 30px; background: linear-gradient(135deg, #ff6b9d 0%, #c98bb8 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255, 107, 157, 0.6)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255, 107, 157, 0.4)';">
+                        ⚙️ Panel Admin
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&h=700&fit=crop&crop=center" alt="Moda Femenina" style="width: 100%; max-width: 500px; height: auto; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); object-fit: cover;">
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories">
+        <h2 class="section-title">Comprar por Categoría</h2>
+        <div class="category-grid">
+            <a href="{% url 'shop' %}" class="category-card fade-in" style="text-decoration: none; color: inherit;">
+                <div class="category-image" style="background-image: url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&h=300&fit=crop'); background-size: cover; background-position: center;"></div>
+                <div class="category-info">
+                    <h3>Colección de Mujer</h3>
+                    <p>Elegante y Moderna</p>
+                </div>
+            </a>
+            <a href="{% url 'shop' %}" class="category-card fade-in" style="text-decoration: none; color: inherit;">
+                <div class="category-image" style="background-image: url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop'); background-size: cover; background-position: center;"></div>
+                <div class="category-info">
+                    <h3>Nueva Colección</h3>
+                    <p>Clásico y Moderno</p>
+                </div>
+            </a>
+            <a href="{% url 'shop' %}?categoria=Accesorios" class="category-card fade-in" style="text-decoration: none; color: inherit;">
+                <div class="category-image" style="background-image: url('https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=300&fit=crop'); background-size: cover; background-position: center;"></div>
+                <div class="category-info">
+                    <h3>Accesorios</h3>
+                    <p>Completa Tu Look</p>
+                </div>
+            </a>
+            <a href="{% url 'shop' %}" class="category-card fade-in" style="text-decoration: none; color: inherit;">
+                <div class="category-image" style="background-image: url('https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=300&fit=crop'); background-size: cover; background-position: center;"></div>
+                <div class="category-info">
+                    <h3>Nuevos Llegados</h3>
+                    <p>Estilos Frescos Diarios</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="featured-products">
+        <h2 class="section-title">Productos Destacados</h2>
+        <div class="product-grid">
+            {% for producto in productos %}
+            <div class="product-card">
+                {% if producto.FecheIngreso %}
+                <span class="product-badge">NUEVO</span>
+                {% endif %}
+                <div class="product-image">
+                    {% if producto.ImgUrl|fix_image_url %}
+                    <img src="{{ producto.ImgUrl|fix_image_url }}" alt="{{ producto.Nombre }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div style="width: 100%; height: 100%; background: #f0f0f0; display: none; align-items: center; justify-content: center; color: #999;">
+                        Sin imagen
+                    </div>
+                    {% else %}
+                    <div style="width: 100%; height: 100%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #999;">
+                        Sin imagen
+                    </div>
+                    {% endif %}
+                    <div class="product-overlay">
+                        <div class="overlay-buttons">
+                            <a href="{% url 'producto_detalle' producto.id %}" class="overlay-btn">Ver Detalles</a>
+                            <button class="overlay-btn add-to-cart-btn" data-producto-id="{{ producto.id }}">Agregar al Carrito</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h4>{{ producto.Nombre|default:"Sin nombre" }}</h4>
+                    <div class="product-price">
+                        {% if producto.get_precio_minimo %}
+                            {% if producto.get_precio_minimo != producto.get_precio_maximo %}
+                            <span class="price-current">{{ producto.get_precio_minimo|precio_colombiano }} - {{ producto.get_precio_maximo|precio_colombiano }}</span>
+                            {% else %}
+                            <span class="price-current">{{ producto.get_precio_minimo|precio_colombiano }}</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="price-current">Precio no disponible</span>
+                        {% endif %}
+                    </div>
+                    <div class="product-category">{{ producto.Categorias|default:"" }}</div>
+                </div>
+            </div>
+            {% empty %}
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                <p>No hay productos disponibles en este momento.</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% if productos %}
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="{% url 'shop' %}" class="btn-primary">Ver Todos los Productos</a>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter">
+        <div class="newsletter-content">
+            <h2>Mantente a la Moda</h2>
+            <p>Suscríbete a nuestro boletín y obtén 20% de descuento en tu primera compra</p>
+            <form class="newsletter-form">
+                <input type="email" placeholder="Ingresa tu correo electrónico">
+                <button type="submit">Suscribirse</button>
+            </form>
+        </div>
+    </section>
+
+    {% include 'base_footer.html' %}
+
+    
+
+    <script src="{% static 'js/index.js' %}"></script>
+    
+</body>
+</html>

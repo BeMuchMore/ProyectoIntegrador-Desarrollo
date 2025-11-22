@@ -11,6 +11,48 @@ import java.nio.file.Paths;
  * Adaptada para la estructura específica del proyecto
  */
 public class ConfigImagenes {
+
+    // Agregar este método a ConfigImagenes.java después del método obtenerRutaAbsoluta existente
+
+/**
+ * Convierte una ruta relativa de BD a ruta absoluta del sistema
+ * Método centralizado para evitar duplicación
+ */
+public static String obtenerRutaAbsoluta(String rutaBD) {
+    if (rutaBD == null || rutaBD.isEmpty()) {
+        return null;
+    }
+    
+    if (new File(rutaBD).isAbsolute()) {
+        return rutaBD;
+    }
+    
+    if (rutaBD.startsWith("...Z-Global-Img/")) {
+        String rutaRelativa = rutaBD.substring("...Z-Global-Img/".length());
+        String rutaActual = System.getProperty("user.dir");
+        File dirActual = new File(rutaActual);
+        
+        File temp = dirActual;
+        while (temp != null && !temp.getName().equals("ProyectoIntegrador-Desarrollo")) {
+            temp = temp.getParentFile();
+        }
+        
+        if (temp != null) {
+            File carpetaImagenes = new File(temp, "Z-Global-Img");
+            File archivo = new File(carpetaImagenes, rutaRelativa);
+            if (archivo.exists()) {
+                return archivo.getAbsolutePath();
+            }
+        }
+    }
+    
+    File archivo = new File(rutaBD);
+    if (archivo.exists()) {
+        return archivo.getAbsolutePath();
+    }
+    
+    return rutaBD;
+}
     
     /**
      * Obtiene la ruta de la carpeta Z-Global-Img relativa a la ubicación actual

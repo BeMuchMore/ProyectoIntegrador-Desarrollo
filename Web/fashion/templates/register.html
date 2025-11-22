@@ -1,0 +1,262 @@
+{% load static %}
+{% load image_tags %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %} Moda Femenina</title>
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+</head>
+<body {% if config and config.fondoPrincipal %}style="background: {{ config.fondoPrincipal }};"{% endif %}>
+    <!-- Header Top -->
+    <div class="header-top" {% if config and config.fondoPrincipal %}style="background: {{ config.fondoPrincipal }};"{% endif %}>
+        <div class="header-top-content">
+            <span>📞 +1 234 567 8900 | 📧 {% if config and config.CorreoApp %}{{ config.CorreoApp }}{% else %}info@fashion.com{% endif %}</span>
+            <span>Envío Gratis en Pedidos Superiores a $100</span>
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <header class="header-main">
+        <div class="header-content">
+            <div class="logo">
+                <a href="{% url 'home' %}" style="text-decoration: none; color: inherit;">
+                    {% if config and config.Logo %}
+                        <img src="{{ config.Logo|fix_image_url }}" alt="{% if config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}" style="max-height: 50px; vertical-align: middle;">
+                    {% endif %}
+                    <span style="{% if config and config.Logo %}margin-left: 10px;{% endif %}">
+                        {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}
+                    </span>
+                </a>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'home' %}">Inicio</a></li>
+                    <li><a href="{% url 'shop' %}">Tienda</a></li>
+                    {% for categoria in categorias|slice:":5" %}
+                    <li><a href="{% url 'shop' %}?categoria={{ categoria }}">{{ categoria }}</a></li>
+                    {% endfor %}
+                </ul>
+            </nav>
+            <div class="header-icons">
+                <a href="{% url 'shop' %}" class="header-icon" title="Buscar">🔍</a>
+                {% if request.session.usuario_id %}
+                    <a href="{% url 'perfil' %}" class="header-icon" title="Mi Perfil">👤</a>
+                    <a href="{% url 'logout' %}" class="header-icon" title="Cerrar Sesión">🚪</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="header-icon" title="Iniciar Sesión">👤</a>
+                {% endif %}
+                <a href="{% url 'carrito' %}" class="header-icon" title="Carrito">
+                    🛒
+                    <span class="cart-badge" id="cart-count">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Register Section -->
+    <main class="auth-container">
+        <div class="auth-card fade-in">
+            <div class="auth-header">
+                <h1>Únete a FASHION - Moda Femenina</h1>
+                <p>Crea tu cuenta y comienza a comprar</p>
+            </div>
+            
+            <!-- Messages -->
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post" class="auth-form">
+                {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="first_name">Nombre</label>
+                        <input 
+                            type="text" 
+                            id="first_name" 
+                            name="first_name" 
+                            class="form-control" 
+                            placeholder="Ingresa tu nombre"
+                            required
+                            value="{{ form.first_name.value|default:'' }}"
+                        >
+                        {% if form.first_name.errors %}
+                            <div class="field-error">
+                                {% for error in form.first_name.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="last_name">Apellido</label>
+                        <input 
+                            type="text" 
+                            id="last_name" 
+                            name="last_name" 
+                            class="form-control" 
+                            placeholder="Ingresa tu apellido"
+                            required
+                            value="{{ form.last_name.value|default:'' }}"
+                        >
+                        {% if form.last_name.errors %}
+                            <div class="field-error">
+                                {% for error in form.last_name.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Correo Electrónico</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        class="form-control" 
+                        placeholder="Ingresa tu correo electrónico"
+                        required
+                        value="{{ form.email.value|default:'' }}"
+                    >
+                    {% if form.email.errors %}
+                        <div class="field-error">
+                            {% for error in form.email.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="identificacion">Identificación</label>
+                    <input 
+                        type="number" 
+                        id="identificacion" 
+                        name="identificacion" 
+                        class="form-control" 
+                        placeholder="Ingresa tu número de identificación"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="tipo_identificacion">Tipo de Identificación</label>
+                    <select id="tipo_identificacion" name="tipo_identificacion" class="form-control" required>
+                        <option value="CC">Cédula de Ciudadanía</option>
+                        <option value="CE">Cédula de Extranjería</option>
+                        <option value="TI">Tarjeta de Identidad</option>
+                        <option value="PAS">Pasaporte</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="usuario">Nombre de Usuario (opcional)</label>
+                    <input 
+                        type="text" 
+                        id="usuario" 
+                        name="usuario" 
+                        class="form-control" 
+                        placeholder="Se usará tu email si no lo especificas"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password1">Contraseña</label>
+                    <input 
+                        type="password" 
+                        id="password1" 
+                        name="password1" 
+                        class="form-control" 
+                        placeholder="Crea una contraseña"
+                        required
+                    >
+                    <small class="form-help">La contraseña debe tener al menos 6 caracteres</small>
+                    {% if form.password1.errors %}
+                        <div class="field-error">
+                            {% for error in form.password1.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="password2">Confirmar Contraseña</label>
+                    <input 
+                        type="password" 
+                        id="password2" 
+                        name="password2" 
+                        class="form-control" 
+                        placeholder="Confirma tu contraseña"
+                        required
+                    >
+                    {% if form.password2.errors %}
+                        <div class="field-error">
+                            {% for error in form.password2.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="gender">Género (Opcional)</label>
+                    <select id="gender" name="gender" class="form-control">
+                        <option value="">Selecciona tu género</option>
+                        <option value="F" {% if form.gender.value == 'F' %}selected{% endif %}>Femenino</option>
+                        <option value="O" {% if form.gender.value == 'O' %}selected{% endif %}>Otro</option>
+                        <option value="N" {% if form.gender.value == 'N' %}selected{% endif %}>Prefiero no decir</option>
+                    </select>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="newsletter" name="newsletter" checked>
+                    <label for="newsletter">Suscríbete a nuestro boletín y obtén 20% de descuento en tu primera compra</label>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <label for="terms">Acepto los <a href="#" target="_blank">Términos y Condiciones</a> y la <a href="#" target="_blank">Política de Privacidad</a></label>
+                </div>
+
+                <button type="submit" class="btn-auth">Crear Cuenta</button>
+            </form>
+
+            <div class="auth-divider">
+                <span>o</span>
+            </div>
+
+            <div class="social-login">
+                <button class="btn-social btn-google" onclick="alert('Inicio de sesión con Google próximamente'); return false;">
+                    <span>🔍</span>
+                    Continuar con Google
+                </button>
+                <button class="btn-social btn-facebook" onclick="alert('Inicio de sesión con Facebook próximamente'); return false;">
+                    <span>f</span>
+                    Continuar con Facebook
+                </button>
+            </div>
+
+            <div class="auth-link">
+                <p>¿Ya tienes una cuenta? <a href="{% url 'login' %}">Inicia sesión aquí</a></p>
+            </div>
+        </div>
+    </main>
+
+    {% include 'base_footer.html' %}
+
+    <script src="{% static 'js/auth.js' %}"></script>
+</body>
+</html>

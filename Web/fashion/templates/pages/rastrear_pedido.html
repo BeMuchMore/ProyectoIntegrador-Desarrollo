@@ -1,0 +1,39 @@
+{% extends 'pages/base_page.html' %}
+
+{% block title %}Rastrear Pedido - {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}{% endblock %}
+
+{% block content %}
+<div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(212, 165, 199, 0.15);">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #c98bb8; margin-bottom: 30px; text-align: center;">Rastrear Pedido</h1>
+    
+    <div style="max-width: 600px; margin: 0 auto;">
+        <p style="font-size: 1.1rem; line-height: 1.8; color: #666; margin-bottom: 30px; text-align: center;">
+            Ingresa tu número de pedido y correo electrónico para rastrear el estado de tu envío.
+        </p>
+        
+        <form style="background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); padding: 30px; border-radius: 15px;">
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">Número de Pedido</label>
+                <input type="text" style="width: 100%; padding: 12px; border: 2px solid #d4a5c7; border-radius: 8px; font-size: 1rem;" placeholder="Ej: PED-123456">
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">Correo Electrónico</label>
+                <input type="email" style="width: 100%; padding: 12px; border: 2px solid #d4a5c7; border-radius: 8px; font-size: 1rem;" placeholder="tu@email.com">
+            </div>
+            
+            <button type="submit" class="btn-primary" style="width: 100%; padding: 15px; font-size: 1.1rem; font-weight: 600;">
+                🔍 Rastrear Pedido
+            </button>
+        </form>
+        
+        <div style="margin-top: 40px; padding: 25px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px;">
+            <h3 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin-bottom: 15px;">💡 ¿No tienes tu número de pedido?</h3>
+            <p style="color: #666; line-height: 1.8;">
+                Revisa el email de confirmación que enviamos cuando realizaste tu pedido. Si no lo encuentras, contáctanos y te ayudaremos.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

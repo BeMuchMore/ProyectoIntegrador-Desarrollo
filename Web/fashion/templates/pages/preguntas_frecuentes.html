@@ -1,0 +1,47 @@
+{% extends 'pages/base_page.html' %}
+
+{% block title %}Preguntas Frecuentes - {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}{% endblock %}
+
+{% block content %}
+<div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(212, 165, 199, 0.15);">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #c98bb8; margin-bottom: 30px; text-align: center;">Preguntas Frecuentes</h1>
+    
+    <div style="max-width: 800px; margin: 0 auto;">
+        <div style="margin-bottom: 30px; padding: 25px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px;">
+            <h3 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin-bottom: 15px;">¿Cómo puedo realizar un pedido?</h3>
+            <p style="color: #666; line-height: 1.8;">
+                Puedes realizar tu pedido directamente desde nuestra tienda online. Agrega los productos que desees al carrito y completa el proceso de checkout.
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 30px; padding: 25px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px;">
+            <h3 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin-bottom: 15px;">¿Cuáles son los métodos de pago aceptados?</h3>
+            <p style="color: #666; line-height: 1.8;">
+                Aceptamos tarjetas de crédito/débito, transferencias bancarias y pagos en efectivo contra entrega.
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 30px; padding: 25px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px;">
+            <h3 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin-bottom: 15px;">¿Puedo cambiar el tamaño de mi pedido?</h3>
+            <p style="color: #666; line-height: 1.8;">
+                Sí, puedes devolver el artículo y realizar un nuevo pedido con la talla correcta. Consulta nuestra política de devoluciones para más información.
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 30px; padding: 25px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px;">
+            <h3 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin-bottom: 15px;">¿Ofrecen envío internacional?</h3>
+            <p style="color: #666; line-height: 1.8;">
+                Actualmente realizamos envíos solo dentro de Colombia. Estamos trabajando para expandir nuestros servicios internacionales.
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 30px; padding: 25px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px;">
+            <h3 style="font-family: 'Playfair Display', serif; color: #c98bb8; margin-bottom: 15px;">¿Cómo puedo contactar al servicio al cliente?</h3>
+            <p style="color: #666; line-height: 1.8;">
+                Puedes contactarnos por email a {% if config and config.CorreoApp %}{{ config.CorreoApp }}{% else %}info@fashion.com{% endif %} o llamarnos al +1 234 567 8900 de lunes a viernes de 9:00 a 18:00.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,46 @@
+{% extends 'pages/base_page.html' %}
+
+{% block title %}Términos y Condiciones - {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %}{% endblock %}
+
+{% block content %}
+<div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(212, 165, 199, 0.15);">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #c98bb8; margin-bottom: 30px; text-align: center;">Términos y Condiciones</h1>
+    
+    <div style="max-width: 800px; margin: 0 auto;">
+        <div style="margin-bottom: 30px;">
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #c98bb8; margin-bottom: 20px;">Aceptación de los Términos</h2>
+            <p style="font-size: 1.1rem; line-height: 1.8; color: #666;">
+                Al acceder y utilizar este sitio web, aceptas cumplir con estos términos y condiciones. Si no estás de acuerdo con alguna parte de estos términos, no debes utilizar nuestro sitio.
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 30px;">
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #c98bb8; margin-bottom: 20px;">Uso del Sitio</h2>
+            <p style="font-size: 1.1rem; line-height: 1.8; color: #666;">
+                El sitio web está destinado únicamente para uso personal y no comercial. No puedes reproducir, duplicar, copiar, vender o explotar cualquier parte del sitio sin nuestro permiso expreso por escrito.
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 30px;">
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #c98bb8; margin-bottom: 20px;">Productos y Precios</h2>
+            <p style="font-size: 1.1rem; line-height: 1.8; color: #666;">
+                Nos reservamos el derecho de modificar precios, productos y disponibilidad en cualquier momento sin previo aviso. Todos los precios están en pesos colombianos (COP) e incluyen IVA cuando corresponda.
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 30px;">
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #c98bb8; margin-bottom: 20px;">Propiedad Intelectual</h2>
+            <p style="font-size: 1.1rem; line-height: 1.8; color: #666;">
+                Todo el contenido del sitio, incluyendo textos, gráficos, logotipos, imágenes y software, es propiedad de {% if config and config.NombreDeApp %}{{ config.NombreDeApp }}{% else %}FASHION{% endif %} y está protegido por leyes de propiedad intelectual.
+            </p>
+        </div>
+        
+        <div style="padding: 25px; background: linear-gradient(135deg, #f5e6f0 0%, #ffeef7 100%); border-radius: 15px;">
+            <p style="color: #666; line-height: 1.8;">
+                Estos términos pueden ser modificados en cualquier momento. Te recomendamos revisarlos periódicamente. El uso continuado del sitio después de cualquier cambio constituye tu aceptación de los nuevos términos.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
