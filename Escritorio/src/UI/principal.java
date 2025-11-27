@@ -115,12 +115,18 @@ public class principal extends javax.swing.JFrame {
             scrollPane.setBorder(null);
             scrollPane.getVerticalScrollBar().setUnitIncrement(16);
             scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            
+            // Personalizar el scrollbar vertical con diseño moderno
+            personalizarScrollBar(scrollPane.getVerticalScrollBar());
         } else {
             // Si ya existe, solo configuramos sus propiedades
             scrollPane.setViewportView(mainPanel);
             scrollPane.setBorder(null);
             scrollPane.getVerticalScrollBar().setUnitIncrement(16);
             scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            
+            // Personalizar el scrollbar vertical con diseño moderno
+            personalizarScrollBar(scrollPane.getVerticalScrollBar());
         }
         
         // Layout principal: header sticky arriba, contenido scrolleable abajo
@@ -740,20 +746,26 @@ public class principal extends javax.swing.JFrame {
         headerPanel.add(title);
         headerPanel.add(subtitle);
         
-        // Panel de productos con scroll horizontal mejorado y organizado
+        // Panel de productos con carrusel mejorado
         JPanel productsWrapper = new JPanel();
         productsWrapper.setLayout(new BorderLayout());
         productsWrapper.setOpaque(false);
         productsWrapper.setBorder(new EmptyBorder(0, 0, 40, 0));
         
+        // Contenedor principal del carrusel
+        JPanel carouselContainer = new JPanel(new BorderLayout());
+        carouselContainer.setOpaque(false);
+        carouselContainer.setBorder(new EmptyBorder(30, 0, 30, 0));
+        
         JPanel productsContainer = new JPanel();
         productsContainer.setLayout(new BoxLayout(productsContainer, BoxLayout.X_AXIS));
         productsContainer.setOpaque(false);
-        productsContainer.setBorder(new EmptyBorder(30, 50, 30, 50));
+        productsContainer.setBorder(new EmptyBorder(0, 60, 0, 60));
         productsContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
         
+        // ScrollPane oculto para el carrusel
         JScrollPane horizontalScroll = new JScrollPane(productsContainer);
-        horizontalScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        horizontalScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         horizontalScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         horizontalScroll.setBorder(null);
         horizontalScroll.setOpaque(false);
@@ -761,25 +773,47 @@ public class principal extends javax.swing.JFrame {
         horizontalScroll.setPreferredSize(new Dimension(1200, 430));
         horizontalScroll.setMaximumSize(new Dimension(1200, 430));
         
-        // Estilizar la scrollbar
-        horizontalScroll.getHorizontalScrollBar().setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
-            @Override
-            protected void configureScrollBarColors() {
-                this.thumbColor = new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 100);
-                this.trackColor = new Color(240, 240, 240);
-            }
+        // Guardar referencia para actualizar botones
+        carruselScrollPane = horizontalScroll;
+        
+        // Botones de navegación del carrusel
+        JButton btnAnterior = crearBotonCarrusel("◀", true);
+        JButton btnSiguiente = crearBotonCarrusel("▶", false);
+        
+        // Guardar referencias para actualizar visibilidad
+        carruselBtnAnterior = btnAnterior;
+        carruselBtnSiguiente = btnSiguiente;
+        
+        btnAnterior.addActionListener(e -> {
+            JScrollBar scrollBar = horizontalScroll.getHorizontalScrollBar();
+            int currentValue = scrollBar.getValue();
+            int scrollAmount = 320; // Ancho de una tarjeta + espaciado
+            scrollBar.setValue(Math.max(0, currentValue - scrollAmount));
+        });
+        
+        btnSiguiente.addActionListener(e -> {
+            JScrollBar scrollBar = horizontalScroll.getHorizontalScrollBar();
+            int currentValue = scrollBar.getValue();
+            int maxValue = scrollBar.getMaximum();
+            int scrollAmount = 320; // Ancho de una tarjeta + espaciado
+            scrollBar.setValue(Math.min(maxValue, currentValue + scrollAmount));
         });
         
         // Cargar productos recién llegados
         recienLlegadosProductsPanel = productsContainer;
         cargarRecienLlegados();
         
+        // Agregar botones y scroll al carrusel
+        carouselContainer.add(btnAnterior, BorderLayout.WEST);
+        carouselContainer.add(horizontalScroll, BorderLayout.CENTER);
+        carouselContainer.add(btnSiguiente, BorderLayout.EAST);
+        
         // Botón mejorado
         JButton verTodosBtn = crearBotonVerTodos("Ver Todos los Recién Llegados", e -> abrirCategoria("Nuevas Llegadas"));
         verTodosBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         verTodosBtn.setBorder(new EmptyBorder(30, 0, 0, 0));
         
-        productsWrapper.add(horizontalScroll, BorderLayout.CENTER);
+        productsWrapper.add(carouselContainer, BorderLayout.CENTER);
         
         recienLlegadosPanel.add(headerPanel);
         recienLlegadosPanel.add(productsWrapper);
@@ -789,6 +823,9 @@ public class principal extends javax.swing.JFrame {
     }
     
     private JPanel recienLlegadosProductsPanel;
+    private JButton carruselBtnAnterior;
+    private JButton carruselBtnSiguiente;
+    private JScrollPane carruselScrollPane;
     
     /**
      * Crea la sección de categorías con diseño mejorado
@@ -1325,6 +1362,24 @@ public class principal extends javax.swing.JFrame {
         
         recienLlegadosProductsPanel.revalidate();
         recienLlegadosProductsPanel.repaint();
+        
+        // Actualizar visibilidad de botones del carrusel después de cargar productos
+        SwingUtilities.invokeLater(() -> {
+            actualizarBotonesCarrusel();
+        });
+    }
+    
+    /**
+     * Actualiza la visibilidad de los botones del carrusel según el contenido
+     */
+    private void actualizarBotonesCarrusel() {
+        if (carruselScrollPane != null && carruselBtnAnterior != null && carruselBtnSiguiente != null) {
+            JScrollBar scrollBar = carruselScrollPane.getHorizontalScrollBar();
+            boolean necesitaScroll = scrollBar.getMaximum() > scrollBar.getVisibleAmount();
+            
+            carruselBtnAnterior.setVisible(necesitaScroll);
+            carruselBtnSiguiente.setVisible(necesitaScroll);
+        }
     }
     
     /**
@@ -1338,13 +1393,17 @@ public class principal extends javax.swing.JFrame {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 
-                // Sombra sutil
-                g2.setColor(new Color(0, 0, 0, 8));
-                g2.fillRoundRect(2, 4, getWidth() - 2, getHeight() - 2, 15, 15);
+                // Sombra más pronunciada y elegante
+                g2.setColor(new Color(0, 0, 0, 12));
+                g2.fillRoundRect(3, 5, getWidth() - 3, getHeight() - 3, 18, 18);
+                
+                // Sombra intermedia
+                g2.setColor(new Color(0, 0, 0, 6));
+                g2.fillRoundRect(1, 2, getWidth() - 1, getHeight() - 1, 18, 18);
                 
                 // Fondo blanco con bordes redondeados
                 g2.setColor(Color.WHITE);
-                g2.fillRoundRect(0, 0, getWidth() - 2, getHeight() - 4, 15, 15);
+                g2.fillRoundRect(0, 0, getWidth() - 2, getHeight() - 3, 18, 18);
                 
                 g2.dispose();
             }
@@ -1357,77 +1416,143 @@ public class principal extends javax.swing.JFrame {
         card.setMinimumSize(new Dimension(280, 400));
         card.setBorder(new EmptyBorder(15, 15, 15, 15));
         
-        // Panel de imagen con badge "NUEVO" mejorado - fondo blanco
+        // Panel de imagen con badge "NUEVO" mejorado - borde atractivo
         JPanel imageContainer = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                
+                // Sombra interna sutil
+                g2.setColor(new Color(0, 0, 0, 5));
+                g2.fillRoundRect(1, 1, getWidth() - 2, getHeight() - 2, 12, 12);
+                
+                // Fondo blanco con bordes redondeados
                 g2.setColor(Color.WHITE);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                
+                // Borde elegante con gradiente sutil
+                g2.setStroke(new BasicStroke(2.0f));
+                g2.setColor(new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 30));
+                g2.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 12, 12);
+                
                 g2.dispose();
             }
         };
-        imageContainer.setPreferredSize(new Dimension(240, 260));
-        imageContainer.setMaximumSize(new Dimension(240, 260));
+        imageContainer.setPreferredSize(new Dimension(250, 270));
+        imageContainer.setMaximumSize(new Dimension(250, 270));
         imageContainer.setOpaque(false);
-        imageContainer.setBorder(new EmptyBorder(8, 8, 8, 8));
+        imageContainer.setBorder(new EmptyBorder(12, 12, 12, 12));
         
-        // Badge "NUEVO" mejorado con bordes redondeados
-        JLabel badge = new JLabel("NUEVO") {
+        // Badge "NUEVO" mejorado - más visible y atractivo
+        JLabel badge = new JLabel("✨ NUEVO") {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(COLOR_ACCENT);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                
+                // Fondo con gradiente
+                GradientPaint gradient = new GradientPaint(
+                    0, 0, COLOR_ACCENT,
+                    getWidth(), getHeight(), COLOR_SECONDARY
+                );
+                g2.setPaint(gradient);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                
+                // Sombra sutil
+                g2.setColor(new Color(0, 0, 0, 20));
+                g2.fillRoundRect(1, 2, getWidth() - 1, getHeight() - 1, 10, 10);
+                
+                // Redibujar el fondo
+                g2.setPaint(gradient);
+                g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 2, 10, 10);
+                
                 g2.dispose();
                 super.paintComponent(g);
             }
         };
-        badge.setFont(new Font("Poppins", Font.BOLD, 11));
+        badge.setFont(new Font("Poppins", Font.BOLD, 12));
         badge.setForeground(COLOR_TEXT_LIGHT);
         badge.setOpaque(false);
-        badge.setBorder(new EmptyBorder(5, 12, 5, 12));
-        badge.setHorizontalAlignment(JLabel.CENTER);
+        badge.setBorder(new EmptyBorder(6, 14, 6, 14));
+        badge.setHorizontalAlignment(SwingConstants.CENTER);
         
-        // Imagen del producto mejorada - fondo blanco
-        JLabel imageLabel = new JLabel();
-        imageLabel.setPreferredSize(new Dimension(226, 256));
-        imageLabel.setMaximumSize(new Dimension(226, 256));
+        // Imagen del producto mejorada - fondo blanco con mejor presentación
+        JLabel imageLabel = new JLabel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                // Primero dibujar el fondo blanco
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                g2.setColor(Color.WHITE);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                g2.dispose();
+                
+                // Luego dibujar el componente (incluyendo el icono)
+                super.paintComponent(g);
+            }
+        };
+        imageLabel.setPreferredSize(new Dimension(226, 246));
+        imageLabel.setMaximumSize(new Dimension(226, 246));
         imageLabel.setOpaque(true);
         imageLabel.setBackground(Color.WHITE);
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         imageLabel.setVerticalAlignment(SwingConstants.CENTER);
         
-        // Cargar imagen
+        // Cargar imagen - método mejorado
         if (producto.getImgUrl() != null && !producto.getImgUrl().isEmpty()) {
             try {
+                // Intentar primero con obtenerRutaAbsoluta
                 String rutaAbsoluta = ConfigImagenes.obtenerRutaAbsoluta(producto.getImgUrl());
                 File archivo = new File(rutaAbsoluta);
-                if (archivo.exists()) {
+                
+                if (archivo.exists() && archivo.isFile()) {
                     ImageIcon icon = new ImageIcon(rutaAbsoluta);
-                    Image img = icon.getImage();
-                    Image imgEscalada = img.getScaledInstance(240, 240, Image.SCALE_SMOOTH);
-                    imageLabel.setIcon(new ImageIcon(imgEscalada));
-                    imageLabel.setText("");
+                    if (icon.getIconWidth() > 0 && icon.getIconHeight() > 0) {
+                        Image img = icon.getImage();
+                        Image imgEscalada = img.getScaledInstance(226, 246, Image.SCALE_SMOOTH);
+                        imageLabel.setIcon(new ImageIcon(imgEscalada));
+                        imageLabel.setText("");
+                    } else {
+                        throw new Exception("Imagen inválida");
+                    }
                 } else {
-                    ImageIcon icon = ConfigImagenes.cargarImagenEscalada(producto.getImgUrl(), 226, 256);
-                    if (icon != null) {
+                    // Intentar con cargarImagenEscalada
+                    ImageIcon icon = ConfigImagenes.cargarImagenEscalada(producto.getImgUrl(), 226, 246);
+                    if (icon != null && icon.getIconWidth() > 0) {
                         imageLabel.setIcon(icon);
                         imageLabel.setText("");
                     } else {
-                        imageLabel.setText("<html><div style='text-align: center; padding-top: 100px; color: #999;'>" +
-                            "Sin imagen</div></html>");
+                        // Intentar cargar directamente desde la ruta de BD
+                        File archivoBD = ConfigImagenes.obtenerArchivoImagen(producto.getImgUrl());
+                        if (archivoBD != null && archivoBD.exists()) {
+                            ImageIcon iconBD = new ImageIcon(archivoBD.getAbsolutePath());
+                            if (iconBD.getIconWidth() > 0) {
+                                Image img = iconBD.getImage();
+                                Image imgEscalada = img.getScaledInstance(226, 246, Image.SCALE_SMOOTH);
+                                imageLabel.setIcon(new ImageIcon(imgEscalada));
+                                imageLabel.setText("");
+                            } else {
+                                throw new Exception("No se pudo cargar la imagen");
+                            }
+                        } else {
+                            throw new Exception("Archivo no encontrado");
+                        }
                     }
                 }
             } catch (Exception e) {
-                imageLabel.setText("<html><div style='text-align: center; padding-top: 100px; color: #999;'>" +
+                logger.log(Level.WARNING, "Error al cargar imagen del producto: " + producto.getImgUrl(), e);
+                imageLabel.setIcon(null);
+                imageLabel.setText("<html><div style='text-align: center; padding-top: 100px; color: #999; font-size: 12px;'>" +
                     "Sin imagen</div></html>");
             }
         } else {
-            imageLabel.setText("<html><div style='text-align: center; padding-top: 100px; color: #999;'>" +
+            imageLabel.setIcon(null);
+            imageLabel.setText("<html><div style='text-align: center; padding-top: 100px; color: #999; font-size: 12px;'>" +
                 "Sin imagen</div></html>");
         }
         
@@ -1446,22 +1571,24 @@ public class principal extends javax.swing.JFrame {
         infoPanel.setOpaque(false);
         infoPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        // Nombre del producto centrado
+        // Nombre del producto - más llamativo y destacado
         String nombre = producto.getNombre() != null ? producto.getNombre() : "Sin nombre";
-        if (nombre.length() > 30) {
-            nombre = nombre.substring(0, 27) + "...";
+        if (nombre.length() > 25) {
+            nombre = nombre.substring(0, 22) + "...";
         }
-        JLabel nameLabel = new JLabel("<html><div style='text-align: center; line-height: 1.5;'>" + 
-            nombre + "</div></html>");
-        nameLabel.setFont(new Font("Poppins", Font.BOLD, 15));
-        nameLabel.setForeground(COLOR_TEXT_PRIMARY);
+        JLabel nameLabel = new JLabel("<html><div style='text-align: center; line-height: 1.4; padding: 5px 10px;'>" + 
+            "<b>" + nombre.toUpperCase() + "</b></div></html>");
+        nameLabel.setFont(new Font("Poppins", Font.BOLD, 16));
+        nameLabel.setForeground(new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue()));
         nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
         nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        nameLabel.setBorder(new EmptyBorder(0, 0, 10, 0));
+        nameLabel.setBorder(new EmptyBorder(15, 0, 12, 0));
         
-        // Precio centrado
-        JLabel priceLabel = new JLabel("$" + String.format("%.2f", producto.getPrecio()));
-        priceLabel.setFont(new Font("Poppins", Font.BOLD, 20));
+        // Precio centrado - más destacado
+        JLabel priceLabel = new JLabel("<html><div style='text-align: center;'>" +
+            "<span style='font-size: 24px; font-weight: bold; color: #6B2D4D;'>$" + 
+            String.format("%.2f", producto.getPrecio()) + "</span></div></html>");
+        priceLabel.setFont(new Font("Poppins", Font.BOLD, 22));
         priceLabel.setForeground(COLOR_PRIMARY);
         priceLabel.setHorizontalAlignment(SwingConstants.CENTER);
         priceLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -1671,6 +1798,169 @@ public class principal extends javax.swing.JFrame {
     }
     
     // ========== MÉTODOS DE NAVEGACIÓN ==========
+    
+    /**
+     * Crea un botón de navegación para el carrusel
+     */
+    private JButton crearBotonCarrusel(String texto, boolean esAnterior) {
+        JButton btn = new JButton(texto) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                
+                // Fondo con gradiente
+                GradientPaint gradient = new GradientPaint(
+                    0, 0, COLOR_PRIMARY,
+                    getWidth(), getHeight(), COLOR_SECONDARY
+                );
+                g2.setPaint(gradient);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
+                
+                // Sombra sutil
+                g2.setColor(new Color(0, 0, 0, 20));
+                g2.fillRoundRect(1, 2, getWidth() - 1, getHeight() - 1, 25, 25);
+                
+                // Redibujar el fondo
+                g2.setPaint(gradient);
+                g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 2, 25, 25);
+                
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        
+        btn.setFont(new Font("Poppins", Font.BOLD, 24));
+        btn.setForeground(COLOR_TEXT_LIGHT);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setOpaque(false);
+        btn.setPreferredSize(new Dimension(50, 430));
+        btn.setMinimumSize(new Dimension(50, 430));
+        btn.setMaximumSize(new Dimension(50, 430));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setHorizontalAlignment(SwingConstants.CENTER);
+        btn.setVerticalAlignment(SwingConstants.CENTER);
+        
+        // Efectos hover
+        btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setFont(new Font("Poppins", Font.BOLD, 28));
+                btn.repaint();
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setFont(new Font("Poppins", Font.BOLD, 24));
+                btn.repaint();
+            }
+            
+            @Override
+            public void mousePressed(MouseEvent e) {
+                btn.setFont(new Font("Poppins", Font.BOLD, 22));
+                btn.repaint();
+            }
+            
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                btn.setFont(new Font("Poppins", Font.BOLD, 24));
+                btn.repaint();
+            }
+        });
+        
+        return btn;
+    }
+    
+    /**
+     * Personaliza el scrollbar con un diseño moderno y atractivo
+     */
+    private void personalizarScrollBar(JScrollBar scrollBar) {
+        scrollBar.setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
+            @Override
+            protected void configureScrollBarColors() {
+                this.thumbColor = new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 120);
+                this.trackColor = new Color(248, 248, 248);
+                this.thumbDarkShadowColor = new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 180);
+                this.thumbLightShadowColor = new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 100);
+                this.thumbHighlightColor = new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 60);
+            }
+            
+            @Override
+            protected JButton createDecreaseButton(int orientation) {
+                return createZeroButton();
+            }
+            
+            @Override
+            protected JButton createIncreaseButton(int orientation) {
+                return createZeroButton();
+            }
+            
+            private JButton createZeroButton() {
+                JButton button = new JButton();
+                button.setPreferredSize(new Dimension(0, 0));
+                button.setMinimumSize(new Dimension(0, 0));
+                button.setMaximumSize(new Dimension(0, 0));
+                return button;
+            }
+            
+            @Override
+            protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
+                if (thumbBounds.isEmpty() || !scrollbar.isEnabled()) {
+                    return;
+                }
+                
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                
+                int w = thumbBounds.width;
+                int h = thumbBounds.height;
+                int x = thumbBounds.x;
+                int y = thumbBounds.y;
+                
+                // Sombra sutil
+                g2.setColor(new Color(0, 0, 0, 15));
+                g2.fillRoundRect(x + 1, y + 2, w - 2, h - 2, 12, 12);
+                
+                // Gradiente para el thumb
+                GradientPaint gradient = new GradientPaint(
+                    x, y, new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 150),
+                    x, y + h, new Color(COLOR_SECONDARY.getRed(), COLOR_SECONDARY.getGreen(), COLOR_SECONDARY.getBlue(), 150)
+                );
+                g2.setPaint(gradient);
+                g2.fillRoundRect(x, y, w - 1, h - 3, 12, 12);
+                
+                // Borde sutil
+                g2.setStroke(new BasicStroke(1.0f));
+                g2.setColor(new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 200));
+                g2.drawRoundRect(x, y, w - 1, h - 3, 12, 12);
+                
+                g2.dispose();
+            }
+            
+            @Override
+            protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                g2.setColor(trackColor);
+                g2.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
+                
+                // Borde sutil a la izquierda
+                g2.setColor(new Color(240, 240, 240));
+                g2.setStroke(new BasicStroke(1.0f));
+                g2.drawLine(trackBounds.x, trackBounds.y, trackBounds.x, trackBounds.y + trackBounds.height);
+                
+                g2.dispose();
+            }
+        });
+        
+        // Ancho del scrollbar
+        scrollBar.setPreferredSize(new Dimension(12, 0));
+    }
     
     private void scrollToTop() {
         SwingUtilities.invokeLater(() -> {

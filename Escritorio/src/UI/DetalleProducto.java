@@ -1,6 +1,7 @@
 package UI;
 
 import javax.swing.*;
+import javax.swing.SpinnerNumberModel;
 import java.awt.*;
 import java.sql.*;
 import java.util.ArrayList;
@@ -136,8 +137,11 @@ public class DetalleProducto extends javax.swing.JFrame {
         if (index >= 0 && index < tallasDisponibles.size()) {
             TallaDisponible talla = tallasDisponibles.get(index);
             jLabelPrecio.setText("$" + String.format("%.2f", talla.precio));
-            jSpinnerCantidad.setMaximum(talla.cantidad);
-            jSpinnerCantidad.setValue(1);
+            
+            // Actualizar el modelo del spinner con el nuevo máximo
+            int maxCantidad = Math.max(1, talla.cantidad);
+            SpinnerNumberModel model = new SpinnerNumberModel(1, 1, maxCantidad, 1);
+            jSpinnerCantidad.setModel(model);
         }
     }
     
