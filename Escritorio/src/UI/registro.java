@@ -6,7 +6,9 @@ import javax.swing.BorderFactory;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.regex.Pattern;
+import java.sql.*;
 import UI.util.ModernStyles;
+import UI.Conexion;
 
 public class registro extends javax.swing.JFrame {
     
