@@ -2,10 +2,14 @@ package UI;
 
 import javax.swing.*;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.awt.image.BufferedImage;
 import UI.ConfigImagenes;
 import UI.util.ErrorHandler;
 
@@ -13,6 +17,15 @@ import UI.util.ErrorHandler;
  * Ventana para ver detalles de un producto y agregarlo al carrito
  */
 public class DetalleProducto extends javax.swing.JFrame {
+    
+    // Colores accesibles WCAG AAA - Paleta femenina y seria (mismos que principal)
+    private static final Color COLOR_PRIMARY = new Color(107, 45, 77); // #6B2D4D
+    private static final Color COLOR_SECONDARY = new Color(139, 74, 107); // #8B4A6B
+    private static final Color COLOR_ACCENT = new Color(168, 85, 122); // #A8557A
+    private static final Color COLOR_TEXT_PRIMARY = new Color(26, 26, 26); // #1a1a1a
+    private static final Color COLOR_TEXT_SECONDARY = new Color(51, 51, 51); // #333333
+    private static final Color COLOR_TEXT_LIGHT = new Color(255, 255, 255); // #FFFFFF
+    private static final Color COLOR_BG_LIGHT = new Color(250, 246, 249); // #FAF6F9
     
     private int userId;
     private UI.Producto producto;
@@ -155,6 +168,19 @@ public class DetalleProducto extends javax.swing.JFrame {
         
         jButtonVolver.addActionListener(e -> {
             this.dispose();
+            // Volver a la página principal - usar SwingUtilities para asegurar que se ejecute en el EDT
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    principal ventanaPrincipal = new principal(userId);
+                    ventanaPrincipal.setVisible(true);
+                } catch (Exception ex) {
+                    ErrorHandler.logError(ex, "Error al volver a la página principal");
+                    JOptionPane.showMessageDialog(this,
+                        "Error al volver a la página principal",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            });
         });
     }
     
@@ -168,7 +194,7 @@ public class DetalleProducto extends javax.swing.JFrame {
                 "Sesión requerida",
                 JOptionPane.WARNING_MESSAGE);
             this.dispose();
-            new UI.pruebas.Inicio().setVisible(true);
+            new Inicio().setVisible(true);
             return;
         }
         
@@ -319,60 +345,93 @@ public class DetalleProducto extends javax.swing.JFrame {
         
         jPanelMain.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         
-        jPanelHeader.setBackground(new java.awt.Color(255, 255, 255));
-        jPanelHeader.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanelHeader.setBackground(new java.awt.Color(250, 246, 249)); // #FAF6F9
+        jPanelHeader.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 50)),
+            javax.swing.BorderFactory.createEmptyBorder(15, 30, 15, 30)
+        ));
         jPanelHeader.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         
-        jLabelTitulo.setFont(new java.awt.Font("Arial", Font.BOLD, 24));
+        jLabelTitulo.setFont(new java.awt.Font("Playfair Display", Font.BOLD, 28));
         jLabelTitulo.setText("Detalle del Producto");
+        jLabelTitulo.setForeground(COLOR_PRIMARY);
         jPanelHeader.add(jLabelTitulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, 400, 40));
         
         jButtonVolver.setText("← Volver");
-        jButtonVolver.setFont(new java.awt.Font("Arial", Font.PLAIN, 14));
+        jButtonVolver.setFont(new java.awt.Font("Poppins", Font.BOLD, 13));
+        jButtonVolver.setForeground(COLOR_PRIMARY);
+        jButtonVolver.setBackground(COLOR_BG_LIGHT);
+        jButtonVolver.setBorderPainted(false);
+        jButtonVolver.setFocusPainted(false);
+        jButtonVolver.setCursor(new Cursor(Cursor.HAND_CURSOR));
         jPanelHeader.add(jButtonVolver, new org.netbeans.lib.awtextra.AbsoluteConstraints(1200, 25, 120, 35));
         
         jPanelMain.add(jPanelHeader, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1363, 80));
         
-        jPanelContenido.setBackground(new java.awt.Color(255, 255, 255));
+        jPanelContenido.setBackground(new java.awt.Color(250, 246, 249)); // #FAF6F9
         jPanelContenido.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         
         jLabelImagen.setHorizontalAlignment(SwingConstants.CENTER);
-        jLabelImagen.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jLabelImagen.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createLineBorder(new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 30), 2),
+            javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
+        jLabelImagen.setBackground(Color.WHITE);
+        jLabelImagen.setOpaque(true);
         jPanelContenido.add(jLabelImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 30, 400, 500));
         
-        jPanelInfo.setBackground(new java.awt.Color(255, 255, 255));
+        jPanelInfo.setBackground(new java.awt.Color(250, 246, 249)); // #FAF6F9
         jPanelInfo.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         
-        jLabelNombre.setFont(new java.awt.Font("Arial", Font.BOLD, 28));
+        jLabelNombre.setFont(new java.awt.Font("Playfair Display", Font.BOLD, 32));
         jLabelNombre.setText("Nombre del Producto");
-        jPanelInfo.add(jLabelNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 800, 40));
+        jLabelNombre.setForeground(COLOR_TEXT_PRIMARY);
+        jPanelInfo.add(jLabelNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 800, 50));
         
-        jLabelPrecio.setFont(new java.awt.Font("Arial", Font.BOLD, 32));
-        jLabelPrecio.setForeground(new java.awt.Color(0, 150, 0));
+        jLabelPrecio.setFont(new java.awt.Font("Poppins", Font.BOLD, 36));
+        jLabelPrecio.setForeground(COLOR_PRIMARY);
         jLabelPrecio.setText("$0.00");
-        jPanelInfo.add(jLabelPrecio, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 70, 200, 40));
+        jPanelInfo.add(jLabelPrecio, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 80, 300, 45));
         
-        jLabelCategoria.setFont(new java.awt.Font("Arial", Font.PLAIN, 16));
+        jLabelCategoria.setFont(new java.awt.Font("Poppins", Font.PLAIN, 15));
         jLabelCategoria.setText("Categoría: ");
-        jPanelInfo.add(jLabelCategoria, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 130, 600, 25));
+        jLabelCategoria.setForeground(COLOR_TEXT_SECONDARY);
+        jPanelInfo.add(jLabelCategoria, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 140, 600, 30));
         
-        jLabelColor.setFont(new java.awt.Font("Arial", Font.PLAIN, 16));
+        jLabelColor.setFont(new java.awt.Font("Poppins", Font.PLAIN, 15));
         jLabelColor.setText("Color: ");
-        jPanelInfo.add(jLabelColor, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 165, 600, 25));
+        jLabelColor.setForeground(COLOR_TEXT_SECONDARY);
+        jPanelInfo.add(jLabelColor, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 175, 600, 30));
         
-        jLabelMaterial.setFont(new java.awt.Font("Arial", Font.PLAIN, 16));
+        jLabelMaterial.setFont(new java.awt.Font("Poppins", Font.PLAIN, 15));
         jLabelMaterial.setText("Material: ");
-        jPanelInfo.add(jLabelMaterial, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 200, 600, 25));
+        jLabelMaterial.setForeground(COLOR_TEXT_SECONDARY);
+        jPanelInfo.add(jLabelMaterial, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 210, 600, 30));
         
         jTextAreaDescripcion.setEditable(false);
-        jTextAreaDescripcion.setFont(new java.awt.Font("Arial", Font.PLAIN, 14));
+        jTextAreaDescripcion.setFont(new java.awt.Font("Poppins", Font.PLAIN, 14));
         jTextAreaDescripcion.setLineWrap(true);
         jTextAreaDescripcion.setWrapStyleWord(true);
+        jTextAreaDescripcion.setBackground(new java.awt.Color(255, 255, 255));
+        jTextAreaDescripcion.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createLineBorder(new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 30), 1),
+            javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
         jScrollPane1.setViewportView(jTextAreaDescripcion);
-        jPanelInfo.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 240, 800, 150));
+        jScrollPane1.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+        jPanelInfo.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 250, 800, 140));
         
-        jPanelCompra.setBackground(new java.awt.Color(245, 245, 245));
-        jPanelCompra.setBorder(javax.swing.BorderFactory.createTitledBorder("Opciones de Compra"));
+        jPanelCompra.setBackground(new java.awt.Color(255, 255, 255));
+        jPanelCompra.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createLineBorder(new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 50), 2),
+            javax.swing.BorderFactory.createTitledBorder(
+                javax.swing.BorderFactory.createEmptyBorder(),
+                "Opciones de Compra",
+                0, 0,
+                new java.awt.Font("Poppins", Font.BOLD, 16),
+                COLOR_PRIMARY
+            )
+        ));
         jPanelCompra.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         
         jLabelTalla.setFont(new java.awt.Font("Arial", Font.BOLD, 14));

@@ -4,13 +4,21 @@ import javax.swing.*;
 import javax.swing.BorderFactory;
 import java.awt.*;
 import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.*;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.border.LineBorder;
+import java.util.Locale;
+import javax.swing.border.EmptyBorder;
 import java.awt.Cursor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 import UI.ConfigImagenes;
 import UI.util.ModernStyles;
 
@@ -19,6 +27,15 @@ import UI.util.ModernStyles;
  * Similar en tamaño y diseño a principal.java
  */
 public class Categorias extends javax.swing.JFrame {
+    
+    // Colores accesibles WCAG AAA - Paleta femenina y seria (mismos que principal)
+    private static final Color COLOR_PRIMARY = new Color(107, 45, 77); // #6B2D4D
+    private static final Color COLOR_SECONDARY = new Color(139, 74, 107); // #8B4A6B
+    private static final Color COLOR_ACCENT = new Color(168, 85, 122); // #A8557A
+    private static final Color COLOR_TEXT_PRIMARY = new Color(26, 26, 26); // #1a1a1a
+    private static final Color COLOR_TEXT_SECONDARY = new Color(51, 51, 51); // #333333
+    private static final Color COLOR_TEXT_LIGHT = new Color(255, 255, 255); // #FFFFFF
+    private static final Color COLOR_BG_LIGHT = new Color(250, 250, 250); // #FAFAFA
     
     // Información del usuario actual
     private int userId;
@@ -447,96 +464,338 @@ public class Categorias extends javax.swing.JFrame {
     }
     
     /**
-     * Crea un panel para un producto
+     * Crea un panel para un producto con diseño moderno
      */
     private JPanel crearPanelProducto(UI.Producto producto) {
-        JPanel panel = new JPanel();
+        // Panel principal con sombra y bordes redondeados
+        JPanel panel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                
+                // Sombra sutil
+                g2.setColor(new Color(0, 0, 0, 10));
+                g2.fillRoundRect(2, 4, getWidth() - 2, getHeight() - 2, 15, 15);
+                
+                // Fondo blanco con bordes redondeados
+                g2.setColor(Color.WHITE);
+                g2.fillRoundRect(0, 0, getWidth() - 2, getHeight() - 4, 15, 15);
+                
+                g2.dispose();
+            }
+        };
         panel.setLayout(new BorderLayout());
-        panel.setPreferredSize(new Dimension(250, 320));
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
+        panel.setPreferredSize(new Dimension(280, 400));
+        panel.setOpaque(false);
+        panel.setBorder(new EmptyBorder(15, 15, 15, 15));
         
         // Panel principal con BoxLayout
         JPanel contenido = new JPanel();
         contenido.setLayout(new BoxLayout(contenido, BoxLayout.Y_AXIS));
-        contenido.setBackground(Color.WHITE);
+        contenido.setOpaque(false);
         
-        // Imagen del producto
-        ImageIcon imagen = null;
+        // Panel de imagen con bordes redondeados
+        JPanel imageContainer = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(Color.WHITE);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2.dispose();
+            }
+        };
+        imageContainer.setOpaque(false);
+        imageContainer.setPreferredSize(new Dimension(250, 200));
+        imageContainer.setBorder(new EmptyBorder(10, 10, 10, 10));
+        
+        // Imagen del producto mejorada
+        JLabel lblImagen = new JLabel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                
+                // Fondo blanco
+                g2.setColor(Color.WHITE);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                
+                // Si hay icono, dibujarlo
+                if (getIcon() != null) {
+                    ImageIcon icon = (ImageIcon) getIcon();
+                    Image img = icon.getImage();
+                    if (img != null) {
+                        int iconWidth = icon.getIconWidth();
+                        int iconHeight = icon.getIconHeight();
+                        int availableWidth = getWidth() - 10;
+                        int availableHeight = getHeight() - 10;
+                        
+                        double scaleX = (double) availableWidth / iconWidth;
+                        double scaleY = (double) availableHeight / iconHeight;
+                        double scale = Math.min(Math.min(scaleX, scaleY), 1.0);
+                        
+                        int scaledWidth = (int) (iconWidth * scale);
+                        int scaledHeight = (int) (iconHeight * scale);
+                        
+                        int x = (getWidth() - scaledWidth) / 2;
+                        int y = (getHeight() - scaledHeight) / 2;
+                        
+                        g2.drawImage(img, x, y, scaledWidth, scaledHeight, null);
+                    }
+                } else {
+                    // Texto si no hay imagen
+                    g2.setColor(COLOR_TEXT_SECONDARY);
+                    g2.setFont(new Font("Poppins", Font.PLAIN, 14));
+                    FontMetrics fm = g2.getFontMetrics();
+                    String texto = "Sin imagen";
+                    int textX = (getWidth() - fm.stringWidth(texto)) / 2;
+                    int textY = ((getHeight() - fm.getHeight()) / 2) + fm.getAscent();
+                    g2.drawString(texto, textX, textY);
+                }
+                
+                g2.dispose();
+            }
+        };
+        lblImagen.setOpaque(false);
+        lblImagen.setPreferredSize(new Dimension(230, 180));
+        lblImagen.setHorizontalAlignment(SwingConstants.CENTER);
+        lblImagen.setVerticalAlignment(SwingConstants.CENTER);
+        
+        // Cargar imagen
         if (producto.getImgUrl() != null && !producto.getImgUrl().isEmpty()) {
-            imagen = ConfigImagenes.cargarImagenEscalada(producto.getImgUrl(), 230, 180);
+            cargarImagenProducto(lblImagen, producto.getImgUrl());
         }
         
-        if (imagen != null) {
-            JLabel lblImagen = new JLabel(imagen);
-            lblImagen.setAlignmentX(Component.CENTER_ALIGNMENT);
-            contenido.add(lblImagen);
-        } else {
-            JLabel lblNoImagen = new JLabel("Sin imagen");
-            lblNoImagen.setAlignmentX(Component.CENTER_ALIGNMENT);
-            lblNoImagen.setPreferredSize(new Dimension(230, 180));
-            lblNoImagen.setHorizontalAlignment(SwingConstants.CENTER);
-            lblNoImagen.setBackground(new Color(240, 240, 240));
-            lblNoImagen.setOpaque(true);
-            contenido.add(lblNoImagen);
-        }
-        
-        contenido.add(Box.createRigidArea(new Dimension(0, 5)));
+        imageContainer.add(lblImagen, BorderLayout.CENTER);
+        contenido.add(imageContainer);
+        contenido.add(Box.createRigidArea(new Dimension(0, 15)));
         
         // Nombre del producto con tipografía mejorada
-        JLabel lblNombre = new JLabel("<html><center>" + producto.getNombre() + "</center></html>");
-        lblNombre.setFont(ModernStyles.getSemiboldFont(14));
-        lblNombre.setForeground(ModernStyles.TEXT_PRIMARY);
+        String nombre = producto.getNombre() != null ? producto.getNombre() : "Sin nombre";
+        if (nombre.length() > 30) {
+            nombre = nombre.substring(0, 27) + "...";
+        }
+        JLabel lblNombre = new JLabel("<html><div style='text-align: center; line-height: 1.4;'>" + nombre + "</div></html>");
+        lblNombre.setFont(new Font("Poppins", Font.BOLD, 16));
+        lblNombre.setForeground(COLOR_TEXT_PRIMARY);
         lblNombre.setAlignmentX(Component.CENTER_ALIGNMENT);
-        ModernStyles.enableTextAntialiasing(lblNombre);
+        lblNombre.setBorder(new EmptyBorder(0, 10, 10, 10));
         contenido.add(lblNombre);
         
-        // Precio con tipografía mejorada (color primario rosado como web)
-        JLabel lblPrecio = new JLabel("$" + String.format("%.2f", producto.getPrecio()));
-        lblPrecio.setFont(ModernStyles.getBoldFont(18));
-        lblPrecio.setForeground(ModernStyles.PRIMARY_COLOR);
+        // Precio con formato mejorado (puntos de miles) y tipografía mejorada
+        JLabel lblPrecio = new JLabel("<html><div style='text-align: center;'>" +
+            "<span style='font-size: 20px; font-weight: bold; color: #6B2D4D;'>" +
+            formatearPrecio(producto.getPrecio()) + "</span></div></html>");
+        lblPrecio.setFont(new Font("Poppins", Font.BOLD, 18));
+        lblPrecio.setForeground(COLOR_PRIMARY);
         lblPrecio.setAlignmentX(Component.CENTER_ALIGNMENT);
-        ModernStyles.enableTextAntialiasing(lblPrecio);
+        lblPrecio.setBorder(new EmptyBorder(0, 10, 10, 10));
         contenido.add(lblPrecio);
         
         // Color y Stock con tipografía mejorada
         JLabel lblDetalles = new JLabel(
-            "<html><center>Color: " + (producto.getColor() != null ? producto.getColor() : "N/A") + 
-            "<br>Stock: " + producto.getCantidad() + " unidades</center></html>"
+            "<html><div style='text-align: center; line-height: 1.6; color: #333;'>" +
+            "Color: " + (producto.getColor() != null ? producto.getColor() : "N/A") + 
+            "<br>Stock: " + producto.getCantidad() + " unidades</div></html>"
         );
-        lblDetalles.setFont(ModernStyles.getBodySmallFont());
-        lblDetalles.setForeground(ModernStyles.TEXT_SECONDARY);
+        lblDetalles.setFont(new Font("Poppins", Font.PLAIN, 12));
+        lblDetalles.setForeground(COLOR_TEXT_SECONDARY);
         lblDetalles.setAlignmentX(Component.CENTER_ALIGNMENT);
-        ModernStyles.enableTextAntialiasing(lblDetalles);
+        lblDetalles.setBorder(new EmptyBorder(0, 10, 15, 10));
         contenido.add(lblDetalles);
         
-        contenido.add(Box.createRigidArea(new Dimension(0, 5)));
-        
-        // Botón Ver Detalles con tipografía mejorada
-        JButton btnVer = new JButton("Ver Detalles");
+        // Botón Ver Detalles mejorado
+        JButton btnVer = crearBotonModerno("Ver Detalles", e -> mostrarDetallesProducto(producto));
         btnVer.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnVer.setFont(ModernStyles.getSemiboldFont(12));
-        ModernStyles.enableTextAntialiasing(btnVer);
-        btnVer.addActionListener(e -> mostrarDetallesProducto(producto));
+        btnVer.setPreferredSize(new Dimension(200, 40));
         contenido.add(btnVer);
         
         panel.add(contenido, BorderLayout.CENTER);
         
-        // Efecto hover
+        // Efecto hover mejorado
         panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                panel.setBorder(new LineBorder(Color.BLUE, 2));
+                panel.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(COLOR_PRIMARY, 2),
+                    new EmptyBorder(13, 13, 13, 13)
+                ));
+                panel.repaint();
             }
             
             @Override
             public void mouseExited(MouseEvent e) {
-                panel.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
+                panel.setBorder(new EmptyBorder(15, 15, 15, 15));
+                panel.repaint();
             }
         });
         
         return panel;
+    }
+    
+    /**
+     * Carga la imagen de un producto
+     */
+    private void cargarImagenProducto(JLabel imageLabel, String imgUrl) {
+        try {
+            String rutaAbsoluta = ConfigImagenes.obtenerRutaAbsoluta(imgUrl);
+            File archivo = new File(rutaAbsoluta);
+            
+            if (archivo.exists()) {
+                ImageIcon icon = new ImageIcon(rutaAbsoluta);
+                Image img = icon.getImage();
+                if (img != null) {
+                    Image imgEscalada = img.getScaledInstance(230, 180, Image.SCALE_SMOOTH);
+                    imageLabel.setIcon(new ImageIcon(imgEscalada));
+                    imageLabel.setText("");
+                    imageLabel.repaint();
+                    return;
+                }
+            }
+            
+            // Si no hay imagen local, intentar cargar imagen web
+            cargarImagenWebProducto(imageLabel);
+        } catch (Exception e) {
+            // Intentar cargar imagen web
+            cargarImagenWebProducto(imageLabel);
+        }
+    }
+    
+    /**
+     * Carga una imagen web como fallback
+     */
+    private void cargarImagenWebProducto(JLabel imageLabel) {
+        String imageUrl = "https://picsum.photos/seed/fashion-product/230/180";
+        
+        new Thread(() -> {
+            try {
+                URL url = new URL(imageUrl);
+                URLConnection connection = url.openConnection();
+                connection.setConnectTimeout(10000); // 10 segundos
+                connection.setReadTimeout(10000); // 10 segundos
+                connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+                
+                InputStream inputStream = connection.getInputStream();
+                Image img = ImageIO.read(inputStream);
+                inputStream.close();
+                
+                if (img != null && img.getWidth(null) > 0 && img.getHeight(null) > 0) {
+                    Image imgEscalada = img.getScaledInstance(230, 180, Image.SCALE_SMOOTH);
+                    SwingUtilities.invokeLater(() -> {
+                        imageLabel.setIcon(new ImageIcon(imgEscalada));
+                        imageLabel.setText("");
+                        imageLabel.repaint();
+                    });
+                }
+            } catch (java.net.SocketTimeoutException e) {
+                // Timeout silencioso - el texto "Sin imagen" ya está en el paintComponent
+            } catch (Exception e) {
+                // Solo loguear errores no relacionados con timeout
+                if (!(e instanceof java.net.SocketTimeoutException)) {
+                    // Error silencioso - no mostrar en consola
+                }
+            }
+        }).start();
+    }
+    
+    /**
+     * Crea un botón moderno con estilo
+     */
+    private JButton crearBotonModerno(String texto, java.awt.event.ActionListener action) {
+        JButton btn = new JButton(texto) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Gradiente de fondo
+                GradientPaint gradient = new GradientPaint(
+                    0, 0, COLOR_PRIMARY,
+                    getWidth(), getHeight(), COLOR_SECONDARY
+                );
+                g2.setPaint(gradient);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+                
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        
+        btn.setFont(new Font("Poppins", Font.BOLD, 14));
+        btn.setForeground(COLOR_TEXT_LIGHT);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setOpaque(false);
+        btn.addActionListener(action);
+        
+        // Efecto hover
+        btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setFont(new Font("Poppins", Font.BOLD, 15));
+                btn.repaint();
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setFont(new Font("Poppins", Font.BOLD, 14));
+                btn.repaint();
+            }
+        });
+        
+        return btn;
+    }
+    
+    /**
+     * Formatea un precio con puntos de miles y dos decimales
+     */
+    private String formatearPrecio(double precio) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("es", "CO"));
+        symbols.setGroupingSeparator('.');
+        symbols.setDecimalSeparator(',');
+        DecimalFormat formatter = new DecimalFormat("#,##0.00", symbols);
+        return "$" + formatter.format(precio);
+    }
+    
+    /**
+     * Crea un botón moderno para el header
+     */
+    private JButton crearBotonHeader(String texto, java.awt.event.ActionListener action) {
+        JButton btn = new JButton(texto) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Gradiente de fondo
+                GradientPaint gradient = new GradientPaint(
+                    0, 0, COLOR_PRIMARY,
+                    getWidth(), getHeight(), COLOR_SECONDARY
+                );
+                g2.setPaint(gradient);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
+                
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        
+        btn.setFont(new Font("Poppins", Font.BOLD, 13));
+        btn.setForeground(COLOR_TEXT_LIGHT);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setOpaque(false);
+        btn.addActionListener(action);
+        
+        return btn;
     }
     
     /**
@@ -592,20 +851,18 @@ public class Categorias extends javax.swing.JFrame {
                 System.err.println("Error al obtener datos del usuario: " + e.getMessage());
             }
         } else {
-            // Mostrar botones de login/registro
-            JButton btnIniciar = new JButton("Iniciar");
-            btnIniciar.addActionListener(e -> {
-                this.dispose();
-                new UI.pruebas.Inicio().setVisible(true);
+            // Mostrar botones de login/registro sin cerrar la página actual
+            JButton btnIniciar = crearBotonHeader("Iniciar", e -> {
+                Inicio ventanaLogin = new Inicio();
+                ventanaLogin.setVisible(true);
             });
-            jPanelHeader.add(btnIniciar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 50, 80, 23));
+            jPanelHeader.add(btnIniciar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 50, 100, 35));
             
-            JButton btnRegistrar = new JButton("Registrar");
-            btnRegistrar.addActionListener(e -> {
-                this.dispose();
-                new registro().setVisible(true);
+            JButton btnRegistrar = crearBotonHeader("Registrar", e -> {
+                registro ventanaRegistro = new registro();
+                ventanaRegistro.setVisible(true);
             });
-            jPanelHeader.add(btnRegistrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1130, 50, 100, 23));
+            jPanelHeader.add(btnRegistrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1150, 50, 100, 35));
         }
     }
     
@@ -634,37 +891,51 @@ public class Categorias extends javax.swing.JFrame {
         jPanelMain.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanelHeader.setBackground(new java.awt.Color(255, 255, 255));
-        jPanelHeader.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanelHeader.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 30)),
+            BorderFactory.createEmptyBorder(0, 0, 0, 0)
+        ));
         jPanelHeader.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabelTituloApp.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        jLabelTituloApp.setFont(new Font("Playfair Display", Font.BOLD, 24));
         jLabelTituloApp.setText("FASHION");
+        jLabelTituloApp.setForeground(COLOR_PRIMARY);
         jPanelHeader.add(jLabelTituloApp, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, 150, 30));
 
         jButtonVolver.setText("← Volver");
-        jButtonVolver.setFont(new java.awt.Font("Arial", Font.PLAIN, 12));
+        jButtonVolver.setFont(new Font("Poppins", Font.PLAIN, 14));
+        jButtonVolver.setForeground(COLOR_PRIMARY);
         jPanelHeader.add(jButtonVolver, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 30, 100, 30));
 
         jPanelMain.add(jPanelHeader, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1363, 100));
 
-        jPanelBuscar.setBackground(new java.awt.Color(245, 245, 245));
+        jPanelBuscar.setBackground(COLOR_BG_LIGHT);
         jPanelBuscar.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        jPanelBuscar.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        jTextFieldBuscar.setFont(new java.awt.Font("Arial", Font.PLAIN, 14));
-        jTextFieldBuscar.setPreferredSize(new java.awt.Dimension(400, 30));
-        jPanelBuscar.add(jTextFieldBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 10, 400, 30));
+        jTextFieldBuscar.setFont(new Font("Poppins", Font.PLAIN, 14));
+        jTextFieldBuscar.setPreferredSize(new java.awt.Dimension(400, 35));
+        jTextFieldBuscar.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(COLOR_PRIMARY, 1),
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
+        jPanelBuscar.add(jTextFieldBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 10, 400, 35));
 
         jButtonBuscar.setText("Buscar");
-        jButtonBuscar.setFont(new java.awt.Font("Arial", Font.PLAIN, 12));
-        jPanelBuscar.add(jButtonBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 10, 100, 30));
+        jButtonBuscar.setFont(new Font("Poppins", Font.BOLD, 14));
+        jButtonBuscar.setForeground(COLOR_TEXT_LIGHT);
+        jButtonBuscar.setBackground(COLOR_PRIMARY);
+        jPanelBuscar.add(jButtonBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 10, 120, 35));
 
-        jLabelCategoria.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
+        jLabelCategoria.setFont(new Font("Playfair Display", Font.BOLD, 32));
         jLabelCategoria.setText("Categoría");
-        jPanelBuscar.add(jLabelCategoria, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 50, 500, 30));
+        jLabelCategoria.setForeground(COLOR_TEXT_PRIMARY);
+        jPanelBuscar.add(jLabelCategoria, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 50, 500, 35));
 
-        jLabelContador.setFont(new java.awt.Font("Arial", Font.PLAIN, 12));
+        jLabelContador.setFont(new Font("Poppins", Font.PLAIN, 14));
         jLabelContador.setText("Mostrando 0 productos");
-        jPanelBuscar.add(jLabelContador, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 80, 300, 20));
+        jLabelContador.setForeground(COLOR_TEXT_SECONDARY);
+        jPanelBuscar.add(jLabelContador, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 85, 300, 25));
 
         jPanelMain.add(jPanelBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 1363, 120));
 
