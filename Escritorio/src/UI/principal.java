@@ -26,19 +26,19 @@ import UI.ConfigImagenes;
  * diseño moderno de la página web
  */
 public class principal extends javax.swing.JFrame {
-
+    
     // Información del usuario
     private int userId;
     private String username;
     private String cargo;
     private boolean isLoggedIn;
-
+    
     // Complementos de la aplicación
     private String nombreApp = "FASHION";
     private String correoApp = "info@fashion.com";
     private String rutaFondoPrincipal = "";
     private String rutaLogo = "";
-
+    
     // Componentes principales
     private JPanel mainPanel;
     private JPanel headerTopPanel;
@@ -49,7 +49,7 @@ public class principal extends javax.swing.JFrame {
     private JPanel newsletterPanel;
     private JPanel footerPanel;
     private JScrollPane scrollPane;
-
+    
     // Colores accesibles WCAG AAA - Paleta femenina y seria
     // Contraste mínimo 7:1 para texto normal, 4.5:1 para texto grande
     private static final Color COLOR_PRIMARY = new Color(107, 45, 77); // #6B2D4D - Morado oscuro profesional (contraste 8.2:1 con blanco)
@@ -58,44 +58,44 @@ public class principal extends javax.swing.JFrame {
     private static final Color COLOR_BG_GRADIENT_START = new Color(250, 246, 249); // #FAF6F9 - Rosa muy claro
     private static final Color COLOR_BG_GRADIENT_MID = new Color(250, 246, 249); // #FAF6F9 - Rosa muy claro
     private static final Color COLOR_BG_GRADIENT_END = new Color(250, 246, 249); // #FAF6F9 - Rosa muy claro
-
+    
     // Colores de texto accesibles
     private static final Color COLOR_TEXT_PRIMARY = new Color(26, 26, 26); // #1a1a1a - Casi negro (contraste 16.8:1 con blanco)
     private static final Color COLOR_TEXT_SECONDARY = new Color(51, 51, 51); // #333333 - Gris muy oscuro (contraste 12.6:1 con blanco)
     private static final Color COLOR_TEXT_LIGHT = new Color(255, 255, 255); // #FFFFFF - Blanco (para fondos oscuros)
-
+    
     // Colores de fondo alternativos
     private static final Color COLOR_BG_LIGHT = new Color(250, 250, 250); // #FAFAFA - Gris muy claro
     private static final Color COLOR_BG_DARK = new Color(91, 29, 61); // #5B1D3D - Morado muy oscuro (para headers)
-
+    
     private static final Logger logger = Logger.getLogger(principal.class.getName());
-
+    
     public principal(int userId) {
         this.userId = userId;
         this.isLoggedIn = (userId > 0);
-
+        
         // Obtener información de sesión
         if (isLoggedIn) {
             SessionManager session = SessionManager.getInstance();
             this.username = session.getUsername();
             this.cargo = session.getCargo();
         }
-
+        
         ModernStyles.applyModernLookAndFeel();
         initComponents();
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        
         // Cargar complementos
         cargarComplementos();
-
+        
         // Construir interfaz
         construirInterfaz();
-
+        
         // Cargar datos
         cargarDatos();
     }
-
+    
     /**
      * Inicializa los componentes básicos Este método es llamado automáticamente
      * por NetBeans cuando se usa el editor visual También puede ser llamado
@@ -104,7 +104,7 @@ public class principal extends javax.swing.JFrame {
     private void initComponents() {
         setTitle(nombreApp + " - Moda Femenina Premium");
         setBackground(COLOR_BG_GRADIENT_START);
-
+        
         // Si los componentes ya fueron creados por NetBeans (desde .form), no los recreamos
         if (mainPanel == null) {
             mainPanel = new JPanel();
@@ -115,13 +115,13 @@ public class principal extends javax.swing.JFrame {
             mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
             mainPanel.setBackground(COLOR_BG_GRADIENT_START);
         }
-
+        
         if (scrollPane == null) {
             scrollPane = new JScrollPane(mainPanel);
             scrollPane.setBorder(null);
             scrollPane.getVerticalScrollBar().setUnitIncrement(16);
             scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
+            
             // Personalizar el scrollbar vertical con diseño moderno
             personalizarScrollBar(scrollPane.getVerticalScrollBar());
         } else {
@@ -130,19 +130,19 @@ public class principal extends javax.swing.JFrame {
             scrollPane.setBorder(null);
             scrollPane.getVerticalScrollBar().setUnitIncrement(16);
             scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
+            
             // Personalizar el scrollbar vertical con diseño moderno
             personalizarScrollBar(scrollPane.getVerticalScrollBar());
         }
-
+        
         // Layout principal: header sticky arriba, contenido scrolleable abajo
         getContentPane().setLayout(new BorderLayout());
-
+        
         // El header se agregará después en construirInterfaz()
         // Por ahora solo agregamos el scroll
         getContentPane().add(scrollPane, BorderLayout.CENTER);
     }
-
+    
     /**
      * Construye toda la interfaz basada en el diseño web
      */
@@ -151,81 +151,81 @@ public class principal extends javax.swing.JFrame {
         JPanel headerContainer = new JPanel();
         headerContainer.setLayout(new BoxLayout(headerContainer, BoxLayout.Y_AXIS));
         headerContainer.setBackground(Color.WHITE);
-
+        
         // Header Top
         crearHeaderTop();
         headerContainer.add(headerTopPanel);
-
+        
         // Header Principal
         crearHeaderMain();
         headerContainer.add(headerMainPanel);
-
+        
         // Agregar header sticky al frame (fuera del scroll)
         getContentPane().add(headerContainer, BorderLayout.NORTH);
-
+        
         // Hero Section (dentro del scroll)
         crearHeroSection();
-
+        
         // Sección de Recién Llegados
         crearRecienLlegadosSection();
-
+        
         // Sección de Categorías
         crearCategoriesSection();
-
+        
         // Productos Destacados
         crearFeaturedProductsSection();
-
+        
         // Newsletter
         crearNewsletterSection();
-
+        
         // Footer
         crearFooter();
     }
-
+    
     /**
      * Crea el header top (barra superior con contacto)
      */
     private void crearHeaderTop() {
         headerTopPanel = new JPanel();
-
+       
         headerTopPanel.setBackground(COLOR_BG_DARK);
         headerTopPanel.setPreferredSize(new Dimension(Integer.MAX_VALUE, 25));
-
+        
         JLabel contactInfo = new JLabel("📞 +1 234 567 8900 | 📧 " + correoApp);
         contactInfo.setForeground(COLOR_TEXT_LIGHT);
         contactInfo.setFont(new Font("Poppins", Font.PLAIN, 13));
-
+        
         JLabel shippingInfo = new JLabel("Envío Gratis en Pedidos Superiores a $100");
         shippingInfo.setForeground(COLOR_TEXT_LIGHT);
         shippingInfo.setFont(new Font("Poppins", Font.PLAIN, 13));
-
+        
         headerTopPanel.add(contactInfo);
         headerTopPanel.add(Box.createHorizontalStrut(50));
         headerTopPanel.add(shippingInfo);
-
+        
         // No agregar al mainPanel, se agregará al headerContainer
     }
-
+    
     /**
      * Crea el header principal con logo, navegación e iconos
      */
     private void crearHeaderMain() {
-
+        
         headerMainPanel = new JPanel();
-
+        
         headerMainPanel.setLayout(new BorderLayout(200, 5));
         headerMainPanel.setBackground(Color.WHITE);
         headerMainPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(240, 240, 240)),
-                new EmptyBorder(15, 50, 15, 50)
+            BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(240, 240, 240)),
+            new EmptyBorder(15, 50, 15, 50)
         ));
         headerMainPanel.setPreferredSize(new Dimension(Integer.MAX_VALUE, 80));
         headerMainPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
-
+        
         // Logo
         JPanel logoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         logoPanel.setOpaque(false);
-
+        
         // Cargar logo si existe
         if (rutaLogo != null && !rutaLogo.isEmpty()) {
             try {
@@ -242,7 +242,7 @@ public class principal extends javax.swing.JFrame {
                 logger.log(Level.WARNING, "Error al cargar logo", e);
             }
         }
-
+        
         JLabel logoLabel = new JLabel(nombreApp);
         logoLabel.setFont(new Font("Playfair Display", Font.BOLD, 28));
         logoLabel.setForeground(COLOR_PRIMARY);
@@ -254,28 +254,28 @@ public class principal extends javax.swing.JFrame {
             }
         });
         logoPanel.add(logoLabel);
-
+        
         // Navegación
         JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 0));
         navPanel.setOpaque(false);
-
+        
         JLabel navInicio = crearNavLink("Inicio", e -> scrollToTop());
         JLabel navTienda = crearNavLink("Tienda", e -> abrirTienda());
         JLabel navMujer = crearNavLink("Mujer", e -> abrirCategoria("Mujer"));
         JLabel navAccesorios = crearNavLink("Accesorios", e -> abrirCategoria("Accesorios"));
-
+        
         navPanel.add(navInicio);
         navPanel.add(navTienda);
         navPanel.add(navMujer);
         navPanel.add(navAccesorios);
 
-        // Campo de búsqueda integrado
+        // Campo de búsqueda integrado en la barra superior
         JPanel searchPanel = new JPanel(new BorderLayout(5, 0));
         searchPanel.setOpaque(false);
-        searchPanel.setBorder(new EmptyBorder(5, 0, 5, 0));
+        searchPanel.setBorder(new EmptyBorder(0, 20, 0, 20));
 
         JTextField searchField = new JTextField();
-        searchField.setPreferredSize(new Dimension(250, 30));
+        searchField.setPreferredSize(new Dimension(300, 1));
         searchField.setFont(new Font("Poppins", Font.PLAIN, 13));
         searchField.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 100), 1),
@@ -291,7 +291,7 @@ public class principal extends javax.swing.JFrame {
         });
 
         // Icono de búsqueda dentro del campo
-        JLabel searchIconLabel = new JLabel("🔍");
+        JLabel searchIconLabel = new JLabel("");
         searchIconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
         searchIconLabel.setBorder(new EmptyBorder(0, 10, 0, 0));
         searchIconLabel.setForeground(new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 150));
@@ -306,7 +306,7 @@ public class principal extends javax.swing.JFrame {
         searchButton.setBackground(COLOR_PRIMARY);
         searchButton.setBorderPainted(false);
         searchButton.setFocusPainted(false);
-        searchButton.setPreferredSize(new Dimension(80, 30));
+        searchButton.setPreferredSize(new Dimension(80, 15));
         searchButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         searchButton.addActionListener(e -> {
             String busqueda = searchField.getText().trim();
@@ -315,16 +315,27 @@ public class principal extends javax.swing.JFrame {
                 new Categorias(userId, busqueda).setVisible(true);
             }
         });
+        searchButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                searchButton.setBackground(COLOR_SECONDARY);
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                searchButton.setBackground(COLOR_PRIMARY);
+            }
+        });
         searchPanel.add(searchButton, BorderLayout.EAST);
-
+        
         // Iconos del header
         JPanel iconsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
         iconsPanel.setOpaque(false);
-
+        
         // Icono de usuario con información si está logueado
         JPanel userPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
         userPanel.setOpaque(false);
-
+        
         if (isLoggedIn && username != null) {
             // Mostrar nombre de usuario
             JLabel userNameLabel = new JLabel(username);
@@ -332,11 +343,11 @@ public class principal extends javax.swing.JFrame {
             userNameLabel.setForeground(COLOR_TEXT_PRIMARY);
             userNameLabel.setBorder(new EmptyBorder(0, 0, 0, 5));
             userPanel.add(userNameLabel);
-
+            
             // Icono de usuario
             JPanel userIcon = crearHeaderIcon("👤", "Mi Perfil", e -> manejarUsuario());
             userPanel.add(userIcon);
-
+            
             // Botón de cerrar sesión si es admin
             if ("admin".equalsIgnoreCase(cargo)) {
                 JLabel adminBadge = new JLabel("⚙️");
@@ -345,7 +356,7 @@ public class principal extends javax.swing.JFrame {
                 adminBadge.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 userPanel.add(adminBadge);
             }
-
+            
             // Botón cerrar sesión
             JPanel logoutIcon = crearHeaderIcon("🚪", "Cerrar Sesión", e -> cerrarSesion());
             userPanel.add(logoutIcon);
@@ -353,32 +364,36 @@ public class principal extends javax.swing.JFrame {
             JPanel userIcon = crearHeaderIcon("👤", "Iniciar Sesión", e -> manejarUsuario());
             userPanel.add(userIcon);
         }
-
+        
         JPanel cartIcon = crearHeaderIcon("🛒", "Carrito", e -> abrirCarrito());
-
+        
         iconsPanel.add(userPanel);
         iconsPanel.add(cartIcon);
 
-        // Crear panel superior con logo, nav e iconos
+        // Crear panel superior con logo, nav, búsqueda e iconos en una sola fila
         JPanel topRow = new JPanel(new BorderLayout(20, 0));
         topRow.setOpaque(false);
-        topRow.add(logoPanel, BorderLayout.WEST);
-        topRow.add(navPanel, BorderLayout.CENTER);
-        topRow.add(iconsPanel, BorderLayout.EAST);
+        
+        // Panel izquierdo con logo y navegación
+        JPanel leftPanel = new JPanel(new BorderLayout(20, 0));
+        leftPanel.setOpaque(false);
+        leftPanel.add(logoPanel, BorderLayout.WEST);
+        leftPanel.add(navPanel, BorderLayout.CENTER);
+        
+        // Panel derecho con búsqueda e iconos
+        JPanel rightPanel = new JPanel(new BorderLayout(15, 0));
+        rightPanel.setOpaque(false);
+        rightPanel.add(searchPanel, BorderLayout.WEST);
+        rightPanel.add(iconsPanel, BorderLayout.EAST);
+        
+        topRow.add(leftPanel, BorderLayout.WEST);
+        topRow.add(rightPanel, BorderLayout.EAST);
 
-        // Panel principal con dos filas
-        JPanel headerContent = new JPanel();
-        headerContent.setLayout(new BoxLayout(headerContent, BoxLayout.Y_AXIS));
-        headerContent.setOpaque(false);
-        headerContent.add(topRow);
-        headerContent.add(Box.createVerticalStrut(5));
-        headerContent.add(searchPanel);
-
-        headerMainPanel.add(headerContent, BorderLayout.CENTER);
-
+        headerMainPanel.add(topRow, BorderLayout.CENTER);
+        
         // No agregar al mainPanel, se agregará al headerContainer
     }
-
+    
     /**
      * Crea un link de navegación
      */
@@ -392,12 +407,12 @@ public class principal extends javax.swing.JFrame {
             public void mouseClicked(MouseEvent e) {
                 action.actionPerformed(new ActionEvent(link, 0, ""));
             }
-
+            
             @Override
             public void mouseEntered(MouseEvent e) {
                 link.setForeground(COLOR_SECONDARY);
             }
-
+            
             @Override
             public void mouseExited(MouseEvent e) {
                 link.setForeground(COLOR_TEXT_PRIMARY);
@@ -405,7 +420,7 @@ public class principal extends javax.swing.JFrame {
         });
         return link;
     }
-
+    
     /**
      * Crea un icono del header con texto
      */
@@ -414,30 +429,30 @@ public class principal extends javax.swing.JFrame {
         iconPanel.setOpaque(false);
         iconPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         iconPanel.setBorder(new EmptyBorder(5, 10, 5, 10));
-
+        
         JLabel iconLabel = new JLabel(icono);
         iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
-
+        
         JLabel textLabel = new JLabel(texto);
         textLabel.setFont(new Font("Poppins", Font.PLAIN, 12));
         textLabel.setForeground(COLOR_TEXT_PRIMARY);
-
+        
         iconPanel.add(iconLabel);
         iconPanel.add(textLabel);
-
+        
         iconPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 action.actionPerformed(new ActionEvent(iconPanel, 0, ""));
             }
-
+            
             @Override
             public void mouseEntered(MouseEvent e) {
                 iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20));
                 textLabel.setForeground(COLOR_PRIMARY);
                 iconPanel.repaint();
             }
-
+            
             @Override
             public void mouseExited(MouseEvent e) {
                 iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
@@ -445,10 +460,10 @@ public class principal extends javax.swing.JFrame {
                 iconPanel.repaint();
             }
         });
-
+        
         return iconPanel;
     }
-
+    
     /**
      * Crea la sección Hero
      */
@@ -459,48 +474,48 @@ public class principal extends javax.swing.JFrame {
                 super.paintComponent(g);
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
+                
                 // Gradiente de fondo elegante
                 int width = getWidth();
                 int height = getHeight();
-
+                
                 // Gradiente principal (rosa suave a blanco)
                 GradientPaint gradient = new GradientPaint(
-                        0, 0, new Color(COLOR_BG_GRADIENT_START.getRed(), COLOR_BG_GRADIENT_START.getGreen(), COLOR_BG_GRADIENT_START.getBlue(), 180),
-                        width, height, new Color(255, 255, 255, 255)
+                    0, 0, new Color(COLOR_BG_GRADIENT_START.getRed(), COLOR_BG_GRADIENT_START.getGreen(), COLOR_BG_GRADIENT_START.getBlue(), 180),
+                    width, height, new Color(255, 255, 255, 255)
                 );
                 g2.setPaint(gradient);
                 g2.fillRect(0, 0, width, height);
-
+                
                 // Formas decorativas circulares
                 g2.setColor(new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 30));
                 g2.fillOval(width - 200, 50, 300, 300);
                 g2.setColor(new Color(COLOR_SECONDARY.getRed(), COLOR_SECONDARY.getGreen(), COLOR_SECONDARY.getBlue(), 20));
                 g2.fillOval(-100, height - 150, 250, 250);
-
+                
                 g2.dispose();
             }
         };
         heroPanel.setLayout(new BorderLayout(40, 0));
         heroPanel.setOpaque(true);
         heroPanel.setBorder(new EmptyBorder(100, 80, 100, 80));
-
+        
         // Contenedor principal centrado
         JPanel contentPanel = new JPanel(new BorderLayout(60, 0));
         contentPanel.setOpaque(false);
-
+        
         // Texto del hero
         JPanel textPanel = new JPanel();
         textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
         textPanel.setOpaque(false);
-
+        
         // Badge decorativo
         JLabel badge = new JLabel("✨ NUEVA COLECCIÓN 2025");
         badge.setFont(new Font("Poppins", Font.BOLD, 12));
         badge.setForeground(COLOR_PRIMARY);
         badge.setAlignmentX(Component.CENTER_ALIGNMENT);
         badge.setBorder(new EmptyBorder(0, 0, 15, 0));
-
+        
         JLabel title = new JLabel("<html><div style='text-align: center; line-height: 1.2;'>"
                 + "Descubre Tu<br>"
                 + "<span style='color: #6B2D4D; font-size: 56px;'>Estilo Femenino</span><br>"
@@ -509,7 +524,7 @@ public class principal extends javax.swing.JFrame {
         title.setForeground(COLOR_TEXT_PRIMARY);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
         title.setBorder(new EmptyBorder(0, 0, 25, 0));
-
+        
         JLabel subtitle = new JLabel("<html><div style='text-align: center; width: 600px; line-height: 1.6;'>"
                 + "Eleva tu guardarropa con nuestra colección exclusiva de moda femenina premium "
                 + "diseñada para empoderarte y hacerte brillar en cada ocasión.</div></html>");
@@ -517,33 +532,33 @@ public class principal extends javax.swing.JFrame {
         subtitle.setForeground(COLOR_TEXT_SECONDARY);
         subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         subtitle.setBorder(new EmptyBorder(0, 0, 40, 0));
-
+        
         JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         buttonsPanel.setOpaque(false);
-
+        
         JButton btnComprar = crearBotonPrimario("Comprar Ahora", e -> abrirTienda());
         btnComprar.setPreferredSize(new Dimension(200, 55));
         btnComprar.setFont(new Font("Poppins", Font.BOLD, 17));
         buttonsPanel.add(btnComprar);
-
+        
         if (isLoggedIn && "admin".equalsIgnoreCase(cargo)) {
             JButton btnAdmin = crearBotonSecundario("⚙️ Panel Admin", e -> abrirPanelAdmin());
             buttonsPanel.add(btnAdmin);
         }
-
+        
         // Estadísticas decorativas
         JPanel statsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 50, 0));
         statsPanel.setOpaque(false);
         statsPanel.setBorder(new EmptyBorder(50, 0, 0, 0));
-
+        
         JPanel stat1 = crearStatLabel("500+", "Productos");
         JPanel stat2 = crearStatLabel("10K+", "Clientes");
         JPanel stat3 = crearStatLabel("4.9★", "Calificación");
-
+        
         statsPanel.add(stat1);
         statsPanel.add(stat2);
         statsPanel.add(stat3);
-
+        
         textPanel.add(Box.createVerticalGlue());
         textPanel.add(badge);
         textPanel.add(title);
@@ -551,7 +566,7 @@ public class principal extends javax.swing.JFrame {
         textPanel.add(buttonsPanel);
         textPanel.add(statsPanel);
         textPanel.add(Box.createVerticalGlue());
-
+        
         // Imagen del hero
         JLabel heroImage = new JLabel();
         heroImage.setPreferredSize(new Dimension(450, 550));
@@ -561,21 +576,21 @@ public class principal extends javax.swing.JFrame {
         heroImage.setHorizontalAlignment(JLabel.CENTER);
         heroImage.setVerticalAlignment(JLabel.CENTER);
         heroImage.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 50), 2),
-                new EmptyBorder(10, 10, 10, 10)
+            BorderFactory.createLineBorder(new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 50), 2),
+            new EmptyBorder(10, 10, 10, 10)
         ));
-
+        
         // Intentar cargar imagen del hero desde complementos o usar placeholder
         cargarImagenHero(heroImage);
-
+        
         contentPanel.add(textPanel, BorderLayout.CENTER);
         contentPanel.add(heroImage, BorderLayout.EAST);
-
+        
         heroPanel.add(contentPanel, BorderLayout.CENTER);
-
+        
         mainPanel.add(heroPanel);
     }
-
+    
     /**
      * Crea una etiqueta de estadística decorativa
      */
@@ -584,23 +599,23 @@ public class principal extends javax.swing.JFrame {
         statPanel.setLayout(new BoxLayout(statPanel, BoxLayout.Y_AXIS));
         statPanel.setOpaque(false);
         statPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+        
         JLabel numLabel = new JLabel(numero);
         numLabel.setFont(new Font("Poppins", Font.BOLD, 28));
         numLabel.setForeground(COLOR_PRIMARY);
         numLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+        
         JLabel textLabel = new JLabel(texto);
         textLabel.setFont(new Font("Poppins", Font.PLAIN, 14));
         textLabel.setForeground(COLOR_TEXT_SECONDARY);
         textLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+        
         statPanel.add(numLabel);
         statPanel.add(textLabel);
-
+        
         return statPanel;
     }
-
+    
     /**
      * Crea un botón primario
      */
@@ -614,22 +629,22 @@ public class principal extends javax.swing.JFrame {
         btn.setPreferredSize(new Dimension(180, 50));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.addActionListener(action);
-
+        
         btn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
                 btn.setBackground(COLOR_SECONDARY);
             }
-
+            
             @Override
             public void mouseExited(MouseEvent e) {
                 btn.setBackground(COLOR_PRIMARY);
             }
         });
-
+        
         return btn;
     }
-
+    
     /**
      * Crea el botón mejorado "Ver Todos los Productos" con diseño moderno
      */
@@ -640,24 +655,24 @@ public class principal extends javax.swing.JFrame {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
+                
                 // Dibujar fondo con bordes redondeados
                 g2.setColor(getBackground());
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
-
+                
                 // Dibujar sombra sutil
                 g2.setColor(new Color(0, 0, 0, 15));
                 g2.fillRoundRect(2, 4, getWidth() - 2, getHeight() - 2, 30, 30);
-
+                
                 // Redibujar el fondo sobre la sombra
                 g2.setColor(getBackground());
                 g2.fillRoundRect(0, 0, getWidth() - 2, getHeight() - 4, 30, 30);
-
+                
                 g2.dispose();
                 super.paintComponent(g);
             }
         };
-
+        
         btn.setFont(new Font("Poppins", Font.BOLD, 18));
         btn.setForeground(COLOR_TEXT_LIGHT);
         btn.setBackground(COLOR_PRIMARY);
@@ -672,10 +687,10 @@ public class principal extends javax.swing.JFrame {
         btn.setHorizontalAlignment(SwingConstants.CENTER);
         btn.setVerticalAlignment(SwingConstants.CENTER);
         btn.addActionListener(action);
-
+        
         // Padding interno generoso
         btn.setBorder(new EmptyBorder(18, 40, 18, 40));
-
+        
         // Efectos hover mejorados
         btn.addMouseListener(new MouseAdapter() {
             @Override
@@ -684,24 +699,24 @@ public class principal extends javax.swing.JFrame {
                 btn.setFont(new Font("Poppins", Font.BOLD, 19));
                 btn.repaint();
             }
-
+            
             @Override
             public void mouseExited(MouseEvent e) {
                 btn.setBackground(COLOR_PRIMARY);
                 btn.setFont(new Font("Poppins", Font.BOLD, 18));
                 btn.repaint();
             }
-
+            
             @Override
             public void mousePressed(MouseEvent e) {
                 btn.setBackground(new Color(
-                        Math.max(0, COLOR_SECONDARY.getRed() - 25),
-                        Math.max(0, COLOR_SECONDARY.getGreen() - 25),
-                        Math.max(0, COLOR_SECONDARY.getBlue() - 25)
+                    Math.max(0, COLOR_SECONDARY.getRed() - 25),
+                    Math.max(0, COLOR_SECONDARY.getGreen() - 25),
+                    Math.max(0, COLOR_SECONDARY.getBlue() - 25)
                 ));
                 btn.repaint();
             }
-
+            
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (btn.getMousePosition() != null) {
@@ -712,10 +727,10 @@ public class principal extends javax.swing.JFrame {
                 btn.repaint();
             }
         });
-
+        
         return btn;
     }
-
+    
     /**
      * Crea un botón secundario
      */
@@ -729,10 +744,10 @@ public class principal extends javax.swing.JFrame {
         btn.setPreferredSize(new Dimension(180, 50));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.addActionListener(action);
-
+        
         return btn;
     }
-
+    
     /**
      * Crea la sección de Recién Llegados con diseño mejorado
      */
@@ -743,65 +758,65 @@ public class principal extends javax.swing.JFrame {
                 super.paintComponent(g);
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
+                
                 // Fondo con gradiente sutil
                 int width = getWidth();
                 int height = getHeight();
-
+                
                 GradientPaint gradient = new GradientPaint(
-                        0, 0, new Color(COLOR_BG_LIGHT.getRed(), COLOR_BG_LIGHT.getGreen(), COLOR_BG_LIGHT.getBlue(), 255),
-                        width, height, new Color(255, 255, 255, 255)
+                    0, 0, new Color(COLOR_BG_LIGHT.getRed(), COLOR_BG_LIGHT.getGreen(), COLOR_BG_LIGHT.getBlue(), 255),
+                    width, height, new Color(255, 255, 255, 255)
                 );
                 g2.setPaint(gradient);
                 g2.fillRect(0, 0, width, height);
-
+                
                 // Formas decorativas sutiles
                 g2.setColor(new Color(COLOR_ACCENT.getRed(), COLOR_ACCENT.getGreen(), COLOR_ACCENT.getBlue(), 15));
                 g2.fillOval(width - 150, 20, 200, 200);
                 g2.setColor(new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 10));
                 g2.fillOval(50, height - 100, 150, 150);
-
+                
                 g2.dispose();
             }
         };
         recienLlegadosPanel.setLayout(new BoxLayout(recienLlegadosPanel, BoxLayout.Y_AXIS));
         recienLlegadosPanel.setOpaque(true);
         recienLlegadosPanel.setBorder(new EmptyBorder(80, 50, 80, 50));
-
+        
         // Header mejorado con badge
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
         headerPanel.setOpaque(false);
         headerPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+        
         // Badge decorativo mejorado - completamente centrado
         JPanel badgePanel = new JPanel();
         badgePanel.setLayout(new BoxLayout(badgePanel, BoxLayout.X_AXIS));
         badgePanel.setOpaque(false);
         badgePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         badgePanel.setBorder(new EmptyBorder(0, 0, 15, 0));
-
+        
         JLabel badgeIcon = new JLabel("✨");
         badgeIcon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20));
         badgeIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+        
         JLabel badgeText = new JLabel("NUEVA COLECCIÓN");
         badgeText.setFont(new Font("Poppins", Font.BOLD, 11));
         badgeText.setForeground(COLOR_PRIMARY);
         badgeText.setOpaque(true);
         badgeText.setBackground(new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 20));
         badgeText.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(COLOR_PRIMARY, 1),
-                new EmptyBorder(3, 8, 3, 8)
+            BorderFactory.createLineBorder(COLOR_PRIMARY, 1),
+            new EmptyBorder(3, 8, 3, 8)
         ));
         badgeText.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+        
         badgePanel.add(Box.createHorizontalGlue());
         badgePanel.add(badgeIcon);
         badgePanel.add(Box.createHorizontalStrut(8));
         badgePanel.add(badgeText);
         badgePanel.add(Box.createHorizontalGlue());
-
+        
         // Título mejorado - completamente centrado
         JLabel title = new JLabel("<html><div style='text-align: center; line-height: 1.2;'>"
                 + "<span style='color: #6B2D4D;'>Recién</span> "
@@ -811,7 +826,7 @@ public class principal extends javax.swing.JFrame {
         title.setHorizontalAlignment(SwingConstants.CENTER);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
         title.setBorder(new EmptyBorder(0, 0, 15, 0));
-
+        
         // Subtítulo mejorado - completamente centrado
         JLabel subtitle = new JLabel("<html><div style='text-align: center; line-height: 1.6;'>"
                 + "Descubre las últimas incorporaciones a nuestra colección exclusiva</div></html>");
@@ -820,28 +835,28 @@ public class principal extends javax.swing.JFrame {
         subtitle.setHorizontalAlignment(SwingConstants.CENTER);
         subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         subtitle.setBorder(new EmptyBorder(0, 0, 50, 0));
-
+        
         headerPanel.add(badgePanel);
         headerPanel.add(title);
         headerPanel.add(subtitle);
-
+        
         // Panel de productos con carrusel mejorado
         JPanel productsWrapper = new JPanel();
         productsWrapper.setLayout(new BorderLayout());
         productsWrapper.setOpaque(false);
         productsWrapper.setBorder(new EmptyBorder(0, 0, 40, 0));
-
+        
         // Contenedor principal del carrusel
         JPanel carouselContainer = new JPanel(new BorderLayout());
         carouselContainer.setOpaque(false);
         carouselContainer.setBorder(new EmptyBorder(30, 0, 30, 0));
-
+        
         JPanel productsContainer = new JPanel();
         productsContainer.setLayout(new BoxLayout(productsContainer, BoxLayout.X_AXIS));
         productsContainer.setOpaque(false);
         productsContainer.setBorder(new EmptyBorder(0, 60, 0, 60));
         productsContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+        
         // ScrollPane oculto para el carrusel
         JScrollPane horizontalScroll = new JScrollPane(productsContainer);
         horizontalScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -851,25 +866,25 @@ public class principal extends javax.swing.JFrame {
         horizontalScroll.getViewport().setOpaque(false);
         horizontalScroll.setPreferredSize(new Dimension(1200, 430));
         horizontalScroll.setMaximumSize(new Dimension(1200, 430));
-
+        
         // Guardar referencia para actualizar botones
         carruselScrollPane = horizontalScroll;
-
+        
         // Botones de navegación del carrusel
         JButton btnAnterior = crearBotonCarrusel("◀", true);
         JButton btnSiguiente = crearBotonCarrusel("▶", false);
-
+        
         // Guardar referencias para actualizar visibilidad
         carruselBtnAnterior = btnAnterior;
         carruselBtnSiguiente = btnSiguiente;
-
+        
         btnAnterior.addActionListener(e -> {
             JScrollBar scrollBar = horizontalScroll.getHorizontalScrollBar();
             int currentValue = scrollBar.getValue();
             int scrollAmount = 320; // Ancho de una tarjeta + espaciado
             scrollBar.setValue(Math.max(0, currentValue - scrollAmount));
         });
-
+        
         btnSiguiente.addActionListener(e -> {
             JScrollBar scrollBar = horizontalScroll.getHorizontalScrollBar();
             int currentValue = scrollBar.getValue();
@@ -877,35 +892,40 @@ public class principal extends javax.swing.JFrame {
             int scrollAmount = 320; // Ancho de una tarjeta + espaciado
             scrollBar.setValue(Math.min(maxValue, currentValue + scrollAmount));
         });
-
+        
         // Cargar productos recién llegados
         recienLlegadosProductsPanel = productsContainer;
         cargarRecienLlegados();
-
+        
         // Agregar botones y scroll al carrusel
         carouselContainer.add(btnAnterior, BorderLayout.WEST);
         carouselContainer.add(horizontalScroll, BorderLayout.CENTER);
         carouselContainer.add(btnSiguiente, BorderLayout.EAST);
-
+        
         // Botón mejorado
         JButton verTodosBtn = crearBotonVerTodos("Ver Todos los Recién Llegados", e -> abrirCategoria("Nuevas Llegadas"));
         verTodosBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         verTodosBtn.setBorder(new EmptyBorder(30, 0, 0, 0));
-
+        
         productsWrapper.add(carouselContainer, BorderLayout.CENTER);
-
+        
         recienLlegadosPanel.add(headerPanel);
         recienLlegadosPanel.add(productsWrapper);
         recienLlegadosPanel.add(verTodosBtn);
-
+        
         mainPanel.add(recienLlegadosPanel);
     }
-
+    
     private JPanel recienLlegadosProductsPanel;
     private JButton carruselBtnAnterior;
     private JButton carruselBtnSiguiente;
     private JScrollPane carruselScrollPane;
-
+    
+    // Carrusel de productos destacados
+    private JButton featuredBtnAnterior;
+    private JButton featuredBtnSiguiente;
+    private JScrollPane featuredScrollPane;
+    
     /**
      * Crea la sección de categorías con diseño mejorado
      */
@@ -916,15 +936,15 @@ public class principal extends javax.swing.JFrame {
                 super.paintComponent(g);
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
+                
                 // Fondo con el color solicitado #FAF6F9
                 int width = getWidth();
                 int height = getHeight();
-
+                
                 Color bgColor = new Color(250, 246, 249); // #FAF6F9
                 g2.setColor(bgColor);
                 g2.fillRect(0, 0, width, height);
-
+                
                 // Formas decorativas sutiles y elegantes
                 g2.setColor(new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 10));
                 g2.fillOval(width - 120, 60, 180, 180);
@@ -932,20 +952,20 @@ public class principal extends javax.swing.JFrame {
                 g2.fillOval(60, height - 100, 140, 140);
                 g2.setColor(new Color(COLOR_ACCENT.getRed(), COLOR_ACCENT.getGreen(), COLOR_ACCENT.getBlue(), 4));
                 g2.fillOval(width / 3, -50, 160, 160);
-
+                
                 g2.dispose();
             }
         };
         categoriesPanel.setLayout(new BoxLayout(categoriesPanel, BoxLayout.Y_AXIS));
         categoriesPanel.setOpaque(true);
         categoriesPanel.setBorder(new EmptyBorder(80, 50, 80, 50));
-
+        
         // Header mejorado
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
         headerPanel.setOpaque(false);
         headerPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+        
         // Título mejorado y centrado
         JLabel title = new JLabel("<html><div style='text-align: center; line-height: 1.2;'>"
                 + "<span style='color: #6B2D4D;'>Comprar por</span> "
@@ -955,7 +975,7 @@ public class principal extends javax.swing.JFrame {
         title.setHorizontalAlignment(SwingConstants.CENTER);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
         title.setBorder(new EmptyBorder(0, 0, 15, 0));
-
+        
         // Subtítulo mejorado y centrado
         JLabel subtitle = new JLabel("<html><div style='text-align: center; line-height: 1.6;'>"
                 + "Explora nuestras colecciones cuidadosamente seleccionadas</div></html>");
@@ -964,29 +984,29 @@ public class principal extends javax.swing.JFrame {
         subtitle.setHorizontalAlignment(SwingConstants.CENTER);
         subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         subtitle.setBorder(new EmptyBorder(0, 0, 50, 0));
-
+        
         headerPanel.add(title);
         headerPanel.add(subtitle);
-
-        // Grid de categorías mejorado
+        
+        // Grid de categorías - ajustado para imágenes más anchas
         JPanel gridPanel = new JPanel(new GridLayout(2, 2, 30, 30));
         gridPanel.setOpaque(false);
-        gridPanel.setMaximumSize(new Dimension(1200, 600));
+        gridPanel.setMaximumSize(new Dimension(1400, 700));
         gridPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         gridPanel.setBorder(new EmptyBorder(20, 0, 0, 0));
-
+        
         // Crear cards de categorías mejorados
         gridPanel.add(crearCategoryCardMejorado("Colección de Mujer", "Elegante y Moderna", "Mujer"));
         gridPanel.add(crearCategoryCardMejorado("Nueva Colección", "Clásico y Moderno", "Nueva Colección"));
         gridPanel.add(crearCategoryCardMejorado("Accesorios", "Completa Tu Look", "Accesorios"));
         gridPanel.add(crearCategoryCardMejorado("Ofertas Especiales", "Ahorra hasta 50%", "Ofertas Especiales"));
-
+        
         categoriesPanel.add(headerPanel);
         categoriesPanel.add(gridPanel);
-
+        
         mainPanel.add(categoriesPanel);
     }
-
+    
     /**
      * Crea un card de categoría mejorado con mejor diseño más moderno y atractivo
      */
@@ -997,7 +1017,7 @@ public class principal extends javax.swing.JFrame {
                 super.paintComponent(g);
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
+                
                 int width = getWidth();
                 int height = getHeight();
                 int cornerRadius = 15;
@@ -1005,50 +1025,60 @@ public class principal extends javax.swing.JFrame {
                 // Sombra simple
                 g2.setColor(new Color(0, 0, 0, 8));
                 g2.fillRoundRect(2, 3, width - 2, height - 2, cornerRadius, cornerRadius);
-
+                
                 // Fondo blanco con bordes redondeados
                 g2.setColor(Color.WHITE);
                 g2.fillRoundRect(0, 0, width - 2, height - 3, cornerRadius, cornerRadius);
-
+                
                 g2.dispose();
             }
         };
         card.setLayout(new BorderLayout());
         card.setOpaque(false);
         card.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        card.setPreferredSize(new Dimension(320, 280));
-        card.setMaximumSize(new Dimension(320, 280));
+        card.setPreferredSize(new Dimension(640, 300));
+        card.setMaximumSize(new Dimension(640, 300));
         card.setBorder(new EmptyBorder(10, 10, 10, 10));
-
-        // Panel de imagen usando JLayeredPane para permitir overlay
-        JLayeredPane imageContainer = new JLayeredPane();
+        
+        // Panel de imagen - dimensiones 600x220
+        JPanel imageContainer = new JPanel(new BorderLayout());
         imageContainer.setOpaque(false);
-        imageContainer.setPreferredSize(new Dimension(300, 200));
-        imageContainer.setMaximumSize(new Dimension(300, 200));
-
-        // Imagen de categoría
+        imageContainer.setPreferredSize(new Dimension(620, 240));
+        imageContainer.setMaximumSize(new Dimension(620, 240));
+        imageContainer.setBorder(new EmptyBorder(0, 0, 0, 0));
+        
+        // Imagen de categoría - dimensiones 600x220
         JLabel imageLabel = new JLabel() {
             @Override
             protected void paintComponent(Graphics g) {
-                // Solo dibujar el fondo si no hay icono
+                super.paintComponent(g);
+                // Si no hay icono, dibujar fondo blanco
                 if (getIcon() == null) {
-                    super.paintComponent(g);
-                    Graphics2D g2 = (Graphics2D) g.create();
-                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    g2.setColor(Color.WHITE);
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(Color.WHITE);
                     g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
-                    g2.dispose();
-                } else {
-                    // Si hay icono, dibujar normalmente
-                    super.paintComponent(g);
+                g2.dispose();
                 }
             }
         };
-        imageLabel.setBounds(10, 10, 280, 180);
+        imageLabel.setPreferredSize(new Dimension(600, 220));
+        imageLabel.setMaximumSize(new Dimension(600, 220));
+        imageLabel.setMinimumSize(new Dimension(600, 220));
         imageLabel.setOpaque(false);
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         imageLabel.setVerticalAlignment(SwingConstants.CENTER);
-
+        
+        // Overlay simple usando JLayeredPane para que esté encima
+        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane.setPreferredSize(new Dimension(600, 220));
+        layeredPane.setMaximumSize(new Dimension(600, 220));
+        layeredPane.setOpaque(false);
+        
+        // Agregar imagen en la capa inferior
+        imageLabel.setBounds(0, 0, 600, 220);
+        layeredPane.add(imageLabel, JLayeredPane.DEFAULT_LAYER);
+        
         // Overlay simple
         JPanel overlay = new JPanel() {
             @Override
@@ -1062,10 +1092,10 @@ public class principal extends javax.swing.JFrame {
                 }
             }
         };
-        overlay.setBounds(10, 10, 280, 180);
+        overlay.setBounds(0, 0, 600, 220);
         overlay.setOpaque(false);
         overlay.setVisible(false);
-
+        
         JLabel overlayText = new JLabel("Explorar →");
         overlayText.setFont(new Font("Poppins", Font.BOLD, 16));
         overlayText.setForeground(COLOR_TEXT_LIGHT);
@@ -1073,64 +1103,68 @@ public class principal extends javax.swing.JFrame {
         overlayText.setVerticalAlignment(SwingConstants.CENTER);
         overlay.setLayout(new BorderLayout());
         overlay.add(overlayText, BorderLayout.CENTER);
-
-        // Agregar imagen en la capa inferior, overlay en la superior
-        imageContainer.add(imageLabel, JLayeredPane.DEFAULT_LAYER);
-        imageContainer.add(overlay, JLayeredPane.PALETTE_LAYER);
+        
+        // Agregar overlay en la capa superior
+        layeredPane.add(overlay, JLayeredPane.PALETTE_LAYER);
+        
+        // Agregar el layeredPane al contenedor centrado
+        imageContainer.add(layeredPane, BorderLayout.CENTER);
         
         // Cargar imagen después de agregar al contenedor
         cargarImagenCategoria(imageLabel, categoria);
-
-        // Info panel mejorado y centrado
+        
+        // Info panel REDUCIDO - más compacto y pequeño
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-        infoPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        infoPanel.setBorder(new EmptyBorder(5, 10, 5, 10));
         infoPanel.setOpaque(true);
         infoPanel.setBackground(new Color(250, 246, 249)); // #FAF6F9
         infoPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+        infoPanel.setPreferredSize(new Dimension(600, 50));
+        infoPanel.setMaximumSize(new Dimension(600, 50));
+        
         JLabel titleLabel = new JLabel("<html><div style='text-align: center;'>" + titulo + "</div></html>");
-        titleLabel.setFont(new Font("Playfair Display", Font.BOLD, 22));
+        titleLabel.setFont(new Font("Playfair Display", Font.BOLD, 16));
         titleLabel.setForeground(COLOR_TEXT_PRIMARY);
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+        
         JLabel subtitleLabel = new JLabel("<html><div style='text-align: center;'>" + subtitulo + "</div></html>");
-        subtitleLabel.setFont(new Font("Poppins", Font.PLAIN, 14));
+        subtitleLabel.setFont(new Font("Poppins", Font.PLAIN, 11));
         subtitleLabel.setForeground(COLOR_TEXT_SECONDARY);
         subtitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         subtitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        subtitleLabel.setBorder(new EmptyBorder(8, 0, 0, 0));
-
+        subtitleLabel.setBorder(new EmptyBorder(2, 0, 0, 0));
+        
         infoPanel.add(titleLabel);
         infoPanel.add(subtitleLabel);
-
+        
         card.add(imageContainer, BorderLayout.CENTER);
         card.add(infoPanel, BorderLayout.SOUTH);
-
+        
         // Mouse listeners
         card.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 abrirCategoria(categoria);
             }
-
+            
             @Override
             public void mouseEntered(MouseEvent e) {
                 overlay.setVisible(true);
                 overlay.repaint();
             }
-
+            
             @Override
             public void mouseExited(MouseEvent e) {
                 overlay.setVisible(false);
                 overlay.repaint();
             }
         });
-
+        
         return card;
     }
-
+    
     /**
      * Crea la sección de productos destacados con diseño mejorado
      */
@@ -1199,7 +1233,7 @@ public class principal extends javax.swing.JFrame {
         badgePanel.add(Box.createHorizontalStrut(8));
         badgePanel.add(badgeText);
         badgePanel.add(Box.createHorizontalGlue());
-
+        
         JLabel title = new JLabel("<html><div style='text-align: center; line-height: 1.2;'>"
                 + "<span style='color: #6B2D4D;'>Productos</span> "
                 + "<span style='color: #8B4A6B;'>Destacados</span></div></html>");
@@ -1218,32 +1252,86 @@ public class principal extends javax.swing.JFrame {
         subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         subtitle.setBorder(new EmptyBorder(0, 0, 50, 0));
 
-        JPanel gridPanel = new JPanel(new GridLayout(2, 4, 25, 25));
-        gridPanel.setOpaque(false);
-        gridPanel.setMaximumSize(new Dimension(1200, 700));
-        gridPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        gridPanel.setBorder(new EmptyBorder(20, 0, 0, 0));
+        // Panel de productos con carrusel
+        JPanel productsWrapper = new JPanel();
+        productsWrapper.setLayout(new BorderLayout());
+        productsWrapper.setOpaque(false);
+        productsWrapper.setBorder(new EmptyBorder(0, 0, 40, 0));
 
+        // Contenedor principal del carrusel
+        JPanel carouselContainer = new JPanel(new BorderLayout());
+        carouselContainer.setOpaque(false);
+        carouselContainer.setBorder(new EmptyBorder(30, 0, 30, 0));
+
+        JPanel productsContainer = new JPanel();
+        productsContainer.setLayout(new BoxLayout(productsContainer, BoxLayout.X_AXIS));
+        productsContainer.setOpaque(false);
+        productsContainer.setBorder(new EmptyBorder(0, 60, 0, 60));
+        productsContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // ScrollPane oculto para el carrusel
+        JScrollPane horizontalScroll = new JScrollPane(productsContainer);
+        horizontalScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        horizontalScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        horizontalScroll.setBorder(null);
+        horizontalScroll.setOpaque(false);
+        horizontalScroll.getViewport().setOpaque(false);
+        horizontalScroll.setPreferredSize(new Dimension(1200, 430));
+        horizontalScroll.setMaximumSize(new Dimension(1200, 430));
+
+        // Guardar referencia para actualizar botones
+        featuredScrollPane = horizontalScroll;
+
+        // Botones de navegación del carrusel
+        JButton btnAnterior = crearBotonCarrusel("◀", true);
+        JButton btnSiguiente = crearBotonCarrusel("▶", false);
+
+        // Guardar referencias para actualizar visibilidad
+        featuredBtnAnterior = btnAnterior;
+        featuredBtnSiguiente = btnSiguiente;
+
+        btnAnterior.addActionListener(e -> {
+            JScrollBar scrollBar = horizontalScroll.getHorizontalScrollBar();
+            int currentValue = scrollBar.getValue();
+            int scrollAmount = 300; // Ancho de una tarjeta (275) + espaciado (25)
+            scrollBar.setValue(Math.max(0, currentValue - scrollAmount));
+        });
+
+        btnSiguiente.addActionListener(e -> {
+            JScrollBar scrollBar = horizontalScroll.getHorizontalScrollBar();
+            int currentValue = scrollBar.getValue();
+            int maxValue = scrollBar.getMaximum();
+            int scrollAmount = 300; // Ancho de una tarjeta (275) + espaciado (25)
+            scrollBar.setValue(Math.min(maxValue, currentValue + scrollAmount));
+        });
+        
         // Los productos se cargarán dinámicamente
-        productosGridPanel = gridPanel;
+        productosGridPanel = productsContainer;
         
         headerPanel.add(badgePanel);
         headerPanel.add(title);
         headerPanel.add(subtitle);
 
-        featuredProductsPanel.add(headerPanel);
-        featuredProductsPanel.add(gridPanel);
-
+        // Agregar botones y scroll al carrusel
+        carouselContainer.add(btnAnterior, BorderLayout.WEST);
+        carouselContainer.add(horizontalScroll, BorderLayout.CENTER);
+        carouselContainer.add(btnSiguiente, BorderLayout.EAST);
+        
         JButton verTodosBtn = crearBotonVerTodos("Ver Todos los Productos", e -> abrirTienda());
         verTodosBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        verTodosBtn.setBorder(new EmptyBorder(50, 0, 0, 0));
-        featuredProductsPanel.add(verTodosBtn);
+        verTodosBtn.setBorder(new EmptyBorder(30, 0, 0, 0));
 
+        productsWrapper.add(carouselContainer, BorderLayout.CENTER);
+
+        featuredProductsPanel.add(headerPanel);
+        featuredProductsPanel.add(productsWrapper);
+        featuredProductsPanel.add(verTodosBtn);
+        
         mainPanel.add(featuredProductsPanel);
     }
-
+    
     private JPanel productosGridPanel;
-
+    
     /**
      * Crea la sección de newsletter
      */
@@ -1252,31 +1340,31 @@ public class principal extends javax.swing.JFrame {
         newsletterPanel.setLayout(new BoxLayout(newsletterPanel, BoxLayout.Y_AXIS));
         newsletterPanel.setBackground(COLOR_BG_DARK);
         newsletterPanel.setBorder(new EmptyBorder(60, 0, 60, 0));
-
+        
         JLabel title = new JLabel("Mantente a la Moda");
         title.setFont(new Font("Playfair Display", Font.BOLD, 36));
         title.setForeground(COLOR_TEXT_LIGHT);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+        
         JLabel subtitle = new JLabel("Suscríbete a nuestro boletín y obtén 20% de descuento en tu primera compra");
         subtitle.setFont(new Font("Poppins", Font.PLAIN, 16));
         subtitle.setForeground(COLOR_TEXT_LIGHT);
         subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         subtitle.setBorder(new EmptyBorder(15, 0, 30, 0));
-
+        
         JPanel formPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         formPanel.setOpaque(false);
         formPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         formPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+        
         JTextField emailField = new JTextField(25);
         emailField.setFont(new Font("Poppins", Font.PLAIN, 14));
         emailField.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.WHITE, 2),
-                new EmptyBorder(10, 15, 10, 15)
+            BorderFactory.createLineBorder(Color.WHITE, 2),
+            new EmptyBorder(10, 15, 10, 15)
         ));
         emailField.setPreferredSize(new Dimension(300, 45));
-
+        
         JButton suscribirBtn = new JButton("Suscribirse");
         suscribirBtn.setFont(new Font("Poppins", Font.BOLD, 14));
         suscribirBtn.setForeground(COLOR_BG_DARK);
@@ -1288,25 +1376,25 @@ public class principal extends javax.swing.JFrame {
         suscribirBtn.addActionListener(e -> {
             String email = emailField.getText().trim();
             if (email.isEmpty() || !email.contains("@")) {
-                JOptionPane.showMessageDialog(this, "Por favor ingrese un email válido",
-                        "Newsletter", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Por favor ingrese un email válido", 
+                    "Newsletter", JOptionPane.WARNING_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(this, "¡Gracias por suscribirte!",
-                        "Newsletter", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "¡Gracias por suscribirte!", 
+                    "Newsletter", JOptionPane.INFORMATION_MESSAGE);
                 emailField.setText("");
             }
         });
-
+        
         formPanel.add(emailField);
         formPanel.add(suscribirBtn);
-
+        
         newsletterPanel.add(title);
         newsletterPanel.add(subtitle);
         newsletterPanel.add(formPanel);
-
+        
         mainPanel.add(newsletterPanel);
     }
-
+    
     /**
      * Crea el footer
      */
@@ -1315,16 +1403,16 @@ public class principal extends javax.swing.JFrame {
         footerPanel.setLayout(new BoxLayout(footerPanel, BoxLayout.Y_AXIS));
         footerPanel.setBackground(COLOR_BG_DARK);
         footerPanel.setBorder(new EmptyBorder(50, 50, 20, 50));
-
+        
         JPanel contentPanel = new JPanel(new GridLayout(1, 4, 30, 0));
         contentPanel.setOpaque(false);
         contentPanel.setMaximumSize(new Dimension(1200, Integer.MAX_VALUE));
-
+        
         // Sección 1: Acerca de
         JPanel section1 = crearFooterSection("Acerca de " + nombreApp,
-                "Tu destino premium para las últimas tendencias de moda femenina y clásicos atemporales.");
+            "Tu destino premium para las últimas tendencias de moda femenina y clásicos atemporales.");
         contentPanel.add(section1);
-
+        
         // Sección 2: Enlaces Rápidos
         JPanel section2 = crearFooterSection("Enlaces Rápidos", null);
         section2.add(crearFooterLink("Sobre Nosotros"));
@@ -1333,7 +1421,7 @@ public class principal extends javax.swing.JFrame {
         section2.add(crearFooterLink("Información de Envío"));
         section2.add(crearFooterLink("Devoluciones"));
         contentPanel.add(section2);
-
+        
         // Sección 3: Categorías
         JPanel section3 = crearFooterSection("Categorías", null);
         section3.add(crearFooterLink("Mujer"));
@@ -1341,7 +1429,7 @@ public class principal extends javax.swing.JFrame {
         section3.add(crearFooterLink("Nuevos Llegados"));
         section3.add(crearFooterLink("Ofertas"));
         contentPanel.add(section3);
-
+        
         // Sección 4: Atención al Cliente
         JPanel section4 = crearFooterSection("Atención al Cliente", null);
         section4.add(crearFooterLink("Rastrear Pedido"));
@@ -1349,28 +1437,28 @@ public class principal extends javax.swing.JFrame {
         section4.add(crearFooterLink("Métodos de Pago"));
         section4.add(crearFooterLink("Tarjetas de Regalo"));
         contentPanel.add(section4);
-
+        
         footerPanel.add(contentPanel);
-
+        
         // Footer bottom
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setOpaque(false);
         bottomPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(255, 255, 255, 25)));
         bottomPanel.setBorder(new EmptyBorder(20, 0, 0, 0));
-
+        
         JLabel copyright = new JLabel("© 2025 " + nombreApp + ". Todos los derechos reservados.");
         copyright.setFont(new Font("Poppins", Font.PLAIN, 12));
         copyright.setForeground(COLOR_TEXT_LIGHT);
-
+        
         bottomPanel.add(copyright);
-
+        
         footerPanel.add(Box.createVerticalStrut(20));
         footerPanel.add(bottomPanel);
-
+        
         mainPanel.add(footerPanel);
     }
-
+    
     /**
      * Crea una sección del footer
      */
@@ -1379,14 +1467,14 @@ public class principal extends javax.swing.JFrame {
         section.setLayout(new BoxLayout(section, BoxLayout.Y_AXIS));
         section.setOpaque(false);
         section.setAlignmentX(Component.LEFT_ALIGNMENT);
-
+        
         JLabel title = new JLabel(titulo);
         title.setFont(new Font("Playfair Display", Font.BOLD, 18));
         title.setForeground(COLOR_TEXT_LIGHT);
         title.setBorder(new EmptyBorder(0, 0, 15, 0));
-
+        
         section.add(title);
-
+        
         if (descripcion != null) {
             JLabel desc = new JLabel("<html><div style='width: 200px;'>" + descripcion + "</div></html>");
             desc.setFont(new Font("Poppins", Font.PLAIN, 12));
@@ -1394,10 +1482,10 @@ public class principal extends javax.swing.JFrame {
             desc.setBorder(new EmptyBorder(0, 0, 15, 0));
             section.add(desc);
         }
-
+        
         return section;
     }
-
+    
     /**
      * Crea un link del footer
      */
@@ -1407,27 +1495,296 @@ public class principal extends javax.swing.JFrame {
         link.setForeground(new Color(224, 224, 224));
         link.setCursor(new Cursor(Cursor.HAND_CURSOR));
         link.setBorder(new EmptyBorder(5, 0, 5, 0));
-
+        
         link.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                // Acción según el link
+                manejarClickFooterLink(texto);
             }
-
+            
             @Override
             public void mouseEntered(MouseEvent e) {
                 link.setForeground(COLOR_PRIMARY);
             }
-
+            
             @Override
             public void mouseExited(MouseEvent e) {
-                link.setForeground(COLOR_TEXT_LIGHT);
+                link.setForeground(new Color(224, 224, 224));
             }
         });
-
+        
         return link;
     }
-
+    
+    /**
+     * Maneja los clicks en los enlaces del footer
+     */
+    private void manejarClickFooterLink(String texto) {
+        switch (texto) {
+            // Enlaces Rápidos
+            case "Sobre Nosotros":
+                mostrarSobreNosotros();
+                break;
+            case "Contacto":
+                mostrarContacto();
+                break;
+            case "Guía de Tallas":
+                mostrarGuiaTallas();
+                break;
+            case "Información de Envío":
+                mostrarInfoEnvio();
+                break;
+            case "Devoluciones":
+                mostrarDevoluciones();
+                break;
+            // Categorías
+            case "Mujer":
+                abrirCategoria("Mujer");
+                break;
+            case "Accesorios":
+                abrirCategoria("Accesorios");
+                break;
+            case "Nuevos Llegados":
+                abrirCategoria("Nuevas Llegadas");
+                break;
+            case "Ofertas":
+                abrirCategoria("Ofertas Especiales");
+                break;
+            // Atención al Cliente
+            case "Rastrear Pedido":
+                rastrearPedido();
+                break;
+            case "Preguntas Frecuentes":
+                mostrarPreguntasFrecuentes();
+                break;
+            case "Métodos de Pago":
+                mostrarMetodosPago();
+                break;
+            case "Tarjetas de Regalo":
+                mostrarTarjetasRegalo();
+                break;
+        }
+    }
+    
+    /**
+     * Muestra información sobre la empresa
+     */
+    private void mostrarSobreNosotros() {
+        String mensaje = "<html><div style='width: 500px; text-align: justify;'>"
+                + "<h2 style='color: #6B2D4D; margin-bottom: 15px;'>Sobre " + nombreApp + "</h2>"
+                + "<p style='line-height: 1.8; margin-bottom: 15px;'>"
+                + "Somos una tienda de moda femenina comprometida con ofrecer las últimas tendencias "
+                + "y clásicos atemporales que empoderan a cada mujer a expresar su estilo único."
+                + "</p>"
+                + "<p style='line-height: 1.8; margin-bottom: 15px;'>"
+                + "Nuestra misión es brindar una experiencia de compra excepcional, con productos "
+                + "de alta calidad y un servicio al cliente dedicado."
+                + "</p>"
+                + "<p style='line-height: 1.8;'>"
+                + "Desde nuestra fundación, nos hemos comprometido a ofrecer moda accesible, "
+                + "sostenible y que refleje la diversidad y belleza de todas las mujeres."
+                + "</p>"
+                + "</div></html>";
+        JOptionPane.showMessageDialog(this, mensaje, "Sobre Nosotros", 
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    /**
+     * Muestra información de contacto
+     */
+    private void mostrarContacto() {
+        String mensaje = "<html><div style='width: 500px;'>"
+                + "<h2 style='color: #6B2D4D; margin-bottom: 20px;'>Contáctanos</h2>"
+                + "<p style='line-height: 2; margin-bottom: 10px;'><b>Email:</b> contacto@" + nombreApp.toLowerCase().replace(" ", "") + ".com</p>"
+                + "<p style='line-height: 2; margin-bottom: 10px;'><b>Teléfono:</b> +1 (555) 123-4567</p>"
+                + "<p style='line-height: 2; margin-bottom: 10px;'><b>Dirección:</b> Calle Principal 123, Ciudad</p>"
+                + "<p style='line-height: 2; margin-bottom: 10px;'><b>Horario de Atención:</b></p>"
+                + "<p style='line-height: 2; margin-left: 20px;'>Lunes - Viernes: 9:00 AM - 6:00 PM</p>"
+                + "<p style='line-height: 2; margin-left: 20px;'>Sábados: 10:00 AM - 4:00 PM</p>"
+                + "<p style='line-height: 2; margin-left: 20px;'>Domingos: Cerrado</p>"
+                + "</div></html>";
+        JOptionPane.showMessageDialog(this, mensaje, "Contacto", 
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    /**
+     * Muestra la guía de tallas
+     */
+    private void mostrarGuiaTallas() {
+        String mensaje = "<html><div style='width: 600px;'>"
+                + "<h2 style='color: #6B2D4D; margin-bottom: 20px;'>Guía de Tallas</h2>"
+                + "<table border='1' cellpadding='10' style='border-collapse: collapse; width: 100%; margin-bottom: 20px;'>"
+                + "<tr style='background-color: #6B2D4D; color: white;'><th>Talla</th><th>Busto (cm)</th><th>Cintura (cm)</th><th>Cadera (cm)</th></tr>"
+                + "<tr><td>XS</td><td>80-84</td><td>60-64</td><td>84-88</td></tr>"
+                + "<tr><td>S</td><td>84-88</td><td>64-68</td><td>88-92</td></tr>"
+                + "<tr><td>M</td><td>88-92</td><td>68-72</td><td>92-96</td></tr>"
+                + "<tr><td>L</td><td>92-96</td><td>72-76</td><td>96-100</td></tr>"
+                + "<tr><td>XL</td><td>96-100</td><td>76-80</td><td>100-104</td></tr>"
+                + "</table>"
+                + "<p style='line-height: 1.8;'><b>Consejos:</b></p>"
+                + "<ul style='line-height: 1.8;'>"
+                + "<li>Mide tu busto, cintura y cadera para encontrar tu talla perfecta</li>"
+                + "<li>Si estás entre dos tallas, te recomendamos la talla más grande</li>"
+                + "<li>Las medidas pueden variar según el estilo y la marca</li>"
+                + "</ul>"
+                + "</div></html>";
+        JOptionPane.showMessageDialog(this, mensaje, "Guía de Tallas", 
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    /**
+     * Muestra información de envío
+     */
+    private void mostrarInfoEnvio() {
+        String mensaje = "<html><div style='width: 550px;'>"
+                + "<h2 style='color: #6B2D4D; margin-bottom: 20px;'>Información de Envío</h2>"
+                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>📦 Envío Estándar:</b></p>"
+                + "<p style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
+                + "• Tiempo de entrega: 5-7 días hábiles<br>"
+                + "• Costo: $5.99<br>"
+                + "• Envío gratuito en compras superiores a $100"
+                + "</p>"
+                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>🚀 Envío Express:</b></p>"
+                + "<p style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
+                + "• Tiempo de entrega: 2-3 días hábiles<br>"
+                + "• Costo: $12.99"
+                + "</p>"
+                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>🌍 Envío Internacional:</b></p>"
+                + "<p style='line-height: 1.8; margin-left: 20px;'>"
+                + "• Disponible a la mayoría de países<br>"
+                + "• Tiempo de entrega: 10-15 días hábiles<br>"
+                + "• Costo: $25.99"
+                + "</p>"
+                + "</div></html>";
+        JOptionPane.showMessageDialog(this, mensaje, "Información de Envío", 
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    /**
+     * Muestra política de devoluciones
+     */
+    private void mostrarDevoluciones() {
+        String mensaje = "<html><div style='width: 550px;'>"
+                + "<h2 style='color: #6B2D4D; margin-bottom: 20px;'>Política de Devoluciones</h2>"
+                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>⏰ Plazo de Devolución:</b></p>"
+                + "<p style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
+                + "Tienes 30 días desde la fecha de recepción para devolver cualquier artículo."
+                + "</p>"
+                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>✅ Condiciones:</b></p>"
+                + "<ul style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
+                + "<li>Los artículos deben estar sin usar y con etiquetas originales</li>"
+                + "<li>Deben incluirse todos los accesorios y embalaje original</li>"
+                + "<li>No se aceptan devoluciones de ropa interior o artículos personalizados</li>"
+                + "</ul>"
+                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>💰 Reembolsos:</b></p>"
+                + "<p style='line-height: 1.8; margin-left: 20px;'>"
+                + "El reembolso se procesará en un plazo de 5-7 días hábiles después de recibir "
+                + "el artículo. El costo de envío original no es reembolsable."
+                + "</p>"
+                + "</div></html>";
+        JOptionPane.showMessageDialog(this, mensaje, "Devoluciones", 
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    /**
+     * Permite rastrear un pedido
+     */
+    private void rastrearPedido() {
+        String numeroPedido = JOptionPane.showInputDialog(this, 
+                "Ingrese el número de su pedido:", "Rastrear Pedido", 
+                JOptionPane.QUESTION_MESSAGE);
+        if (numeroPedido != null && !numeroPedido.trim().isEmpty()) {
+            // Aquí se podría implementar la lógica real de rastreo
+            JOptionPane.showMessageDialog(this, 
+                    "Pedido #" + numeroPedido + "\n\nEstado: En tránsito\n" +
+                    "Última actualización: En camino a destino\n" +
+                    "Tiempo estimado de entrega: 2-3 días hábiles",
+                    "Estado del Pedido", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
+    /**
+     * Muestra preguntas frecuentes
+     */
+    private void mostrarPreguntasFrecuentes() {
+        String mensaje = "<html><div style='width: 600px;'>"
+                + "<h2 style='color: #6B2D4D; margin-bottom: 20px;'>Preguntas Frecuentes</h2>"
+                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>❓ ¿Cómo realizo un pedido?</b></p>"
+                + "<p style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
+                + "Simplemente navega por nuestra tienda, selecciona los productos que deseas, "
+                + "elige tu talla y agrégalos al carrito. Luego procede al checkout."
+                + "</p>"
+                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>❓ ¿Qué métodos de pago aceptan?</b></p>"
+                + "<p style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
+                + "Aceptamos tarjetas de crédito/débito, PayPal y transferencias bancarias."
+                + "</p>"
+                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>❓ ¿Puedo cambiar el tamaño de mi pedido?</b></p>"
+                + "<p style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
+                + "Sí, puedes realizar cambios dentro de los primeros 30 días después de recibir tu pedido."
+                + "</p>"
+                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>❓ ¿Ofrecen envío internacional?</b></p>"
+                + "<p style='line-height: 1.8; margin-left: 20px;'>"
+                + "Sí, realizamos envíos a la mayoría de países. Consulta nuestra sección de "
+                + "Información de Envío para más detalles."
+                + "</p>"
+                + "</div></html>";
+        JOptionPane.showMessageDialog(this, mensaje, "Preguntas Frecuentes", 
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    /**
+     * Muestra métodos de pago disponibles
+     */
+    private void mostrarMetodosPago() {
+        String mensaje = "<html><div style='width: 550px;'>"
+                + "<h2 style='color: #6B2D4D; margin-bottom: 20px;'>Métodos de Pago</h2>"
+                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>💳 Tarjetas de Crédito/Débito:</b></p>"
+                + "<p style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
+                + "Aceptamos Visa, Mastercard, American Express y Discover. Todas las transacciones "
+                + "están protegidas con encriptación SSL."
+                + "</p>"
+                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>📱 PayPal:</b></p>"
+                + "<p style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
+                + "Puedes pagar de forma segura usando tu cuenta PayPal."
+                + "</p>"
+                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>🏦 Transferencia Bancaria:</b></p>"
+                + "<p style='line-height: 1.8; margin-left: 20px;'>"
+                + "También aceptamos transferencias bancarias directas. El pedido se procesará "
+                + "una vez confirmado el pago."
+                + "</p>"
+                + "</div></html>";
+        JOptionPane.showMessageDialog(this, mensaje, "Métodos de Pago", 
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    /**
+     * Muestra información sobre tarjetas de regalo
+     */
+    private void mostrarTarjetasRegalo() {
+        String mensaje = "<html><div style='width: 550px;'>"
+                + "<h2 style='color: #6B2D4D; margin-bottom: 20px;'>Tarjetas de Regalo</h2>"
+                + "<p style='line-height: 1.8; margin-bottom: 15px;'>"
+                + "Nuestras tarjetas de regalo son el regalo perfecto para esa persona especial. "
+                + "Puedes elegir el monto que deseas regalar."
+                + "</p>"
+                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>💰 Montos Disponibles:</b></p>"
+                + "<p style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
+                + "• $25, $50, $100, $200, $500 o un monto personalizado"
+                + "</p>"
+                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>⏰ Validez:</b></p>"
+                + "<p style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
+                + "Las tarjetas de regalo no expiran y pueden usarse en cualquier momento."
+                + "</p>"
+                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>📧 Entrega:</b></p>"
+                + "<p style='line-height: 1.8; margin-left: 20px;'>"
+                + "Puedes enviar la tarjeta de regalo por email al destinatario o imprimirla "
+                + "para entregarla en persona."
+                + "</p>"
+                + "</div></html>";
+        JOptionPane.showMessageDialog(this, mensaje, "Tarjetas de Regalo", 
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+    
     /**
      * Carga los complementos desde la base de datos
      */
@@ -1436,13 +1793,13 @@ public class principal extends javax.swing.JFrame {
             String sql = "SELECT * FROM tb_complementos ORDER BY id DESC LIMIT 1";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
-
+            
             if (rs.next()) {
                 String nombre = rs.getString("NombreDeApp");
                 String correo = rs.getString("CorreoApp");
                 String fondo = rs.getString("fondoPrincipal");
                 String logo = rs.getString("Logo");
-
+                
                 if (nombre != null && !nombre.isEmpty()) {
                     nombreApp = nombre;
                 }
@@ -1460,7 +1817,7 @@ public class principal extends javax.swing.JFrame {
             ErrorHandler.logWarning("Error al cargar complementos", e);
         }
     }
-
+    
     /**
      * Carga los datos (productos, categorías, etc.)
      */
@@ -1468,7 +1825,7 @@ public class principal extends javax.swing.JFrame {
         cargarProductosDestacados();
         // cargarRecienLlegados se llama desde crearRecienLlegadosSection
     }
-
+    
     /**
      * Carga los productos recién llegados
      */
@@ -1476,9 +1833,9 @@ public class principal extends javax.swing.JFrame {
         if (recienLlegadosProductsPanel == null) {
             return;
         }
-
+        
         recienLlegadosProductsPanel.removeAll();
-
+        
         try (Connection conn = Conexion.getConnection()) {
             String sql = """
                 SELECT p.*, 
@@ -1489,10 +1846,10 @@ public class principal extends javax.swing.JFrame {
                 ORDER BY p.FecheIngreso DESC, p.id DESC
                 LIMIT 10
                 """;
-
+            
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
-
+            
             int count = 0;
             while (rs.next() && count < 10) {
                 UI.Producto producto = new UI.Producto();
@@ -1502,19 +1859,19 @@ public class principal extends javax.swing.JFrame {
                 producto.setPrecio(rs.getDouble("precio_promedio"));
                 producto.setCategorias(rs.getString("Categorias"));
                 producto.setCantidad(rs.getInt("total_cantidad"));
-
+                
                 recienLlegadosProductsPanel.add(Box.createHorizontalStrut(25));
                 recienLlegadosProductsPanel.add(crearProductCardRecienLlegado(producto));
                 count++;
             }
-
+            
             if (count == 0) {
                 JLabel noProducts = new JLabel("<html><div style='text-align: center; padding: 50px; color: #999;'>"
                         + "No hay productos recién llegados</div></html>");
                 noProducts.setHorizontalAlignment(JLabel.CENTER);
                 recienLlegadosProductsPanel.add(noProducts);
             }
-
+            
         } catch (SQLException e) {
             ErrorHandler.logWarning("Error al cargar productos recién llegados", e);
             JLabel errorLabel = new JLabel("<html><div style='text-align: center; padding: 50px; color: #999;'>"
@@ -1522,29 +1879,39 @@ public class principal extends javax.swing.JFrame {
             errorLabel.setHorizontalAlignment(JLabel.CENTER);
             recienLlegadosProductsPanel.add(errorLabel);
         }
-
+        
         recienLlegadosProductsPanel.revalidate();
         recienLlegadosProductsPanel.repaint();
-
+        
         // Actualizar visibilidad de botones del carrusel después de cargar productos
         SwingUtilities.invokeLater(() -> {
             actualizarBotonesCarrusel();
         });
     }
-
+    
     /**
      * Actualiza la visibilidad de los botones del carrusel según el contenido
      */
     private void actualizarBotonesCarrusel() {
+        // Carrusel de recién llegados
         if (carruselScrollPane != null && carruselBtnAnterior != null && carruselBtnSiguiente != null) {
             JScrollBar scrollBar = carruselScrollPane.getHorizontalScrollBar();
             boolean necesitaScroll = scrollBar.getMaximum() > scrollBar.getVisibleAmount();
-
+            
             carruselBtnAnterior.setVisible(necesitaScroll);
             carruselBtnSiguiente.setVisible(necesitaScroll);
         }
-    }
+        
+        // Carrusel de productos destacados
+        if (featuredScrollPane != null && featuredBtnAnterior != null && featuredBtnSiguiente != null) {
+            JScrollBar scrollBar = featuredScrollPane.getHorizontalScrollBar();
+            boolean necesitaScroll = scrollBar.getMaximum() > scrollBar.getVisibleAmount();
 
+            featuredBtnAnterior.setVisible(necesitaScroll);
+            featuredBtnSiguiente.setVisible(necesitaScroll);
+        }
+    }
+    
     /**
      * Crea un card de producto mejorado para la sección de recién llegados
      */
@@ -1555,19 +1922,19 @@ public class principal extends javax.swing.JFrame {
                 super.paintComponent(g);
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
+                
                 // Sombra más pronunciada y elegante
                 g2.setColor(new Color(0, 0, 0, 12));
                 g2.fillRoundRect(3, 5, getWidth() - 3, getHeight() - 3, 18, 18);
-
+                
                 // Sombra intermedia
                 g2.setColor(new Color(0, 0, 0, 6));
                 g2.fillRoundRect(1, 2, getWidth() - 1, getHeight() - 1, 18, 18);
-
+                
                 // Fondo blanco con bordes redondeados
                 g2.setColor(Color.WHITE);
                 g2.fillRoundRect(0, 0, getWidth() - 2, getHeight() - 3, 18, 18);
-
+                
                 g2.dispose();
             }
         };
@@ -1578,7 +1945,7 @@ public class principal extends javax.swing.JFrame {
         card.setMaximumSize(new Dimension(280, 400));
         card.setMinimumSize(new Dimension(280, 400));
         card.setBorder(new EmptyBorder(15, 15, 15, 15));
-
+        
         // Panel de imagen con badge "NUEVO" mejorado - borde atractivo
         JPanel imageContainer = new JPanel(new BorderLayout()) {
             @Override
@@ -1587,20 +1954,20 @@ public class principal extends javax.swing.JFrame {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
+                
                 // Sombra interna sutil
                 g2.setColor(new Color(0, 0, 0, 5));
                 g2.fillRoundRect(1, 1, getWidth() - 2, getHeight() - 2, 12, 12);
-
+                
                 // Fondo blanco con bordes redondeados
                 g2.setColor(Color.WHITE);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
-
+                
                 // Borde elegante con gradiente sutil
                 g2.setStroke(new BasicStroke(2.0f));
                 g2.setColor(new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 30));
                 g2.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 12, 12);
-
+                
                 g2.dispose();
             }
         };
@@ -1608,7 +1975,7 @@ public class principal extends javax.swing.JFrame {
         imageContainer.setMaximumSize(new Dimension(250, 270));
         imageContainer.setOpaque(false);
         imageContainer.setBorder(new EmptyBorder(12, 12, 12, 12));
-
+        
         // Badge "NUEVO" mejorado - más visible y atractivo
         JLabel badge = new JLabel("✨ NUEVO") {
             @Override
@@ -1616,23 +1983,23 @@ public class principal extends javax.swing.JFrame {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
+                
                 // Fondo con gradiente
                 GradientPaint gradient = new GradientPaint(
-                        0, 0, COLOR_ACCENT,
-                        getWidth(), getHeight(), COLOR_SECONDARY
+                    0, 0, COLOR_ACCENT,
+                    getWidth(), getHeight(), COLOR_SECONDARY
                 );
                 g2.setPaint(gradient);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
-
+                
                 // Sombra sutil
                 g2.setColor(new Color(0, 0, 0, 20));
                 g2.fillRoundRect(1, 2, getWidth() - 1, getHeight() - 1, 10, 10);
-
+                
                 // Redibujar el fondo
                 g2.setPaint(gradient);
                 g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 2, 10, 10);
-
+                
                 g2.dispose();
                 super.paintComponent(g);
             }
@@ -1642,7 +2009,7 @@ public class principal extends javax.swing.JFrame {
         badge.setOpaque(false);
         badge.setBorder(new EmptyBorder(6, 14, 6, 14));
         badge.setHorizontalAlignment(SwingConstants.CENTER);
-
+        
         // Imagen del producto mejorada - fondo blanco con mejor presentación
         JLabel imageLabel = new JLabel() {
             @Override
@@ -1654,7 +2021,7 @@ public class principal extends javax.swing.JFrame {
                 g2.setColor(Color.WHITE);
                 g2.fillRect(0, 0, getWidth(), getHeight());
                 g2.dispose();
-
+                
                 // Luego dibujar el componente (incluyendo el icono)
                 super.paintComponent(g);
             }
@@ -1665,14 +2032,14 @@ public class principal extends javax.swing.JFrame {
         imageLabel.setBackground(new Color(250, 246, 249)); // #FAF6F9
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         imageLabel.setVerticalAlignment(SwingConstants.CENTER);
-
+        
         // Cargar imagen - método mejorado
         if (producto.getImgUrl() != null && !producto.getImgUrl().isEmpty()) {
             try {
                 // Intentar primero con obtenerRutaAbsoluta
                 String rutaAbsoluta = ConfigImagenes.obtenerRutaAbsoluta(producto.getImgUrl());
                 File archivo = new File(rutaAbsoluta);
-
+                
                 if (archivo.exists() && archivo.isFile()) {
                     ImageIcon icon = new ImageIcon(rutaAbsoluta);
                     if (icon.getIconWidth() > 0 && icon.getIconHeight() > 0) {
@@ -1718,22 +2085,22 @@ public class principal extends javax.swing.JFrame {
             imageLabel.setText("<html><div style='text-align: center; padding-top: 100px; color: #999; font-size: 12px;'>"
                     + "Sin imagen</div></html>");
         }
-
+        
         // Panel para el badge (arriba a la izquierda)
         JPanel badgePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
         badgePanel.setOpaque(false);
         badgePanel.add(badge);
-
+        
         imageContainer.add(badgePanel, BorderLayout.NORTH);
         imageContainer.add(imageLabel, BorderLayout.CENTER);
-
+        
         // Info del producto mejorada y organizada
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.setBorder(new EmptyBorder(20, 0, 0, 0));
         infoPanel.setOpaque(false);
         infoPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+        
         // Nombre del producto - más llamativo y destacado
         String nombre = producto.getNombre() != null ? producto.getNombre() : "Sin nombre";
         if (nombre.length() > 25) {
@@ -1746,7 +2113,7 @@ public class principal extends javax.swing.JFrame {
         nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
         nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         nameLabel.setBorder(new EmptyBorder(15, 0, 12, 0));
-
+        
         // Precio centrado - más destacado con formato mejorado
         JLabel priceLabel = new JLabel("<html><div style='text-align: center;'>"
                 + "<span style='font-size: 24px; font-weight: bold; color: #6B2D4D;'>"
@@ -1755,45 +2122,49 @@ public class principal extends javax.swing.JFrame {
         priceLabel.setForeground(COLOR_PRIMARY);
         priceLabel.setHorizontalAlignment(SwingConstants.CENTER);
         priceLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+        
         infoPanel.add(nameLabel);
         infoPanel.add(priceLabel);
-
+        
         card.add(imageContainer, BorderLayout.CENTER);
         card.add(infoPanel, BorderLayout.SOUTH);
-
+        
         // Efectos hover mejorados
         card.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
                 card.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(COLOR_PRIMARY, 2),
-                        BorderFactory.createEmptyBorder(0, 0, 0, 0)
+                    BorderFactory.createLineBorder(COLOR_PRIMARY, 2),
+                    BorderFactory.createEmptyBorder(0, 0, 0, 0)
                 ));
                 card.setBackground(new Color(252, 252, 252));
             }
-
+            
             @Override
             public void mouseExited(MouseEvent e) {
                 card.setBorder(new EmptyBorder(10, 10, 10, 10));
                 card.repaint();
             }
-
+            
             @Override
             public void mouseClicked(MouseEvent e) {
                 mostrarDetallesProducto(producto);
             }
         });
-
+        
         return card;
     }
-
+    
     /**
      * Carga los productos destacados
      */
     private void cargarProductosDestacados() {
-        productosGridPanel.removeAll();
+        if (productosGridPanel == null) {
+            return;
+        }
 
+        productosGridPanel.removeAll();
+        
         try (Connection conn = Conexion.getConnection()) {
             String sql = """
                 SELECT p.*, 
@@ -1802,14 +2173,14 @@ public class principal extends javax.swing.JFrame {
                 FROM tb_productos p
                 WHERE p.estado = 'vigente'
                 ORDER BY p.FecheIngreso DESC
-                LIMIT 8
+                LIMIT 10
                 """;
-
+            
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
-
+            
             int count = 0;
-            while (rs.next() && count < 8) {
+            while (rs.next() && count < 10) {
                 UI.Producto producto = new UI.Producto();
                 producto.setId(rs.getInt("id"));
                 producto.setNombre(rs.getString("Nombre"));
@@ -1817,29 +2188,36 @@ public class principal extends javax.swing.JFrame {
                 producto.setPrecio(rs.getDouble("precio_promedio"));
                 producto.setCategorias(rs.getString("Categorias"));
                 producto.setCantidad(rs.getInt("total_cantidad"));
-
+                
+                productosGridPanel.add(Box.createHorizontalStrut(25));
                 productosGridPanel.add(crearProductCard(producto));
                 count++;
             }
-
-            // Rellenar con placeholders si hay menos de 8 productos
-            while (count < 8) {
-                productosGridPanel.add(crearProductCardPlaceholder());
-                count++;
+            
+            if (count == 0) {
+                JLabel noProducts = new JLabel("<html><div style='text-align: center; padding: 50px; color: #999;'>"
+                        + "No hay productos destacados</div></html>");
+                noProducts.setHorizontalAlignment(JLabel.CENTER);
+                productosGridPanel.add(noProducts);
             }
-
+            
         } catch (SQLException e) {
             ErrorHandler.logWarning("Error al cargar productos destacados", e);
-            // Agregar placeholders en caso de error
-            for (int i = 0; i < 8; i++) {
-                productosGridPanel.add(crearProductCardPlaceholder());
-            }
+            JLabel errorLabel = new JLabel("<html><div style='text-align: center; padding: 50px; color: #999;'>"
+                    + "Error al cargar productos</div></html>");
+            errorLabel.setHorizontalAlignment(JLabel.CENTER);
+            productosGridPanel.add(errorLabel);
         }
-
+        
         productosGridPanel.revalidate();
         productosGridPanel.repaint();
-    }
 
+        // Actualizar visibilidad de botones del carrusel después de cargar productos
+        SwingUtilities.invokeLater(() -> {
+            actualizarBotonesCarrusel();
+        });
+    }
+    
     /**
      * Crea un card de producto mejorado para productos destacados
      */
@@ -1874,7 +2252,7 @@ public class principal extends javax.swing.JFrame {
         card.setPreferredSize(new Dimension(275, 420));
         card.setMaximumSize(new Dimension(275, 420));
         card.setBorder(new EmptyBorder(0, 0, 0, 0));
-
+        
         // Panel de imagen con bordes redondeados mejorados
         JPanel imageContainer = new JPanel(new BorderLayout()) {
             @Override
@@ -1928,7 +2306,7 @@ public class principal extends javax.swing.JFrame {
         imageLabel.setVerticalAlignment(JLabel.CENTER);
         imageLabel.setPreferredSize(new Dimension(245, 270));
         imageLabel.setMaximumSize(new Dimension(245, 270));
-
+        
         // Cargar imagen del producto
         if (producto.getImgUrl() != null && !producto.getImgUrl().isEmpty()) {
             try {
@@ -1939,8 +2317,8 @@ public class principal extends javax.swing.JFrame {
                     Image img = icon.getImage();
                     if (img != null) {
                         Image imgEscalada = img.getScaledInstance(245, 270, Image.SCALE_SMOOTH);
-                        imageLabel.setIcon(new ImageIcon(imgEscalada));
-                        imageLabel.setText("");
+                    imageLabel.setIcon(new ImageIcon(imgEscalada));
+                    imageLabel.setText("");
                         imageLabel.repaint();
                     }
                 } else {
@@ -1966,7 +2344,7 @@ public class principal extends javax.swing.JFrame {
             imageLabel.setText("<html><div style='text-align: center; padding-top: 120px; color: #999; font-size: 12px;'>"
                     + "Sin imagen</div></html>");
         }
-
+        
         imageContainer.add(imageLabel, BorderLayout.CENTER);
 
         // Info del producto mejorada
@@ -1998,7 +2376,7 @@ public class principal extends javax.swing.JFrame {
         priceLabel.setHorizontalAlignment(SwingConstants.CENTER);
         priceLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         priceLabel.setBorder(new EmptyBorder(0, 0, 8, 0));
-
+        
         // Categoría con estilo más sutil
         JLabel categoryLabel = new JLabel("<html><div style='text-align: center;'>"
                 + "<span style='font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px;'>"
@@ -2007,14 +2385,14 @@ public class principal extends javax.swing.JFrame {
         categoryLabel.setForeground(COLOR_TEXT_SECONDARY);
         categoryLabel.setHorizontalAlignment(SwingConstants.CENTER);
         categoryLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+        
         infoPanel.add(nameLabel);
         infoPanel.add(priceLabel);
         infoPanel.add(categoryLabel);
-
+        
         card.add(imageContainer, BorderLayout.CENTER);
         card.add(infoPanel, BorderLayout.SOUTH);
-
+        
         // Efectos hover mejorados
         card.addMouseListener(new MouseAdapter() {
             @Override
@@ -2025,22 +2403,22 @@ public class principal extends javax.swing.JFrame {
                 ));
                 card.repaint();
             }
-
+            
             @Override
             public void mouseExited(MouseEvent e) {
                 card.setBorder(new EmptyBorder(0, 0, 0, 0));
                 card.repaint();
             }
-
+            
             @Override
             public void mouseClicked(MouseEvent e) {
                 mostrarDetallesProducto(producto);
             }
         });
-
+        
         return card;
     }
-
+    
     /**
      * Crea un placeholder para producto mejorado
      */
@@ -2068,16 +2446,16 @@ public class principal extends javax.swing.JFrame {
         card.setPreferredSize(new Dimension(275, 420));
         card.setMaximumSize(new Dimension(275, 420));
         card.setBorder(new EmptyBorder(0, 0, 0, 0));
-
+        
         JLabel placeholder = new JLabel("<html><div style='text-align: center; padding-top: 180px; color: #ccc; font-size: 14px;'>"
                 + "🔍<br/><br/>Producto<br/>No disponible</div></html>");
         placeholder.setHorizontalAlignment(JLabel.CENTER);
         placeholder.setOpaque(false);
-
+        
         card.add(placeholder, BorderLayout.CENTER);
         return card;
     }
-
+    
     // ========== MÉTODOS DE NAVEGACIÓN ==========
     /**
      * Crea un botón de navegación para el carrusel
@@ -2089,28 +2467,28 @@ public class principal extends javax.swing.JFrame {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
+                
                 // Fondo con gradiente
                 GradientPaint gradient = new GradientPaint(
-                        0, 0, COLOR_PRIMARY,
-                        getWidth(), getHeight(), COLOR_SECONDARY
+                    0, 0, COLOR_PRIMARY,
+                    getWidth(), getHeight(), COLOR_SECONDARY
                 );
                 g2.setPaint(gradient);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
-
+                
                 // Sombra sutil
                 g2.setColor(new Color(0, 0, 0, 20));
                 g2.fillRoundRect(1, 2, getWidth() - 1, getHeight() - 1, 25, 25);
-
+                
                 // Redibujar el fondo
                 g2.setPaint(gradient);
                 g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 2, 25, 25);
-
+                
                 g2.dispose();
                 super.paintComponent(g);
             }
         };
-
+        
         btn.setFont(new Font("Poppins", Font.BOLD, 24));
         btn.setForeground(COLOR_TEXT_LIGHT);
         btn.setBorderPainted(false);
@@ -2123,7 +2501,7 @@ public class principal extends javax.swing.JFrame {
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setHorizontalAlignment(SwingConstants.CENTER);
         btn.setVerticalAlignment(SwingConstants.CENTER);
-
+        
         // Efectos hover
         btn.addMouseListener(new MouseAdapter() {
             @Override
@@ -2131,29 +2509,29 @@ public class principal extends javax.swing.JFrame {
                 btn.setFont(new Font("Poppins", Font.BOLD, 28));
                 btn.repaint();
             }
-
+            
             @Override
             public void mouseExited(MouseEvent e) {
                 btn.setFont(new Font("Poppins", Font.BOLD, 24));
                 btn.repaint();
             }
-
+            
             @Override
             public void mousePressed(MouseEvent e) {
                 btn.setFont(new Font("Poppins", Font.BOLD, 22));
                 btn.repaint();
             }
-
+            
             @Override
             public void mouseReleased(MouseEvent e) {
                 btn.setFont(new Font("Poppins", Font.BOLD, 24));
                 btn.repaint();
             }
         });
-
+        
         return btn;
     }
-
+    
     /**
      * Personaliza el scrollbar con un diseño moderno y atractivo
      */
@@ -2167,17 +2545,17 @@ public class principal extends javax.swing.JFrame {
                 this.thumbLightShadowColor = new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 100);
                 this.thumbHighlightColor = new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 60);
             }
-
+            
             @Override
             protected JButton createDecreaseButton(int orientation) {
                 return createZeroButton();
             }
-
+            
             @Override
             protected JButton createIncreaseButton(int orientation) {
                 return createZeroButton();
             }
-
+            
             private JButton createZeroButton() {
                 JButton button = new JButton();
                 button.setPreferredSize(new Dimension(0, 0));
@@ -2185,105 +2563,105 @@ public class principal extends javax.swing.JFrame {
                 button.setMaximumSize(new Dimension(0, 0));
                 return button;
             }
-
+            
             @Override
             protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
                 if (thumbBounds.isEmpty() || !scrollbar.isEnabled()) {
                     return;
                 }
-
+                
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
+                
                 int w = thumbBounds.width;
                 int h = thumbBounds.height;
                 int x = thumbBounds.x;
                 int y = thumbBounds.y;
-
+                
                 // Sombra sutil
                 g2.setColor(new Color(0, 0, 0, 15));
                 g2.fillRoundRect(x + 1, y + 2, w - 2, h - 2, 12, 12);
-
+                
                 // Gradiente para el thumb
                 GradientPaint gradient = new GradientPaint(
-                        x, y, new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 150),
-                        x, y + h, new Color(COLOR_SECONDARY.getRed(), COLOR_SECONDARY.getGreen(), COLOR_SECONDARY.getBlue(), 150)
+                    x, y, new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 150),
+                    x, y + h, new Color(COLOR_SECONDARY.getRed(), COLOR_SECONDARY.getGreen(), COLOR_SECONDARY.getBlue(), 150)
                 );
                 g2.setPaint(gradient);
                 g2.fillRoundRect(x, y, w - 1, h - 3, 12, 12);
-
+                
                 // Borde sutil
                 g2.setStroke(new BasicStroke(1.0f));
                 g2.setColor(new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 200));
                 g2.drawRoundRect(x, y, w - 1, h - 3, 12, 12);
-
+                
                 g2.dispose();
             }
-
+            
             @Override
             protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
+                
                 g2.setColor(trackColor);
                 g2.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
-
+                
                 // Borde sutil a la izquierda
                 g2.setColor(new Color(240, 240, 240));
                 g2.setStroke(new BasicStroke(1.0f));
                 g2.drawLine(trackBounds.x, trackBounds.y, trackBounds.x, trackBounds.y + trackBounds.height);
-
+                
                 g2.dispose();
             }
         });
-
+        
         // Ancho del scrollbar
         scrollBar.setPreferredSize(new Dimension(12, 0));
     }
-
+    
     private void scrollToTop() {
         SwingUtilities.invokeLater(() -> {
             scrollPane.getVerticalScrollBar().setValue(0);
         });
     }
-
+    
     private void abrirTienda() {
         this.dispose();
         new Categorias(userId, "").setVisible(true);
     }
-
+    
     private void abrirCategoria(String categoria) {
         this.dispose();
         new Categorias(userId, categoria).setVisible(true);
     }
-
+    
     private void mostrarBusqueda() {
-        String busqueda = JOptionPane.showInputDialog(this, "Ingrese su búsqueda:", "Buscar Productos",
-                JOptionPane.QUESTION_MESSAGE);
+        String busqueda = JOptionPane.showInputDialog(this, "Ingrese su búsqueda:", "Buscar Productos", 
+            JOptionPane.QUESTION_MESSAGE);
         if (busqueda != null && !busqueda.trim().isEmpty()) {
             this.dispose();
             new Categorias(userId, busqueda.trim()).setVisible(true);
         }
     }
-
+    
     private void manejarUsuario() {
         if (isLoggedIn) {
             // Abrir perfil
-            JOptionPane.showMessageDialog(this, "Funcionalidad de perfil en desarrollo",
-                    "Perfil", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Funcionalidad de perfil en desarrollo", 
+                "Perfil", JOptionPane.INFORMATION_MESSAGE);
         } else {
             // Abrir login sin cerrar la página actual
             Inicio ventanaLogin = new Inicio();
             ventanaLogin.setVisible(true);
         }
     }
-
+    
     private void abrirCarrito() {
-        JOptionPane.showMessageDialog(this, "Funcionalidad de carrito en desarrollo",
-                "Carrito", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, "Funcionalidad de carrito en desarrollo", 
+            "Carrito", JOptionPane.INFORMATION_MESSAGE);
     }
-
+    
     private void abrirPanelAdmin() {
         if (isLoggedIn && "admin".equalsIgnoreCase(cargo)) {
             this.dispose();
@@ -2295,12 +2673,12 @@ public class principal extends javax.swing.JFrame {
             }
         }
     }
-
+    
     private void mostrarDetallesProducto(UI.Producto producto) {
         this.dispose();
         new DetalleProducto(userId, producto).setVisible(true);
     }
-
+    
     /**
      * Carga la imagen del hero desde complementos o usa placeholder
      */
@@ -2319,7 +2697,7 @@ public class principal extends javax.swing.JFrame {
                     return;
                 }
             }
-
+            
             // Si no hay imagen, buscar una imagen de producto destacado
             try (Connection conn = Conexion.getConnection()) {
                 String sql = """
@@ -2329,16 +2707,16 @@ public class principal extends javax.swing.JFrame {
                     """;
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 ResultSet rs = pstmt.executeQuery();
-
+                
                 if (rs.next()) {
                     String imgUrl = rs.getString("ImgUrl");
                     String rutaAbsoluta = ConfigImagenes.obtenerRutaAbsoluta(imgUrl);
                     File archivo = new File(rutaAbsoluta);
                     if (archivo.exists()) {
                         ImageIcon icon = new ImageIcon(rutaAbsoluta);
-                        Image img = icon.getImage();
-                        Image imgEscalada = img.getScaledInstance(400, 500, Image.SCALE_SMOOTH);
-                        heroImage.setIcon(new ImageIcon(imgEscalada));
+                    Image img = icon.getImage();
+                    Image imgEscalada = img.getScaledInstance(400, 500, Image.SCALE_SMOOTH);
+                    heroImage.setIcon(new ImageIcon(imgEscalada));
                         heroImage.setText("");
                         return;
                     }
@@ -2346,7 +2724,7 @@ public class principal extends javax.swing.JFrame {
             } catch (SQLException e) {
                 logger.log(Level.WARNING, "Error al cargar imagen hero desde BD", e);
             }
-
+            
             // Placeholder si no hay imagen
             heroImage.setText("<html><div style='text-align: center; padding-top: 220px; color: #999;'>"
                     + "Imagen Hero<br/>400x500</div></html>");
@@ -2356,7 +2734,7 @@ public class principal extends javax.swing.JFrame {
                     + "Imagen Hero<br/>400x500</div></html>");
         }
     }
-
+    
     /**
      * Carga imagen de categoría - prioriza imágenes web representativas
      */
@@ -2378,29 +2756,29 @@ public class principal extends javax.swing.JFrame {
             
             // Si no se encontró en complementos, intentar desde BD
             try {
-                try (Connection conn = Conexion.getConnection()) {
-                    String sql = """
-                        SELECT ImgUrl FROM tb_productos 
-                        WHERE estado = 'vigente' 
-                        AND (Categorias LIKE ? OR Categorias = ?)
-                        AND ImgUrl IS NOT NULL AND ImgUrl != ''
-                        ORDER BY FecheIngreso DESC LIMIT 1
-                        """;
-                    PreparedStatement pstmt = conn.prepareStatement(sql);
-                    pstmt.setString(1, "%" + categoria + "%");
-                    pstmt.setString(2, categoria);
-                    ResultSet rs = pstmt.executeQuery();
-
-                    if (rs.next()) {
-                        String imgUrl = rs.getString("ImgUrl");
-                        String rutaAbsoluta = ConfigImagenes.obtenerRutaAbsoluta(imgUrl);
-                        File archivo = new File(rutaAbsoluta);
+            try (Connection conn = Conexion.getConnection()) {
+                String sql = """
+                    SELECT ImgUrl FROM tb_productos 
+                    WHERE estado = 'vigente' 
+                    AND (Categorias LIKE ? OR Categorias = ?)
+                    AND ImgUrl IS NOT NULL AND ImgUrl != ''
+                    ORDER BY FecheIngreso DESC LIMIT 1
+                    """;
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, "%" + categoria + "%");
+                pstmt.setString(2, categoria);
+                ResultSet rs = pstmt.executeQuery();
+                
+                if (rs.next()) {
+                    String imgUrl = rs.getString("ImgUrl");
+                    String rutaAbsoluta = ConfigImagenes.obtenerRutaAbsoluta(imgUrl);
+                    File archivo = new File(rutaAbsoluta);
                         if (archivo.exists() && archivo.isFile()) {
                             cargarImagenLocal(imageLabel, archivo);
                             return; // Si se cargó desde BD, no intentar web
-                        }
                     }
-                } catch (SQLException e) {
+                }
+            } catch (SQLException e) {
                     // Continuar al siguiente método
                 }
             } catch (Exception e) {
@@ -2723,8 +3101,28 @@ public class principal extends javax.swing.JFrame {
             }
             
             if (bufferedImage != null && bufferedImage.getWidth() > 0 && bufferedImage.getHeight() > 0) {
-                int targetWidth = 280;
-                int targetHeight = 180;
+                int targetWidth = 600;
+                int targetHeight = 220;
+                
+                // Calcular escalado para llenar completamente el espacio sin espacios en blanco
+                int imgWidth = bufferedImage.getWidth();
+                int imgHeight = bufferedImage.getHeight();
+                
+                // Calcular escalas para ambos ejes
+                double scaleX = (double) targetWidth / imgWidth;
+                double scaleY = (double) targetHeight / imgHeight;
+                
+                // Usar el MAYOR factor de escala para que la imagen llene completamente el espacio
+                // Esto puede recortar partes de la imagen pero elimina espacios en blanco
+                double scale = Math.max(scaleX, scaleY);
+                
+                // Calcular dimensiones escaladas
+                int scaledWidth = (int) (imgWidth * scale);
+                int scaledHeight = (int) (imgHeight * scale);
+                
+                // Calcular posición para centrar (recortará si es necesario)
+                int x = (targetWidth - scaledWidth) / 2;
+                int y = (targetHeight - scaledHeight) / 2;
                 
                 // Crear BufferedImage escalado con alta calidad
                 java.awt.image.BufferedImage bufferedEscalada = new java.awt.image.BufferedImage(targetWidth, targetHeight, java.awt.image.BufferedImage.TYPE_INT_RGB);
@@ -2737,8 +3135,9 @@ public class principal extends javax.swing.JFrame {
                 g2d.setColor(Color.WHITE);
                 g2d.fillRect(0, 0, targetWidth, targetHeight);
                 
-                // Dibujar la imagen escalada manteniendo proporción
-                g2d.drawImage(bufferedImage, 0, 0, targetWidth, targetHeight, null);
+                // Dibujar la imagen escalada para llenar completamente el espacio
+                // La imagen se ampliará lo suficiente para llenar todo el espacio, recortando si es necesario
+                g2d.drawImage(bufferedImage, x, y, scaledWidth, scaledHeight, null);
                 g2d.dispose();
                 
                 final ImageIcon iconEscalado = new ImageIcon(bufferedEscalada);
@@ -2778,7 +3177,7 @@ public class principal extends javax.swing.JFrame {
      */
     private void cargarImagenWebCategoria(JLabel imageLabel, String categoria) {
         String imageUrl = obtenerUrlImagenCategoria(categoria);
-
+        
         // Cargar imagen en un hilo separado para no bloquear la UI
         new Thread(() -> {
             try {
@@ -2795,16 +3194,36 @@ public class principal extends javax.swing.JFrame {
                 
                 int responseCode = connection.getResponseCode();
                 if (responseCode == java.net.HttpURLConnection.HTTP_OK) {
-                    InputStream inputStream = connection.getInputStream();
+                InputStream inputStream = connection.getInputStream();
                     BufferedImage img = ImageIO.read(inputStream);
-                    inputStream.close();
+                inputStream.close();
                     connection.disconnect();
-
+                
                     if (img != null && img.getWidth() > 0 && img.getHeight() > 0) {
                         System.out.println("✓ Imagen cargada: " + img.getWidth() + "x" + img.getHeight() + " para: " + categoria);
                         
-                        int targetWidth = 280;
-                        int targetHeight = 180;
+                        int targetWidth = 600;
+                        int targetHeight = 220;
+                        
+                        // Calcular escalado para llenar completamente el espacio sin espacios en blanco
+                        int imgWidth = img.getWidth();
+                        int imgHeight = img.getHeight();
+                        
+                        // Calcular escalas para ambos ejes
+                        double scaleX = (double) targetWidth / imgWidth;
+                        double scaleY = (double) targetHeight / imgHeight;
+                        
+                        // Usar el MAYOR factor de escala para que la imagen llene completamente el espacio
+                        // Esto puede recortar partes de la imagen pero elimina espacios en blanco
+                        double scale = Math.max(scaleX, scaleY);
+                        
+                        // Calcular dimensiones escaladas
+                        int scaledWidth = (int) (imgWidth * scale);
+                        int scaledHeight = (int) (imgHeight * scale);
+                        
+                        // Calcular posición para centrar (recortará si es necesario)
+                        int x = (targetWidth - scaledWidth) / 2;
+                        int y = (targetHeight - scaledHeight) / 2;
                         
                         // Crear BufferedImage escalado con alta calidad
                         BufferedImage bufferedEscalada = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
@@ -2817,18 +3236,19 @@ public class principal extends javax.swing.JFrame {
                         g2d.setColor(Color.WHITE);
                         g2d.fillRect(0, 0, targetWidth, targetHeight);
                         
-                        // Dibujar la imagen escalada manteniendo proporción
-                        g2d.drawImage(img, 0, 0, targetWidth, targetHeight, null);
+                        // Dibujar la imagen escalada para llenar completamente el espacio
+                        // La imagen se ampliará lo suficiente para llenar todo el espacio, recortando si es necesario
+                        g2d.drawImage(img, x, y, scaledWidth, scaledHeight, null);
                         g2d.dispose();
-
-                        // Actualizar UI en el hilo de eventos
+                    
+                    // Actualizar UI en el hilo de eventos
                         final ImageIcon icon = new ImageIcon(bufferedEscalada);
-                        SwingUtilities.invokeLater(() -> {
+                    SwingUtilities.invokeLater(() -> {
                             imageLabel.setIcon(icon);
-                            imageLabel.setText("");
+                        imageLabel.setText("");
                             imageLabel.revalidate();
-                            imageLabel.repaint();
-                        });
+                        imageLabel.repaint();
+                    });
                     }
                 } else {
                     System.out.println("✗ Error HTTP " + responseCode + " al cargar imagen para: " + categoria);
@@ -2842,7 +3262,7 @@ public class principal extends javax.swing.JFrame {
             }
         }).start();
     }
-
+    
     /**
      * Obtiene la URL de imagen web según la categoría
      * Usa imágenes de Unsplash que son más confiables
@@ -2868,13 +3288,15 @@ public class principal extends javax.swing.JFrame {
             return "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&h=400&fit=crop&auto=format";
         }
     }
-
+    
     /**
      * Muestra una imagen decorativa atractiva para la categoría
      */
     private void mostrarGradienteCategoria(JLabel imageLabel, String categoria) {
         // Crear una imagen decorativa atractiva con diseño único según la categoría
-        java.awt.image.BufferedImage bufferedImage = new java.awt.image.BufferedImage(280, 180, java.awt.image.BufferedImage.TYPE_INT_RGB);
+        int width = 600;
+        int height = 220;
+        java.awt.image.BufferedImage bufferedImage = new java.awt.image.BufferedImage(width, height, java.awt.image.BufferedImage.TYPE_INT_RGB);
         Graphics2D g2 = bufferedImage.createGraphics();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
@@ -2899,15 +3321,15 @@ public class principal extends javax.swing.JFrame {
             color1 = COLOR_PRIMARY;
             color2 = COLOR_SECONDARY;
         }
-
+        
         // Gradiente decorativo diagonal
         GradientPaint gradient = new GradientPaint(
                 0, 0, color1,
-                280, 180, color2
+                width, height, color2
         );
         g2.setPaint(gradient);
-        g2.fillRect(0, 0, 280, 180);
-
+        g2.fillRect(0, 0, width, height);
+        
         // Círculos decorativos con diferentes opacidades
         g2.setColor(new Color(255, 255, 255, 40));
         g2.fillOval(-30, -30, 120, 120);
@@ -2921,9 +3343,9 @@ public class principal extends javax.swing.JFrame {
         g2.setColor(new Color(255, 255, 255, 30));
         for (int i = 0; i < 5; i++) {
             int y = 30 + i * 30;
-            g2.drawLine(0, y, 280, y + 20);
+            g2.drawLine(0, y, width, y + 20);
         }
-
+        
         // Icono decorativo grande en el centro
         g2.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 60));
         FontMetrics fm = g2.getFontMetrics();
@@ -2932,20 +3354,20 @@ public class principal extends javax.swing.JFrame {
         else if (catLower.contains("oferta")) icono = "🏷️";
         else if (catLower.contains("nueva")) icono = "✨";
         
-        int iconX = (280 - fm.stringWidth(icono)) / 2;
+        int iconX = (width - fm.stringWidth(icono)) / 2;
         int iconY = 90 + fm.getAscent() / 2;
         g2.setColor(new Color(255, 255, 255, 180));
         g2.drawString(icono, iconX, iconY);
-
+        
         g2.dispose();
-
+        
         ImageIcon gradientIcon = new ImageIcon(bufferedImage);
         imageLabel.setIcon(gradientIcon);
         imageLabel.setText("");
         imageLabel.revalidate();
         imageLabel.repaint();
     }
-
+    
     /**
      * Formatea un precio con puntos de miles y dos decimales Ejemplo: 150000.50
      * -> "$150.000,50"
@@ -2957,22 +3379,22 @@ public class principal extends javax.swing.JFrame {
         DecimalFormat formatter = new DecimalFormat("#,##0.00", symbols);
         return "$" + formatter.format(precio);
     }
-
+    
     /**
      * Cierra la sesión del usuario
      */
     private void cerrarSesion() {
         int respuesta = JOptionPane.showConfirmDialog(
-                this,
-                "¿Está seguro que desea cerrar sesión?",
-                "Cerrar Sesión",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE
+            this,
+            "¿Está seguro que desea cerrar sesión?",
+            "Cerrar Sesión",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
         );
-
+        
         if (respuesta == JOptionPane.YES_OPTION) {
             SessionManager.getInstance().logout();
-            this.dispose();
+        this.dispose();
             new principal(0).setVisible(true); // Volver a página principal sin sesión
         }
     }
