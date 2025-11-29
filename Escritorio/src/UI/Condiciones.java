@@ -1,33 +1,407 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package UI;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
-import java.util.regex.Pattern;
-import UI.util.ErrorHandler;
+import java.text.SimpleDateFormat;
+import UI.Conexion;
+import UI.util.ModernStyles;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
+
 /**
- *
+ * Ventana de Términos y Condiciones con diseño moderno
  * @author calam
  */
-public class Condiciones extends javax.swing.JFrame {
+public class Condiciones extends javax.swing.JDialog {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Condiciones.class.getName());
-    private String nombreApp = "FASHION";
+    
+    // Colores consistentes con el resto de la aplicación
+    private static final Color COLOR_PRIMARY = new Color(107, 45, 77); // #6B2D4D
+    private static final Color COLOR_SECONDARY = new Color(139, 74, 107); // #8B4A6B
+    private static final Color COLOR_TEXT_PRIMARY = new Color(26, 26, 26); // #1a1a1a
+    private static final Color COLOR_TEXT_SECONDARY = new Color(102, 102, 102); // #666666
+    private static final Color COLOR_TEXT_LIGHT = new Color(255, 255, 255); // #FFFFFF
+    private static final Color COLOR_BG_LIGHT = new Color(250, 246, 249); // #FAF6F9
+    private static final Color COLOR_BG_GRADIENT_START = new Color(255, 245, 252); // Rosa muy claro
+    private static final Color COLOR_BG_GRADIENT_END = new Color(250, 246, 249); // #FAF6F9
+    
+    // Componentes principales
+    private JPanel mainPanel;
+    private JPanel headerPanel;
+    private JPanel contentPanel;
+    private JPanel footerPanel;
+    private JLabel nombreAppLabel;
+    private JLabel correoAppLabel;
+    private JTextPane terminosPane;
+    private JButton btnCerrar;
+    private String nombreApp = "Fashion";
     private String correoApp = "";
-
+    
     /**
      * Creates new form Condiciones
      */
-    public Condiciones() {
+    public Condiciones(java.awt.Window parent) {
+        super(parent, parent == null ? java.awt.Dialog.ModalityType.MODELESS : java.awt.Dialog.ModalityType.APPLICATION_MODAL);
+        ModernStyles.applyModernLookAndFeel();
         initComponents();
-        setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
         cargarComplementos();
         cargarTerminos();
+        
+        // Asegurar que aparezca encima
+        setAlwaysOnTop(false); // No siempre encima para no molestar
+        if (parent != null) {
+            setLocationRelativeTo(parent);
+        } else {
+            setLocationRelativeTo(null);
+        }
+        
+        // Asegurar que aparezca al frente cuando se hace visible
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent e) {
+                toFront();
+                requestFocus();
+            }
+        });
+    }
+    
+    // Constructor con Frame para compatibilidad
+    public Condiciones(java.awt.Frame parent) {
+        super(parent, true); // Modal dialog
+        ModernStyles.applyModernLookAndFeel();
+        initComponents();
+        cargarComplementos();
+        cargarTerminos();
+        if (parent != null) {
+            setLocationRelativeTo(parent);
+        } else {
+            setLocationRelativeTo(null);
+        }
+    }
+    
+    // Constructor sin parámetros para compatibilidad
+    public Condiciones() {
+        this((java.awt.Window) null);
+    }
+    
+    /**
+     * This method is called from within the constructor to initialize the form.
+     */
+    @SuppressWarnings("unchecked")
+    private void initComponents() {
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setUndecorated(true); // Sin decoración del sistema
+        setTitle("Términos y Condiciones de Uso");
+        setSize(1200, 700);
+        setResizable(false);
+        
+        // Panel principal con diseño moderno
+        mainPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Fondo con gradiente elegante
+                GradientPaint gradient = new GradientPaint(
+                    0, 0, new Color(250, 246, 249), // #FAF6F9
+                    getWidth(), getHeight(), new Color(255, 255, 255)
+                );
+                g2.setPaint(gradient);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                
+                g2.dispose();
+            }
+        };
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.setOpaque(true);
+        
+        // Header decorativo moderno
+        crearHeaderModerno();
+        mainPanel.add(headerPanel, BorderLayout.NORTH);
+        
+        // Panel de contenido con scroll
+        crearPanelContenido();
+        mainPanel.add(contentPanel, BorderLayout.CENTER);
+        
+        // Footer
+        crearPanelFooter();
+        mainPanel.add(footerPanel, BorderLayout.SOUTH);
+        
+        // Crear JLayeredPane para superponer el botón cerrar
+        javax.swing.JLayeredPane layeredPane = new javax.swing.JLayeredPane();
+        layeredPane.setPreferredSize(new Dimension(1200, 700));
+        
+        // Agregar mainPanel en la capa inferior
+        mainPanel.setBounds(0, 0, 1200, 700);
+        layeredPane.add(mainPanel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        
+        // Crear y agregar botón cerrar en la capa superior
+        crearBotonCerrar(layeredPane);
+        
+        getContentPane().setLayout(new BorderLayout());
+        getContentPane().add(layeredPane, BorderLayout.CENTER);
+    }
+    
+    /**
+     * Crea un header moderno y decorativo
+     */
+    private void crearHeaderModerno() {
+        headerPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Fondo con gradiente elegante
+                GradientPaint gradient = new GradientPaint(
+                    0, 0, COLOR_PRIMARY,
+                    getWidth(), getHeight(), COLOR_SECONDARY
+                );
+                g2.setPaint(gradient);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                
+                // Formas decorativas
+                g2.setColor(new Color(255, 255, 255, 15));
+                g2.fillOval(getWidth() - 100, -30, 200, 200);
+                g2.fillOval(-50, getHeight() - 50, 150, 150);
+                
+                g2.dispose();
+            }
+        };
+        headerPanel.setLayout(new BorderLayout());
+        headerPanel.setPreferredSize(new Dimension(1200, 100));
+        headerPanel.setMaximumSize(new Dimension(1200, 100));
+        headerPanel.setOpaque(true);
+        headerPanel.setBorder(new EmptyBorder(20, 50, 20, 50));
+        
+        JLabel titleLabel = new JLabel("📋 TÉRMINOS Y CONDICIONES DE USO");
+        titleLabel.setFont(new Font("Playfair Display", Font.BOLD, 32));
+        titleLabel.setForeground(Color.WHITE);
+        
+        headerPanel.add(titleLabel, BorderLayout.CENTER);
+    }
+    
+    /**
+     * Crea el panel de contenido con scroll mejorado y diseño moderno
+     */
+    private void crearPanelContenido() {
+        contentPanel = new JPanel();
+        contentPanel.setLayout(new BorderLayout());
+        contentPanel.setOpaque(false);
+        
+        // Panel interno con el contenido - DISEÑO MODERNO Y LEGIBLE CON ANCHO LIMITADO
+        JPanel innerPanel = new JPanel();
+        innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.Y_AXIS));
+        innerPanel.setOpaque(false);
+        innerPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        innerPanel.setBorder(new EmptyBorder(35, 20, 45, 20)); // Padding reducido lateral para centrar
+        
+        // Badge de fecha actualización - FUERA del panel blanco
+        JPanel fechaPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        fechaPanel.setOpaque(false);
+        fechaPanel.setBorder(new EmptyBorder(0, 0, 30, 0));
+        fechaPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        JLabel fechaIcon = new JLabel("📅");
+        fechaIcon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
+        fechaPanel.add(fechaIcon);
+        
+        JLabel fechaLabel = new JLabel("Última actualización: ");
+        fechaLabel.setFont(new Font("Poppins", Font.PLAIN, 13));
+        fechaLabel.setForeground(COLOR_TEXT_SECONDARY);
+        fechaLabel.setBorder(new EmptyBorder(0, 8, 0, 0));
+        fechaPanel.add(fechaLabel);
+        
+        innerPanel.add(fechaPanel);
+        
+        // Panel de contenido con fondo blanco y sombra - ANCHO LIMITADO PARA MEJOR LEGIBILIDAD
+        JPanel contentCard = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Sombra más pronunciada
+                g2.setColor(new Color(0, 0, 0, 12));
+                g2.fillRoundRect(4, 4, getWidth() - 4, getHeight() - 4, 20, 20);
+                
+                // Fondo blanco brillante
+                g2.setColor(Color.WHITE);
+                g2.fillRoundRect(0, 0, getWidth() - 4, getHeight() - 4, 20, 20);
+                
+                g2.dispose();
+            }
+        };
+        contentCard.setLayout(new BorderLayout());
+        contentCard.setOpaque(false);
+        contentCard.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contentCard.setMaximumSize(new Dimension(1200, 500)); // Dimensiones fijas: 1200x500
+        contentCard.setPreferredSize(new Dimension(1200, 500)); // Dimensiones preferidas: 1200x500
+        contentCard.setMinimumSize(new Dimension(1200, 500));
+        contentCard.setBorder(new EmptyBorder(30, 50, 30, 50)); // Padding con márgenes izquierda y derecha
+        
+        // JTextPane para mostrar los términos con formato HTML mejorado - TEXTO GRANDE Y LEGIBLE
+        terminosPane = new JTextPane();
+        terminosPane.setEditable(false);
+        terminosPane.setOpaque(false);
+        terminosPane.setContentType("text/html");
+        terminosPane.setFont(new Font("Poppins", Font.PLAIN, 20)); // Fuente base grande para legibilidad
+        
+        // Configurar tamaño para que esté dentro del rango 1200x500 con márgenes izquierda y derecha
+        terminosPane.setMaximumSize(new Dimension(1100, Integer.MAX_VALUE)); // 1200 - 50 (izquierda) - 50 (derecha) = 1100
+        terminosPane.setPreferredSize(new Dimension(1100, 440)); // 500 - 30 (arriba) - 30 (abajo) = 440
+        
+        // Estilos CSS mejorados - LETRAS GRANDES Y LEGIBLES CON ANCHO CONTROLADO Y AJUSTE DE TEXTO
+        HTMLEditorKit kit = new HTMLEditorKit();
+        StyleSheet styleSheet = kit.getStyleSheet();
+        styleSheet.addRule("body { font-family: 'Poppins', Arial, sans-serif; font-size: 20px !important; line-height: 2.6 !important; color: #000000 !important; padding: 0px !important; background-color: transparent !important; max-width: 1100px !important; width: 1100px !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }");
+        styleSheet.addRule("h1 { font-family: 'Playfair Display', serif; font-size: 36px !important; color: #6B2D4D !important; margin-top: 50px !important; margin-bottom: 30px !important; font-weight: bold !important; border-bottom: 3px solid #6B2D4D !important; padding-bottom: 20px !important; max-width: 1100px !important; word-wrap: break-word !important; }");
+        styleSheet.addRule("h2 { font-family: 'Playfair Display', serif; font-size: 30px !important; color: #6B2D4D !important; margin-top: 45px !important; margin-bottom: 25px !important; font-weight: bold !important; max-width: 1100px !important; word-wrap: break-word !important; }");
+        styleSheet.addRule("p { margin-bottom: 30px !important; text-align: justify !important; line-height: 2.6 !important; font-size: 20px !important; color: #000000 !important; max-width: 1100px !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }");
+        styleSheet.addRule("strong { color: #6B2D4D !important; font-weight: bold !important; font-size: 21px !important; }");
+        styleSheet.addRule("ul, ol { margin-left: 45px !important; margin-bottom: 30px !important; line-height: 2.6 !important; max-width: 1100px !important; word-wrap: break-word !important; }");
+        styleSheet.addRule("li { margin-bottom: 20px !important; font-size: 20px !important; color: #000000 !important; word-wrap: break-word !important; }");
+        
+        terminosPane.setEditorKit(kit);
+        terminosPane.setText("<html><body>Cargando términos y condiciones...</body></html>");
+        
+        // Configurar propiedades para mejor renderizado del texto
+        terminosPane.putClientProperty(javax.swing.JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+        
+        // SCROLL DENTRO DEL PANEL BLANCO - Solo el contenido de términos tiene scroll
+        JScrollPane contentScrollPane = new JScrollPane(terminosPane);
+        contentScrollPane.setBorder(null);
+        contentScrollPane.setOpaque(false);
+        contentScrollPane.getViewport().setOpaque(false);
+        contentScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        contentScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        contentScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        
+        // Aplicar el mismo scrollbar personalizado (igual que principal.java)
+        personalizarScrollBar(contentScrollPane.getVerticalScrollBar());
+        
+        // Agregar el scroll dentro del panel blanco
+        contentCard.add(contentScrollPane, BorderLayout.CENTER);
+        
+        // Panel wrapper para centrar el contentCard
+        JPanel cardWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        cardWrapper.setOpaque(false);
+        cardWrapper.add(contentCard);
+        
+        innerPanel.add(cardWrapper);
+        
+        // Agregar el innerPanel al contentPanel SIN scroll externo (solo el scroll interno)
+        contentPanel.add(innerPanel, BorderLayout.CENTER);
+    }
+    
+    /**
+     * Crea el panel del footer con diseño moderno y elegante
+     */
+    private void crearPanelFooter() {
+        footerPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Fondo con gradiente elegante
+                GradientPaint gradient = new GradientPaint(
+                    0, 0, COLOR_PRIMARY,
+                    getWidth(), getHeight(), COLOR_SECONDARY
+                );
+                g2.setPaint(gradient);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                
+                // Línea decorativa superior
+                g2.setColor(new Color(255, 255, 255, 20));
+                g2.setStroke(new BasicStroke(1.0f));
+                g2.drawLine(0, 0, getWidth(), 0);
+                
+                // Formas decorativas sutiles
+                g2.setColor(new Color(255, 255, 255, 10));
+                g2.fillOval(getWidth() - 100, -30, 150, 150);
+                
+                g2.dispose();
+            }
+        };
+        footerPanel.setLayout(new BorderLayout());
+        footerPanel.setPreferredSize(new Dimension(1200, 75));
+        footerPanel.setBorder(new EmptyBorder(20, 40, 20, 40));
+        
+        // Panel izquierdo con información - diseño mejorado
+        JPanel leftFooter = new JPanel();
+        leftFooter.setLayout(new BoxLayout(leftFooter, BoxLayout.Y_AXIS));
+        leftFooter.setOpaque(false);
+        leftFooter.setAlignmentY(Component.CENTER_ALIGNMENT);
+        
+        // Nombre de la app con estilo elegante
+        JPanel nombrePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        nombrePanel.setOpaque(false);
+        nombreAppLabel = new JLabel("Fashion");
+        nombreAppLabel.setFont(new Font("Playfair Display", Font.BOLD, 16));
+        nombreAppLabel.setForeground(COLOR_TEXT_LIGHT);
+        nombrePanel.add(nombreAppLabel);
+        
+        // Separador elegante
+        JLabel separator = new JLabel(" • ");
+        separator.setFont(new Font("Poppins", Font.PLAIN, 12));
+        separator.setForeground(new Color(255, 255, 255, 180));
+        nombrePanel.add(separator);
+        
+        correoAppLabel = new JLabel("contacto@fashion.com");
+        correoAppLabel.setFont(new Font("Poppins", Font.PLAIN, 12));
+        correoAppLabel.setForeground(new Color(255, 255, 255, 220));
+        nombrePanel.add(correoAppLabel);
+        
+        // Copyright con estilo más sutil
+        JLabel copyright = new JLabel("© 2025 Todos los derechos reservados");
+        copyright.setFont(new Font("Poppins", Font.PLAIN, 10));
+        copyright.setForeground(new Color(255, 255, 255, 160));
+        copyright.setBorder(new EmptyBorder(5, 0, 0, 0));
+        
+        leftFooter.add(nombrePanel);
+        leftFooter.add(copyright);
+        
+        footerPanel.add(leftFooter, BorderLayout.WEST);
+        
+        // Panel derecho con información adicional - diseño mejorado
+        JPanel rightFooter = new JPanel();
+        rightFooter.setLayout(new BoxLayout(rightFooter, BoxLayout.Y_AXIS));
+        rightFooter.setOpaque(false);
+        rightFooter.setAlignmentY(Component.CENTER_ALIGNMENT);
+        rightFooter.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        
+        // Texto informativo elegante
+        JLabel infoLabel = new JLabel("Términos y Condiciones de Uso");
+        infoLabel.setFont(new Font("Poppins", Font.PLAIN, 11));
+        infoLabel.setForeground(new Color(255, 255, 255, 200));
+        infoLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        
+        JLabel versionLabel = new JLabel("Versión 1.0");
+        versionLabel.setFont(new Font("Poppins", Font.PLAIN, 10));
+        versionLabel.setForeground(new Color(255, 255, 255, 160));
+        versionLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        versionLabel.setBorder(new EmptyBorder(3, 0, 0, 0));
+        
+        rightFooter.add(infoLabel);
+        rightFooter.add(versionLabel);
+        
+        footerPanel.add(rightFooter, BorderLayout.EAST);
+        
+        // Panel central (opcional) - se puede usar para más información
+        JPanel centerFooter = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        centerFooter.setOpaque(false);
+        // Por ahora vacío, pero se puede agregar información adicional aquí
+        footerPanel.add(centerFooter, BorderLayout.CENTER);
     }
     
     /**
@@ -35,7 +409,7 @@ public class Condiciones extends javax.swing.JFrame {
      */
     private void cargarComplementos() {
         try (Connection conn = Conexion.getConnection()) {
-            String sql = "SELECT * FROM tb_complementos ORDER BY id DESC LIMIT 1";
+            String sql = "SELECT NombreDeApp, CorreoApp FROM tb_complementos ORDER BY id DESC LIMIT 1";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
             
@@ -52,11 +426,15 @@ public class Condiciones extends javax.swing.JFrame {
             }
             
             // Actualizar labels
-            jLabel6.setText(nombreApp);
-            jLabel7.setText(correoApp.isEmpty() ? "contacto@fashion.com" : correoApp);
+            if (nombreAppLabel != null) {
+                nombreAppLabel.setText(nombreApp);
+            }
+            if (correoAppLabel != null) {
+                correoAppLabel.setText(correoApp.isEmpty() ? "contacto@fashion.com" : correoApp);
+            }
             
         } catch (SQLException e) {
-            ErrorHandler.logWarning("Error al cargar complementos", e);
+            logger.severe("Error al cargar complementos: " + e.getMessage());
         }
     }
     
@@ -71,437 +449,292 @@ public class Condiciones extends javax.swing.JFrame {
             
             if (rs.next()) {
                 String terminos = rs.getString("TerminosCondiones");
-                java.sql.Timestamp fechaActualizacion = rs.getTimestamp("UltimaActualizacion");
+                Timestamp fechaActualizacion = rs.getTimestamp("UltimaActualizacion");
                 
-                if (terminos != null && !terminos.isEmpty()) {
-                    // Si hay términos en BD, actualizar el label de fecha
-                    if (fechaActualizacion != null) {
-                        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd 'de' MMMM 'de' yyyy");
-                        jLabel29.setText("Última actualización: " + sdf.format(fechaActualizacion));
-                    }
-                    // Los términos están en los labels estáticos del formulario
-                    // Si quieres mostrar los términos de BD, podrías usar un JTextArea
+                // Actualizar fecha de actualización
+                if (fechaActualizacion != null) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd 'de' MMMM 'de' yyyy", new java.util.Locale("es", "ES"));
+                    // Buscar el label de fecha en el contentPanel
+                    SwingUtilities.invokeLater(() -> {
+                        actualizarFechaLabel(sdf.format(fechaActualizacion));
+                    });
                 }
+                
+                // Formatear y mostrar los términos
+                if (terminos != null && !terminos.isEmpty()) {
+                    String htmlContent = formatearTerminosHTML(terminos);
+                    terminosPane.setText(htmlContent);
+                } else {
+                    // Términos por defecto si no hay en BD
+                    terminosPane.setText(formatearTerminosHTML(obtenerTerminosPorDefecto()));
+                }
+            } else {
+                // Términos por defecto si no hay registro
+                terminosPane.setText(formatearTerminosHTML(obtenerTerminosPorDefecto()));
             }
             
         } catch (SQLException e) {
-            ErrorHandler.logWarning("Error al cargar términos", e);
+            logger.severe("Error al cargar términos: " + e.getMessage());
+            terminosPane.setText(formatearTerminosHTML(obtenerTerminosPorDefecto()));
         }
     }
-
+    
     /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
+     * Actualiza el label de fecha de actualización
      */
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
-    private void initComponents() {
-
-        jPanel1 = new javax.swing.JPanel();
-        jPanel5 = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jPanel3 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel28 = new javax.swing.JLabel();
-        jLabel29 = new javax.swing.JLabel();
-        jLabel30 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
-        jLabel16 = new javax.swing.JLabel();
-        jLabel17 = new javax.swing.JLabel();
-        jLabel18 = new javax.swing.JLabel();
-        jLabel19 = new javax.swing.JLabel();
-        jLabel20 = new javax.swing.JLabel();
-        jLabel21 = new javax.swing.JLabel();
-        jLabel22 = new javax.swing.JLabel();
-        jLabel23 = new javax.swing.JLabel();
-        jLabel24 = new javax.swing.JLabel();
-        jLabel25 = new javax.swing.JLabel();
-        jLabel26 = new javax.swing.JLabel();
-        jLabel27 = new javax.swing.JLabel();
-        jLabel31 = new javax.swing.JLabel();
-        jLabel32 = new javax.swing.JLabel();
-        jLabel33 = new javax.swing.JLabel();
-        jLabel34 = new javax.swing.JLabel();
-        jLabel35 = new javax.swing.JLabel();
-        jLabel36 = new javax.swing.JLabel();
-        jLabel37 = new javax.swing.JLabel();
-        jLabel38 = new javax.swing.JLabel();
-        jLabel39 = new javax.swing.JLabel();
-        jLabel40 = new javax.swing.JLabel();
-        jLabel41 = new javax.swing.JLabel();
-        jLabel42 = new javax.swing.JLabel();
-        jLabel43 = new javax.swing.JLabel();
-        jLabel44 = new javax.swing.JLabel();
-        jLabel45 = new javax.swing.JLabel();
-        jLabel46 = new javax.swing.JLabel();
-        jLabel47 = new javax.swing.JLabel();
-        jLabel48 = new javax.swing.JLabel();
-        jLabel49 = new javax.swing.JLabel();
-        jLabel50 = new javax.swing.JLabel();
-        jLabel51 = new javax.swing.JLabel();
-        jLabel52 = new javax.swing.JLabel();
-        jLabel53 = new javax.swing.JLabel();
-        jLabel54 = new javax.swing.JLabel();
-        jLabel55 = new javax.swing.JLabel();
-        jLabel56 = new javax.swing.JLabel();
-        jLabel57 = new javax.swing.JLabel();
-        jLabel58 = new javax.swing.JLabel();
-        jLabel59 = new javax.swing.JLabel();
-        jLabel60 = new javax.swing.JLabel();
-        jLabel61 = new javax.swing.JLabel();
-        jLabel62 = new javax.swing.JLabel();
-        jLabel63 = new javax.swing.JLabel();
-        jLabel64 = new javax.swing.JLabel();
-        jLabel65 = new javax.swing.JLabel();
-        jLabel66 = new javax.swing.JLabel();
-        LabelRegresar = new javax.swing.JLabel();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        jPanel1.setBackground(new java.awt.Color(102, 102, 255));
-        jPanel1.setPreferredSize(new java.awt.Dimension(757, 544));
-
-        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel5.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jLabel6.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel6.setText("FASHION");
-        jLabel6.setAlignmentX(0.5F);
-        jPanel5.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 5, 203, -1));
-
-        jLabel7.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel7.setText("INVOICEDAY@CORREOUNIVALLE.EDU.CO");
-        jPanel5.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 253, 20));
-
-        jLabel8.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel8.setText("COPYRIGHT (C) 2025");
-        jPanel5.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, -1, -1));
-
-        jLabel9.setIcon(new javax.swing.ImageIcon("C:\\Users\\calam\\OneDrive\\Pictures\\insta.png")); // NOI18N
-        jPanel5.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 0, 60, 60));
-
-        jLabel10.setIcon(new javax.swing.ImageIcon("C:\\Users\\calam\\OneDrive\\Pictures\\face.png")); // NOI18N
-        jPanel5.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 5, -1, -1));
-
-        jLabel11.setIcon(new javax.swing.ImageIcon("C:\\Users\\calam\\OneDrive\\Pictures\\twiter.png")); // NOI18N
-        jPanel5.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 5, -1, -1));
-
-        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jLabel1.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
-        jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 28, -1, -1));
-
-        jLabel2.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
-        jPanel3.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(162, 130, -1, -1));
-
-        jLabel28.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
-        jLabel28.setText("TÉRMINOS Y CONDICIONES DE USO");
-        jPanel3.add(jLabel28, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 20, -1, -1));
-
-        jLabel29.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel29.setText("Última actualización: 4 de noviembre de 2025");
-        jPanel3.add(jLabel29, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 70, -1, -1));
-        jPanel3.add(jLabel30, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 170, -1, -1));
-
-        jLabel3.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel3.setText("Bienvenido(a) a Fashion – Ropía Propia Colombia, una aplicación desarrollada para ofrecerte una");
-        jPanel3.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 120, -1, -1));
-
-        jLabel4.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel4.setText("experiencia moderna y segura en la compra de ropa y accesorios.");
-        jPanel3.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 140, -1, -1));
-
-        jLabel5.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel5.setText("Al acceder y usar nuestra aplicación, aceptas los siguientes Términos y Condiciones. Te recomendamos");
-        jPanel3.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 160, -1, -1));
-
-        jLabel12.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel12.setText("leerlos atentamente antes de realizar cualquier compra.");
-        jPanel3.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 180, -1, -1));
-
-        jLabel13.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jLabel13.setText("1. Aceptación de los términos");
-        jPanel3.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 230, -1, -1));
-
-        jLabel14.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel14.setText("El uso de esta aplicación implica la aceptación plena de los presentes Términos y Condiciones. Si no estás de");
-        jPanel3.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 260, -1, -1));
-
-        jLabel15.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel15.setText("acuerdo con ellos, te pedimos no continuar con el uso de la app.");
-        jPanel3.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 280, -1, -1));
-
-        jLabel16.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jLabel16.setText("2. Acceso a la aplicación");
-        jPanel3.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, -1, -1));
-
-        jLabel17.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel17.setText("El acceso para ver productos es libre y no requiere registro.");
-        jPanel3.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 340, -1, -1));
-
-        jLabel18.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel18.setText("Sin embargo, para realizar compras, el usuario deberá crear una cuenta personal proporcionando");
-        jPanel3.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 360, -1, -1));
-
-        jLabel19.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel19.setText("información verídica, actualizada y completa.");
-        jPanel3.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 380, -1, -1));
-
-        jLabel20.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jLabel20.setText("3. Registro y cuenta de usuario");
-        jPanel3.add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 420, -1, -1));
-
-        jLabel21.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel21.setText("El usuario se compromete a mantener la confidencialidad de su cuenta y contraseña. Cualquier actividad");
-        jPanel3.add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 440, -1, -1));
-
-        jLabel22.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel22.setText("realizada desde su cuenta se considerará responsabilidad del usuario.");
-        jPanel3.add(jLabel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 460, -1, -1));
-
-        jLabel23.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel23.setText("Fashion – Ropía Propia Colombia no se hace responsable por el uso indebido de cuentas personales.");
-        jPanel3.add(jLabel23, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 480, -1, -1));
-
-        jLabel24.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jLabel24.setText("4. Productos y precios");
-        jPanel3.add(jLabel24, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 530, -1, -1));
-
-        jLabel25.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel25.setText("Todos los productos publicados incluyen información detallada sobre su descripción, talla, color y precio.");
-        jPanel3.add(jLabel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 550, -1, -1));
-
-        jLabel26.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel26.setText("Nos reservamos el derecho de modificar precios, descuentos o disponibilidad de productos en cualquier");
-        jPanel3.add(jLabel26, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 570, -1, -1));
-
-        jLabel27.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel27.setText("momento, sin previo aviso.");
-        jPanel3.add(jLabel27, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 590, -1, -1));
-
-        jLabel31.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel31.setText("Las imágenes son de carácter ilustrativo y pueden presentar ligeras variaciones respecto al producto real.");
-        jPanel3.add(jLabel31, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 610, -1, -1));
-
-        jLabel32.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jLabel32.setText("5. Pagos");
-        jPanel3.add(jLabel32, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 660, -1, -1));
-
-        jLabel33.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel33.setText("Los pagos se realizan a través de las opciones disponibles en la aplicación (tarjeta, transferencia o pago");
-        jPanel3.add(jLabel33, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 680, -1, -1));
-
-        jLabel34.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel34.setText("contra entrega, según disponibilidad).");
-        jPanel3.add(jLabel34, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 700, -1, -1));
-
-        jLabel35.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel35.setText("El usuario garantiza que los datos proporcionados para el pago son verídicos y que cuenta con la");
-        jPanel3.add(jLabel35, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 720, -1, -1));
-
-        jLabel36.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel36.setText("autorización para utilizarlos.");
-        jPanel3.add(jLabel36, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 740, -1, -1));
-
-        jLabel37.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jLabel37.setText("6. Envíos y entregas");
-        jPanel3.add(jLabel37, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 790, -1, -1));
-
-        jLabel38.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel38.setText("Los tiempos de entrega varían según la ciudad o municipio.");
-        jPanel3.add(jLabel38, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 810, -1, -1));
-
-        jLabel39.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel39.setText("Fashion – Ropía Propia Colombia se compromete a despachar los pedidos en los plazos establecidos, sin");
-        jPanel3.add(jLabel39, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 830, -1, -1));
-
-        jLabel40.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel40.setText("embargo, no se responsabiliza por retrasos ocasionados por transportadoras o causas de fuerza mayor.");
-        jPanel3.add(jLabel40, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 850, -1, -1));
-
-        jLabel41.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel41.setText("El usuario debe verificar los datos de envío antes de confirmar la compra.");
-        jPanel3.add(jLabel41, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 870, -1, -1));
-
-        jLabel42.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jLabel42.setText("7. Cambios y devoluciones");
-        jPanel3.add(jLabel42, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 920, -1, -1));
-
-        jLabel43.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel43.setText("Podrás solicitar cambio o devolución dentro de los 5 días hábiles posteriores a la entrega, siempre que el");
-        jPanel3.add(jLabel43, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 940, -1, -1));
-
-        jLabel44.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel44.setText("producto:");
-        jPanel3.add(jLabel44, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 960, -1, -1));
-
-        jLabel45.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel45.setText("- No haya sido usado, lavado o modificado.");
-        jPanel3.add(jLabel45, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 980, -1, -1));
-
-        jLabel46.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel46.setText("- Conserve sus etiquetas y empaque original.");
-        jPanel3.add(jLabel46, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1000, -1, -1));
-
-        jLabel47.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel47.setText("Los costos de envío para devoluciones o cambios correrán por cuenta del cliente, salvo que el error sea");
-        jPanel3.add(jLabel47, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1020, -1, -1));
-
-        jLabel48.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel48.setText("atribuible a Fashion – Ropía Propia Colombia.");
-        jPanel3.add(jLabel48, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1040, -1, -1));
-
-        jLabel49.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jLabel49.setText("8. Propiedad intelectual");
-        jPanel3.add(jLabel49, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1090, -1, -1));
-
-        jLabel50.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel50.setText("Todos los contenidos de la aplicación (nombre, logotipo, imágenes, textos, diseño y código) son propiedad");
-        jPanel3.add(jLabel50, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1110, -1, -1));
-
-        jLabel51.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel51.setText("exclusiva de Fashion – Ropía Propia Colombia y están protegidos por la legislación colombiana.");
-        jPanel3.add(jLabel51, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1130, -1, -1));
-
-        jLabel52.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel52.setText("Queda prohibida su copia, distribución o uso sin autorización previa.");
-        jPanel3.add(jLabel52, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1150, -1, -1));
-
-        jLabel53.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jLabel53.setText("9. Privacidad y protección de datos");
-        jPanel3.add(jLabel53, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1200, -1, -1));
-
-        jLabel54.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel54.setText("La información personal del usuario será tratada conforme a nuestra Política de Privacidad, cumpliendo con");
-        jPanel3.add(jLabel54, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1220, -1, -1));
-
-        jLabel55.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel55.setText("la Ley 1581 de 2012 de Protección de Datos Personales en Colombia.");
-        jPanel3.add(jLabel55, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1240, -1, -1));
-
-        jLabel56.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel56.setText("Tus datos serán utilizados únicamente para la gestión de compras, envíos y comunicación con la empresa.");
-        jPanel3.add(jLabel56, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1260, -1, -1));
-
-        jLabel57.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jLabel57.setText("10. Responsabilidad");
-        jPanel3.add(jLabel57, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1300, -1, -1));
-
-        jLabel58.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel58.setText("Fashion – Ropía Propia Colombia no será responsable por daños, pérdidas o perjuicios derivados del uso");
-        jPanel3.add(jLabel58, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1320, -1, -1));
-
-        jLabel59.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel59.setText("inadecuado de la aplicación o de los productos adquiridos.");
-        jPanel3.add(jLabel59, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1340, -1, -1));
-
-        jLabel60.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel60.setText("El usuario es responsable de revisar las especificaciones del producto antes de efectuar la compra.");
-        jPanel3.add(jLabel60, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1360, -1, -1));
-
-        jLabel61.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jLabel61.setText("11. Modificaciones");
-        jPanel3.add(jLabel61, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1400, -1, -1));
-
-        jLabel62.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel62.setText("Nos reservamos el derecho de actualizar o modificar estos Términos y Condiciones en cualquier momento.");
-        jPanel3.add(jLabel62, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1420, -1, -1));
-
-        jLabel63.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel63.setText("Las modificaciones serán publicadas en la aplicación y entrarán en vigor de inmediato.");
-        jPanel3.add(jLabel63, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1440, -1, -1));
-
-        jLabel64.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jLabel64.setText("12. Contacto");
-        jPanel3.add(jLabel64, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1480, -1, -1));
-
-        jLabel65.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel65.setText("📧 Correo: contacto@fashioncolombia.com");
-        jPanel3.add(jLabel65, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1510, -1, -1));
-
-        jLabel66.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel66.setText("📞 Teléfono: +57 301 000 0000");
-        jPanel3.add(jLabel66, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 1530, -1, -1));
-
-        LabelRegresar.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        LabelRegresar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/flecha-izquierda.png"))); // NOI18N
-        LabelRegresar.setForeground(Color.BLUE);
-            LabelRegresar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    private void actualizarFechaLabel(String fecha) {
+        SwingUtilities.invokeLater(() -> {
+            // Buscar recursivamente el label de fecha en el contentPanel
+            buscarYActualizarFechaLabel(contentPanel, fecha);
+        });
+    }
+    
+    /**
+     * Busca recursivamente el label de fecha y lo actualiza
+     */
+    private void buscarYActualizarFechaLabel(Container container, String fecha) {
+        Component[] components = container.getComponents();
+        for (Component comp : components) {
+            if (comp instanceof JLabel) {
+                JLabel lbl = (JLabel) comp;
+                String text = lbl.getText();
+                if (text != null && text.contains("Última actualización:")) {
+                    lbl.setText("Última actualización: " + fecha);
+                    return;
+                }
+            } else if (comp instanceof Container) {
+                buscarYActualizarFechaLabel((Container) comp, fecha);
+            }
+        }
+    }
+    
+    /**
+     * Formatea el texto plano de términos en HTML
+     */
+    private String formatearTerminosHTML(String texto) {
+        if (texto == null || texto.isEmpty()) {
+            return obtenerTerminosPorDefectoHTML();
+        }
         
-         LabelRegresar.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
+        // Reemplazar saltos de línea por <br/>
+        String html = texto.replace("\n", "<br/>");
+        
+        // Detectar y formatear secciones numeradas (1., 2., etc.)
+        html = html.replaceAll("(\\d+\\.)\\s+([A-ZÁÉÍÓÚÑ][^\\d]*?)(?=\\d+\\.|$)", "<h2>$1 $2</h2>");
+        
+        // Formatear texto entre secciones como párrafos
+        String[] partes = html.split("<h2>");
+        StringBuilder resultado = new StringBuilder();
+        // Contenedor principal con ancho máximo fijo para controlar el ajuste del texto (1100px dentro del rango 1200x500 con márgenes)
+        resultado.append("<html><body><div style='max-width: 1100px; width: 1100px; word-wrap: break-word; overflow-wrap: break-word;'>");
+        
+        for (int i = 0; i < partes.length; i++) {
+            if (i == 0 && !partes[i].isEmpty()) {
+                resultado.append("<p>").append(partes[i].replace("<br/>", "</p><p>")).append("</p>");
+            } else if (!partes[i].isEmpty()) {
+                String[] seccion = partes[i].split("</h2>", 2);
+                resultado.append("<h2>").append(seccion[0]).append("</h2>");
+                if (seccion.length > 1 && !seccion[1].trim().isEmpty()) {
+                    String contenido = seccion[1].trim().replace("<br/><br/>", "</p><p>").replace("<br/>", " ");
+                    resultado.append("<p>").append(contenido).append("</p>");
+                }
+            }
+        }
+        
+        resultado.append("</div></body></html>");
+        return resultado.toString();
+    }
+    
+    /**
+     * Obtiene términos y condiciones por defecto si no hay en BD
+     */
+    private String obtenerTerminosPorDefecto() {
+        return "Bienvenido(a) a Fashion – Ropía Propia Colombia, una aplicación desarrollada para ofrecerte una experiencia moderna y segura en la compra de ropa y accesorios.\n\n" +
+               "Al acceder y usar nuestra aplicación, aceptas los siguientes Términos y Condiciones. Te recomendamos leerlos atentamente antes de realizar cualquier compra.\n\n" +
+               "1. Aceptación de los términos\n" +
+               "El uso de esta aplicación implica la aceptación plena de los presentes Términos y Condiciones. Si no estás de acuerdo con ellos, te pedimos no continuar con el uso de la app.\n\n" +
+               "2. Acceso a la aplicación\n" +
+               "El acceso para ver productos es libre y no requiere registro. Sin embargo, para realizar compras, el usuario deberá crear una cuenta personal proporcionando información verídica, actualizada y completa.\n\n" +
+               "3. Registro y cuenta de usuario\n" +
+               "El usuario se compromete a mantener la confidencialidad de su cuenta y contraseña. Cualquier actividad realizada desde su cuenta se considerará responsabilidad del usuario. Fashion – Ropía Propia Colombia no se hace responsable por el uso indebido de cuentas personales.\n\n" +
+               "4. Productos y precios\n" +
+               "Todos los productos publicados incluyen información detallada sobre su descripción, talla, color y precio. Nos reservamos el derecho de modificar precios, descuentos o disponibilidad de productos en cualquier momento, sin previo aviso. Las imágenes son de carácter ilustrativo y pueden presentar ligeras variaciones respecto al producto real.\n\n" +
+               "5. Pagos\n" +
+               "Los pagos se realizan a través de las opciones disponibles en la aplicación (tarjeta, transferencia o pago contra entrega, según disponibilidad). El usuario garantiza que los datos proporcionados para el pago son verídicos y que cuenta con la autorización para utilizarlos.\n\n" +
+               "6. Envíos y entregas\n" +
+               "Los tiempos de entrega varían según la ciudad o municipio. Fashion – Ropía Propia Colombia se compromete a despachar los pedidos en los plazos establecidos, sin embargo, no se responsabiliza por retrasos ocasionados por transportadoras o causas de fuerza mayor. El usuario debe verificar los datos de envío antes de confirmar la compra.\n\n" +
+               "7. Cambios y devoluciones\n" +
+               "Podrás solicitar cambio o devolución dentro de los 5 días hábiles posteriores a la entrega, siempre que el producto no haya sido usado, lavado o modificado y conserve sus etiquetas y empaque original. Los costos de envío para devoluciones o cambios correrán por cuenta del cliente, salvo que el error sea atribuible a Fashion – Ropía Propia Colombia.\n\n" +
+               "8. Propiedad intelectual\n" +
+               "Todos los contenidos de la aplicación (nombre, logotipo, imágenes, textos, diseño y código) son propiedad exclusiva de Fashion – Ropía Propia Colombia y están protegidos por la legislación colombiana. Queda prohibida su copia, distribución o uso sin autorización previa.\n\n" +
+               "9. Privacidad y protección de datos\n" +
+               "La información personal del usuario será tratada conforme a nuestra Política de Privacidad, cumpliendo con la Ley 1581 de 2012 de Protección de Datos Personales en Colombia. Tus datos serán utilizados únicamente para la gestión de compras, envíos y comunicación con la empresa.\n\n" +
+               "10. Responsabilidad\n" +
+               "Fashion – Ropía Propia Colombia no será responsable por daños, pérdidas o perjuicios derivados del uso inadecuado de la aplicación o de los productos adquiridos. El usuario es responsable de revisar las especificaciones del producto antes de efectuar la compra.\n\n" +
+               "11. Modificaciones\n" +
+               "Nos reservamos el derecho de actualizar o modificar estos Términos y Condiciones en cualquier momento. Las modificaciones serán publicadas en la aplicación y entrarán en vigor de inmediato.\n\n" +
+               "12. Contacto\n" +
+               "Para más información, contacta con nuestro equipo de atención al cliente.";
+    }
+    
+    /**
+     * Obtiene términos y condiciones por defecto en formato HTML
+     */
+    private String obtenerTerminosPorDefectoHTML() {
+        return "<html><body>" +
+               "<h2>1. Aceptación de los términos</h2>" +
+               "<p>El uso de esta aplicación implica la aceptación plena de los presentes Términos y Condiciones.</p>" +
+               "<h2>2. Acceso a la aplicación</h2>" +
+               "<p>El acceso para ver productos es libre y no requiere registro.</p>" +
+               "</body></html>";
+    }
+    
+    /**
+     * Personaliza el scrollbar con un diseño moderno y atractivo (exactamente igual que principal.java)
+     */
+    private void personalizarScrollBar(JScrollBar scrollBar) {
+        scrollBar.setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
+            @Override
+            protected void configureScrollBarColors() {
+                this.thumbColor = new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 120);
+                this.trackColor = new Color(248, 248, 248);
+                this.thumbDarkShadowColor = new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 180);
+                this.thumbLightShadowColor = new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 100);
+                this.thumbHighlightColor = new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 60);
+            }
+            
+            @Override
+            protected JButton createDecreaseButton(int orientation) {
+                return createZeroButton();
+            }
+            
+            @Override
+            protected JButton createIncreaseButton(int orientation) {
+                return createZeroButton();
+            }
+            
+            private JButton createZeroButton() {
+                JButton button = new JButton();
+                button.setPreferredSize(new Dimension(0, 0));
+                button.setMinimumSize(new Dimension(0, 0));
+                button.setMaximumSize(new Dimension(0, 0));
+                return button;
+            }
+            
+            @Override
+            protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
+                if (thumbBounds.isEmpty() || !scrollbar.isEnabled()) {
+                    return;
+                }
                 
-              cerrar();
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                
+                int w = thumbBounds.width;
+                int h = thumbBounds.height;
+                int x = thumbBounds.x;
+                int y = thumbBounds.y;
+                
+                // Sombra sutil
+                g2.setColor(new Color(0, 0, 0, 15));
+                g2.fillRoundRect(x + 1, y + 2, w - 2, h - 2, 12, 12);
+                
+                // Gradiente para el thumb
+                GradientPaint gradient = new GradientPaint(
+                    x, y, new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 150),
+                    x, y + h, new Color(COLOR_SECONDARY.getRed(), COLOR_SECONDARY.getGreen(), COLOR_SECONDARY.getBlue(), 150)
+                );
+                g2.setPaint(gradient);
+                g2.fillRoundRect(x, y, w - 1, h - 3, 12, 12);
+                
+                // Borde sutil
+                g2.setStroke(new BasicStroke(1.0f));
+                g2.setColor(new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 200));
+                g2.drawRoundRect(x, y, w - 1, h - 3, 12, 12);
+                
+                g2.dispose();
+            }
+            
+            @Override
+            protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                g2.setColor(trackColor);
+                g2.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
+                
+                // Borde sutil a la izquierda
+                g2.setColor(new Color(240, 240, 240));
+                g2.setStroke(new BasicStroke(1.0f));
+                g2.drawLine(trackBounds.x, trackBounds.y, trackBounds.x, trackBounds.y + trackBounds.height);
+                
+                g2.dispose();
             }
         });
         
-        LabelRegresar.setText("Regresar");
-        jPanel3.add(LabelRegresar, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 20, -1, -1));
-
-        jScrollPane1.setViewportView(jPanel3);
-
-        jScrollPane2.setViewportView(jScrollPane1);
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-            .addComponent(jScrollPane2)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 505, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 912, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 577, javax.swing.GroupLayout.PREFERRED_SIZE)
-        );
-
-        pack();
-    }// </editor-fold>                        
-    private void cerrar(){
-    this.dispose();
+        // Ancho del scrollbar
+        scrollBar.setPreferredSize(new Dimension(12, 0));
     }
+    
+    /**
+     * Crea y agrega un botón cerrar personalizado en la esquina superior derecha
+     */
+    private void crearBotonCerrar(javax.swing.JLayeredPane layeredPane) {
+        btnCerrar = new JButton("✕") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Fondo con gradiente
+                GradientPaint gradient = new GradientPaint(
+                    0, 0, new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 220),
+                    getWidth(), getHeight(), new Color(COLOR_SECONDARY.getRed(), COLOR_SECONDARY.getGreen(), COLOR_SECONDARY.getBlue(), 220)
+                );
+                g2.setPaint(gradient);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
+                
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        btnCerrar.setFont(new Font("Arial", Font.BOLD, 18));
+        btnCerrar.setForeground(Color.WHITE);
+        btnCerrar.setBorderPainted(false);
+        btnCerrar.setContentAreaFilled(false);
+        btnCerrar.setOpaque(false);
+        btnCerrar.setSize(35, 35);
+        btnCerrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnCerrar.setFocusPainted(false);
+        
+        btnCerrar.addActionListener(e -> dispose());
+        
+        btnCerrar.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btnCerrar.setForeground(new Color(255, 200, 200));
+                btnCerrar.repaint();
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnCerrar.setForeground(Color.WHITE);
+                btnCerrar.repaint();
+            }
+        });
+        
+        // Posicionar el botón en la esquina superior derecha
+        btnCerrar.setBounds(1155, 10, 35, 35);
+        
+        // Agregar el botón en la capa superior del layeredPane
+        layeredPane.add(btnCerrar, javax.swing.JLayeredPane.PALETTE_LAYER);
+    }
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -512,84 +745,7 @@ public class Condiciones extends javax.swing.JFrame {
         } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
             logger.log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
 
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new Condiciones().setVisible(true));
     }
-
-    // Variables declaration - do not modify                     
-    private javax.swing.JLabel LabelRegresar;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel18;
-    private javax.swing.JLabel jLabel19;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel20;
-    private javax.swing.JLabel jLabel21;
-    private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel23;
-    private javax.swing.JLabel jLabel24;
-    private javax.swing.JLabel jLabel25;
-    private javax.swing.JLabel jLabel26;
-    private javax.swing.JLabel jLabel27;
-    private javax.swing.JLabel jLabel28;
-    private javax.swing.JLabel jLabel29;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel30;
-    private javax.swing.JLabel jLabel31;
-    private javax.swing.JLabel jLabel32;
-    private javax.swing.JLabel jLabel33;
-    private javax.swing.JLabel jLabel34;
-    private javax.swing.JLabel jLabel35;
-    private javax.swing.JLabel jLabel36;
-    private javax.swing.JLabel jLabel37;
-    private javax.swing.JLabel jLabel38;
-    private javax.swing.JLabel jLabel39;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel40;
-    private javax.swing.JLabel jLabel41;
-    private javax.swing.JLabel jLabel42;
-    private javax.swing.JLabel jLabel43;
-    private javax.swing.JLabel jLabel44;
-    private javax.swing.JLabel jLabel45;
-    private javax.swing.JLabel jLabel46;
-    private javax.swing.JLabel jLabel47;
-    private javax.swing.JLabel jLabel48;
-    private javax.swing.JLabel jLabel49;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel50;
-    private javax.swing.JLabel jLabel51;
-    private javax.swing.JLabel jLabel52;
-    private javax.swing.JLabel jLabel53;
-    private javax.swing.JLabel jLabel54;
-    private javax.swing.JLabel jLabel55;
-    private javax.swing.JLabel jLabel56;
-    private javax.swing.JLabel jLabel57;
-    private javax.swing.JLabel jLabel58;
-    private javax.swing.JLabel jLabel59;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel60;
-    private javax.swing.JLabel jLabel61;
-    private javax.swing.JLabel jLabel62;
-    private javax.swing.JLabel jLabel63;
-    private javax.swing.JLabel jLabel64;
-    private javax.swing.JLabel jLabel65;
-    private javax.swing.JLabel jLabel66;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    // End of variables declaration                   
 }

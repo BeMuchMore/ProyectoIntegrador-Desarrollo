@@ -20,6 +20,7 @@ import javax.imageio.ImageIO;
 import UI.util.ErrorHandler;
 import UI.util.ModernStyles;
 import UI.ConfigImagenes;
+import UI.CarritoCompras;
 
 /**
  * Página principal de la aplicación - Diseño basado en index.html Replica el
@@ -213,18 +214,19 @@ public class principal extends javax.swing.JFrame {
         
         headerMainPanel = new JPanel();
         
-        headerMainPanel.setLayout(new BorderLayout(200, 5));
+        headerMainPanel.setLayout(new BorderLayout());
         headerMainPanel.setBackground(Color.WHITE);
         headerMainPanel.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(240, 240, 240)),
-            new EmptyBorder(15, 50, 15, 50)
+            new EmptyBorder(0, 50, 6, 50) // Margen pequeño abajo (6px)
         ));
-        headerMainPanel.setPreferredSize(new Dimension(Integer.MAX_VALUE, 80));
-        headerMainPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
+        headerMainPanel.setPreferredSize(new Dimension(Integer.MAX_VALUE, 70));
+        headerMainPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 70));
         
         // Logo
-        JPanel logoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        JPanel logoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         logoPanel.setOpaque(false);
+        logoPanel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
         
         // Cargar logo si existe
         if (rutaLogo != null && !rutaLogo.isEmpty()) {
@@ -234,8 +236,9 @@ public class principal extends javax.swing.JFrame {
                 if (archivo.exists()) {
                     ImageIcon icon = new ImageIcon(rutaAbsoluta);
                     Image img = icon.getImage();
-                    Image imgEscalada = img.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+                    Image imgEscalada = img.getScaledInstance(45, 45, Image.SCALE_SMOOTH);
                     JLabel logoImage = new JLabel(new ImageIcon(imgEscalada));
+                    logoImage.setVerticalAlignment(SwingConstants.BOTTOM);
                     logoPanel.add(logoImage);
                 }
             } catch (Exception e) {
@@ -244,9 +247,10 @@ public class principal extends javax.swing.JFrame {
         }
         
         JLabel logoLabel = new JLabel(nombreApp);
-        logoLabel.setFont(new Font("Playfair Display", Font.BOLD, 28));
+        logoLabel.setFont(new Font("Playfair Display", Font.BOLD, 26));
         logoLabel.setForeground(COLOR_PRIMARY);
         logoLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        logoLabel.setVerticalAlignment(SwingConstants.BOTTOM);
         logoLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -256,8 +260,9 @@ public class principal extends javax.swing.JFrame {
         logoPanel.add(logoLabel);
         
         // Navegación
-        JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 0));
+        JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 25, 0));
         navPanel.setOpaque(false);
+        navPanel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
         
         JLabel navInicio = crearNavLink("Inicio", e -> scrollToTop());
         JLabel navTienda = crearNavLink("Tienda", e -> abrirTienda());
@@ -269,19 +274,21 @@ public class principal extends javax.swing.JFrame {
         navPanel.add(navMujer);
         navPanel.add(navAccesorios);
 
-        // Campo de búsqueda integrado en la barra superior
+        // Campo de búsqueda integrado - MÁS PEQUEÑO
         JPanel searchPanel = new JPanel(new BorderLayout(5, 0));
         searchPanel.setOpaque(false);
-        searchPanel.setBorder(new EmptyBorder(0, 20, 0, 20));
+        searchPanel.setBorder(new EmptyBorder(0, 15, 0, 15));
+        searchPanel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
 
         JTextField searchField = new JTextField();
-        searchField.setPreferredSize(new Dimension(300, 1));
-        searchField.setFont(new Font("Poppins", Font.PLAIN, 13));
+        searchField.setPreferredSize(new Dimension(180, 28)); // Más pequeño
+        searchField.setMaximumSize(new Dimension(180, 28));
+        searchField.setFont(new Font("Poppins", Font.PLAIN, 12));
         searchField.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 100), 1),
-                BorderFactory.createEmptyBorder(5, 35, 5, 10)
+                BorderFactory.createEmptyBorder(4, 10, 4, 10)
         ));
-        searchField.putClientProperty("JTextField.placeholderText", "Buscar productos...");
+        searchField.putClientProperty("JTextField.placeholderText", "Buscar...");
         searchField.addActionListener(e -> {
             String busqueda = searchField.getText().trim();
             if (!busqueda.isEmpty()) {
@@ -290,23 +297,15 @@ public class principal extends javax.swing.JFrame {
             }
         });
 
-        // Icono de búsqueda dentro del campo
-        JLabel searchIconLabel = new JLabel("");
-        searchIconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
-        searchIconLabel.setBorder(new EmptyBorder(0, 10, 0, 0));
-        searchIconLabel.setForeground(new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 150));
-
-        searchPanel.add(searchIconLabel, BorderLayout.WEST);
-        searchPanel.add(searchField, BorderLayout.CENTER);
-
-        // Botón de búsqueda
+        // Botón de búsqueda - MÁS PEQUEÑO
         JButton searchButton = new JButton("Buscar");
-        searchButton.setFont(new Font("Poppins", Font.BOLD, 12));
+        searchButton.setFont(new Font("Poppins", Font.BOLD, 11));
         searchButton.setForeground(COLOR_TEXT_LIGHT);
         searchButton.setBackground(COLOR_PRIMARY);
         searchButton.setBorderPainted(false);
         searchButton.setFocusPainted(false);
-        searchButton.setPreferredSize(new Dimension(80, 15));
+        searchButton.setPreferredSize(new Dimension(70, 28)); // Más pequeño
+        searchButton.setMaximumSize(new Dimension(70, 28));
         searchButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         searchButton.addActionListener(e -> {
             String busqueda = searchField.getText().trim();
@@ -326,22 +325,27 @@ public class principal extends javax.swing.JFrame {
                 searchButton.setBackground(COLOR_PRIMARY);
             }
         });
+
+        searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.add(searchButton, BorderLayout.EAST);
         
         // Iconos del header
-        JPanel iconsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
+        JPanel iconsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
         iconsPanel.setOpaque(false);
+        iconsPanel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
         
         // Icono de usuario con información si está logueado
         JPanel userPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
         userPanel.setOpaque(false);
+        userPanel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
         
         if (isLoggedIn && username != null) {
             // Mostrar nombre de usuario
             JLabel userNameLabel = new JLabel(username);
-            userNameLabel.setFont(new Font("Poppins", Font.PLAIN, 12));
+            userNameLabel.setFont(new Font("Poppins", Font.PLAIN, 11));
             userNameLabel.setForeground(COLOR_TEXT_PRIMARY);
             userNameLabel.setBorder(new EmptyBorder(0, 0, 0, 5));
+            userNameLabel.setVerticalAlignment(SwingConstants.BOTTOM);
             userPanel.add(userNameLabel);
             
             // Icono de usuario
@@ -351,9 +355,10 @@ public class principal extends javax.swing.JFrame {
             // Botón de cerrar sesión si es admin
             if ("admin".equalsIgnoreCase(cargo)) {
                 JLabel adminBadge = new JLabel("⚙️");
-                adminBadge.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
+                adminBadge.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
                 adminBadge.setToolTipText("Administrador");
                 adminBadge.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                adminBadge.setVerticalAlignment(SwingConstants.BOTTOM);
                 userPanel.add(adminBadge);
             }
             
@@ -370,26 +375,29 @@ public class principal extends javax.swing.JFrame {
         iconsPanel.add(userPanel);
         iconsPanel.add(cartIcon);
 
-        // Crear panel superior con logo, nav, búsqueda e iconos en una sola fila
-        JPanel topRow = new JPanel(new BorderLayout(20, 0));
+        // Crear panel superior con logo, nav, búsqueda e iconos - alineados abajo
+        JPanel topRow = new JPanel(new BorderLayout(15, 0));
         topRow.setOpaque(false);
+        topRow.setAlignmentY(Component.BOTTOM_ALIGNMENT);
         
         // Panel izquierdo con logo y navegación
         JPanel leftPanel = new JPanel(new BorderLayout(20, 0));
         leftPanel.setOpaque(false);
+        leftPanel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
         leftPanel.add(logoPanel, BorderLayout.WEST);
         leftPanel.add(navPanel, BorderLayout.CENTER);
         
         // Panel derecho con búsqueda e iconos
-        JPanel rightPanel = new JPanel(new BorderLayout(15, 0));
+        JPanel rightPanel = new JPanel(new BorderLayout(10, 0));
         rightPanel.setOpaque(false);
+        rightPanel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
         rightPanel.add(searchPanel, BorderLayout.WEST);
         rightPanel.add(iconsPanel, BorderLayout.EAST);
         
         topRow.add(leftPanel, BorderLayout.WEST);
         topRow.add(rightPanel, BorderLayout.EAST);
 
-        headerMainPanel.add(topRow, BorderLayout.CENTER);
+        headerMainPanel.add(topRow, BorderLayout.SOUTH); // Agregar al SUR para que toque el fondo
         
         // No agregar al mainPanel, se agregará al headerContainer
     }
@@ -402,6 +410,8 @@ public class principal extends javax.swing.JFrame {
         link.setFont(new Font("Poppins", Font.PLAIN, 14));
         link.setForeground(Color.BLACK);
         link.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        link.setVerticalAlignment(SwingConstants.BOTTOM);
+        link.setAlignmentY(Component.BOTTOM_ALIGNMENT);
         link.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -425,17 +435,20 @@ public class principal extends javax.swing.JFrame {
      * Crea un icono del header con texto
      */
     private JPanel crearHeaderIcon(String icono, String texto, ActionListener action) {
-        JPanel iconPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+        JPanel iconPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 0));
         iconPanel.setOpaque(false);
         iconPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        iconPanel.setBorder(new EmptyBorder(5, 10, 5, 10));
+        iconPanel.setBorder(new EmptyBorder(0, 8, 0, 8));
+        iconPanel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
         
         JLabel iconLabel = new JLabel(icono);
-        iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
+        iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
+        iconLabel.setVerticalAlignment(SwingConstants.BOTTOM);
         
         JLabel textLabel = new JLabel(texto);
-        textLabel.setFont(new Font("Poppins", Font.PLAIN, 12));
+        textLabel.setFont(new Font("Poppins", Font.PLAIN, 11));
         textLabel.setForeground(COLOR_TEXT_PRIMARY);
+        textLabel.setVerticalAlignment(SwingConstants.BOTTOM);
         
         iconPanel.add(iconLabel);
         iconPanel.add(textLabel);
@@ -448,14 +461,14 @@ public class principal extends javax.swing.JFrame {
             
             @Override
             public void mouseEntered(MouseEvent e) {
-                iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20));
+                iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
                 textLabel.setForeground(COLOR_PRIMARY);
                 iconPanel.repaint();
             }
             
             @Override
             public void mouseExited(MouseEvent e) {
-                iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
+                iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
                 textLabel.setForeground(COLOR_TEXT_PRIMARY);
                 iconPanel.repaint();
             }
@@ -1567,222 +1580,400 @@ public class principal extends javax.swing.JFrame {
     }
     
     /**
+     * Crea un diálogo personalizado moderno y atractivo
+     */
+    private void mostrarDialogoModerno(String titulo, String contenido, String icono) {
+        JDialog dialog = new JDialog(this, titulo, true);
+        dialog.setUndecorated(true);
+        dialog.setSize(750, 650); // Más grande para más espacio de información
+        dialog.setLocationRelativeTo(this);
+        
+        // Panel principal con gradiente
+        JPanel mainPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Gradiente de fondo
+                GradientPaint gradient = new GradientPaint(
+                    0, 0, new Color(250, 246, 249),
+                    getWidth(), getHeight(), new Color(255, 255, 255)
+                );
+                g2.setPaint(gradient);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                
+                // Formas decorativas
+                g2.setColor(new Color(COLOR_PRIMARY.getRed(), COLOR_PRIMARY.getGreen(), COLOR_PRIMARY.getBlue(), 10));
+                g2.fillOval(getWidth() - 150, -50, 300, 300);
+                g2.setColor(new Color(COLOR_SECONDARY.getRed(), COLOR_SECONDARY.getGreen(), COLOR_SECONDARY.getBlue(), 8));
+                g2.fillOval(-100, getHeight() - 100, 250, 250);
+                
+                g2.dispose();
+            }
+        };
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(30, 40, 20, 40)); // Menos padding abajo para más espacio
+        
+        // Header con título e icono
+        JPanel headerPanel = new JPanel(new BorderLayout(15, 0));
+        headerPanel.setOpaque(false);
+        headerPanel.setBorder(new EmptyBorder(0, 0, 15, 0)); // Menos espacio abajo
+        
+        JLabel iconLabel = new JLabel(icono != null ? icono : "✨");
+        iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 48));
+        iconLabel.setBorder(new EmptyBorder(0, 0, 0, 20));
+        
+        JLabel titleLabel = new JLabel(titulo);
+        titleLabel.setFont(new Font("Playfair Display", Font.BOLD, 32));
+        titleLabel.setForeground(COLOR_PRIMARY);
+        
+        headerPanel.add(iconLabel, BorderLayout.WEST);
+        headerPanel.add(titleLabel, BorderLayout.CENTER);
+        mainPanel.add(headerPanel, BorderLayout.NORTH);
+        
+        // Contenido con scroll
+        JTextPane contentPane = new JTextPane();
+        contentPane.setContentType("text/html");
+        contentPane.setText("<html><body style='font-family: Poppins, Arial; font-size: 14px; line-height: 1.8; color: #333; padding: 10px;'>" + contenido + "</body></html>");
+        contentPane.setEditable(false);
+        contentPane.setOpaque(false);
+        contentPane.setBackground(new Color(0, 0, 0, 0));
+        
+        JScrollPane scrollPane = new JScrollPane(contentPane);
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        
+        // Aplicar el mismo diseño de scrollbar que en principal
+        personalizarScrollBar(scrollPane.getVerticalScrollBar());
+        
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        
+        // Botón cerrar moderno - MÁS PEQUEÑO
+        JButton closeBtn = new JButton("Cerrar") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Fondo con gradiente
+                GradientPaint gradient = new GradientPaint(
+                    0, 0, COLOR_PRIMARY,
+                    getWidth(), getHeight(), COLOR_SECONDARY
+                );
+                g2.setPaint(gradient);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+                
+                // Sombra
+                g2.setColor(new Color(0, 0, 0, 20));
+                g2.fillRoundRect(2, 4, getWidth() - 2, getHeight() - 2, 20, 20);
+                
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        closeBtn.setFont(new Font("Poppins", Font.BOLD, 14)); // Fuente más pequeña
+        closeBtn.setForeground(Color.WHITE);
+        closeBtn.setBorderPainted(false);
+        closeBtn.setContentAreaFilled(false);
+        closeBtn.setPreferredSize(new Dimension(100, 35)); // Botón más pequeño
+        closeBtn.setMinimumSize(new Dimension(100, 35));
+        closeBtn.setMaximumSize(new Dimension(100, 35));
+        closeBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        closeBtn.addActionListener(e -> dialog.dispose());
+        
+        closeBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                closeBtn.setForeground(new Color(255, 255, 255, 200));
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                closeBtn.setForeground(Color.WHITE);
+            }
+        });
+        
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.setOpaque(false);
+        buttonPanel.setBorder(new EmptyBorder(10, 0, 0, 0)); // Menos padding
+        buttonPanel.add(closeBtn);
+        
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+        
+        dialog.setContentPane(mainPanel);
+        dialog.setVisible(true);
+    }
+    
+    /**
      * Muestra información sobre la empresa
      */
     private void mostrarSobreNosotros() {
-        String mensaje = "<html><div style='width: 500px; text-align: justify;'>"
-                + "<h2 style='color: #6B2D4D; margin-bottom: 15px;'>Sobre " + nombreApp + "</h2>"
-                + "<p style='line-height: 1.8; margin-bottom: 15px;'>"
+        String contenido = "<div style='text-align: justify;'>"
+                + "<p style='margin-bottom: 20px; font-size: 16px;'>"
                 + "Somos una tienda de moda femenina comprometida con ofrecer las últimas tendencias "
                 + "y clásicos atemporales que empoderan a cada mujer a expresar su estilo único."
                 + "</p>"
-                + "<p style='line-height: 1.8; margin-bottom: 15px;'>"
+                + "<p style='margin-bottom: 20px; font-size: 16px;'>"
                 + "Nuestra misión es brindar una experiencia de compra excepcional, con productos "
                 + "de alta calidad y un servicio al cliente dedicado."
                 + "</p>"
-                + "<p style='line-height: 1.8;'>"
+                + "<p style='font-size: 16px;'>"
                 + "Desde nuestra fundación, nos hemos comprometido a ofrecer moda accesible, "
                 + "sostenible y que refleje la diversidad y belleza de todas las mujeres."
                 + "</p>"
-                + "</div></html>";
-        JOptionPane.showMessageDialog(this, mensaje, "Sobre Nosotros", 
-                JOptionPane.INFORMATION_MESSAGE);
+                + "</div>";
+        mostrarDialogoModerno("Sobre " + nombreApp, contenido, "💼");
     }
     
     /**
      * Muestra información de contacto
      */
     private void mostrarContacto() {
-        String mensaje = "<html><div style='width: 500px;'>"
-                + "<h2 style='color: #6B2D4D; margin-bottom: 20px;'>Contáctanos</h2>"
-                + "<p style='line-height: 2; margin-bottom: 10px;'><b>Email:</b> contacto@" + nombreApp.toLowerCase().replace(" ", "") + ".com</p>"
-                + "<p style='line-height: 2; margin-bottom: 10px;'><b>Teléfono:</b> +1 (555) 123-4567</p>"
-                + "<p style='line-height: 2; margin-bottom: 10px;'><b>Dirección:</b> Calle Principal 123, Ciudad</p>"
-                + "<p style='line-height: 2; margin-bottom: 10px;'><b>Horario de Atención:</b></p>"
-                + "<p style='line-height: 2; margin-left: 20px;'>Lunes - Viernes: 9:00 AM - 6:00 PM</p>"
-                + "<p style='line-height: 2; margin-left: 20px;'>Sábados: 10:00 AM - 4:00 PM</p>"
-                + "<p style='line-height: 2; margin-left: 20px;'>Domingos: Cerrado</p>"
-                + "</div></html>";
-        JOptionPane.showMessageDialog(this, mensaje, "Contacto", 
-                JOptionPane.INFORMATION_MESSAGE);
+        String contenido = "<div style='font-size: 16px;'>"
+                + "<p style='margin-bottom: 15px;'><b style='color: #6B2D4D; font-size: 18px;'>📧 Email:</b><br>contacto@" + nombreApp.toLowerCase().replace(" ", "") + ".com</p>"
+                + "<p style='margin-bottom: 15px;'><b style='color: #6B2D4D; font-size: 18px;'>📞 Teléfono:</b><br>+1 (555) 123-4567</p>"
+                + "<p style='margin-bottom: 15px;'><b style='color: #6B2D4D; font-size: 18px;'>📍 Dirección:</b><br>Calle Principal 123, Ciudad</p>"
+                + "<p style='margin-bottom: 10px;'><b style='color: #6B2D4D; font-size: 18px;'>🕐 Horario de Atención:</b></p>"
+                + "<ul style='margin-left: 20px; margin-top: 5px;'>"
+                + "<li>Lunes - Viernes: 9:00 AM - 6:00 PM</li>"
+                + "<li>Sábados: 10:00 AM - 4:00 PM</li>"
+                + "<li>Domingos: Cerrado</li>"
+                + "</ul>"
+                + "</div>";
+        mostrarDialogoModerno("Contáctanos", contenido, "📞");
     }
     
     /**
      * Muestra la guía de tallas
      */
     private void mostrarGuiaTallas() {
-        String mensaje = "<html><div style='width: 600px;'>"
-                + "<h2 style='color: #6B2D4D; margin-bottom: 20px;'>Guía de Tallas</h2>"
-                + "<table border='1' cellpadding='10' style='border-collapse: collapse; width: 100%; margin-bottom: 20px;'>"
-                + "<tr style='background-color: #6B2D4D; color: white;'><th>Talla</th><th>Busto (cm)</th><th>Cintura (cm)</th><th>Cadera (cm)</th></tr>"
-                + "<tr><td>XS</td><td>80-84</td><td>60-64</td><td>84-88</td></tr>"
-                + "<tr><td>S</td><td>84-88</td><td>64-68</td><td>88-92</td></tr>"
-                + "<tr><td>M</td><td>88-92</td><td>68-72</td><td>92-96</td></tr>"
-                + "<tr><td>L</td><td>92-96</td><td>72-76</td><td>96-100</td></tr>"
-                + "<tr><td>XL</td><td>96-100</td><td>76-80</td><td>100-104</td></tr>"
+        String contenido = "<div style='font-size: 16px;'>"
+                + "<table border='1' cellpadding='12' style='border-collapse: collapse; width: 100%; margin-bottom: 25px; border: 2px solid #6B2D4D;'>"
+                + "<tr style='background: linear-gradient(135deg, #6B2D4D, #8B4A6B); color: white; font-weight: bold;'>"
+                + "<th style='padding: 12px;'>Talla</th>"
+                + "<th style='padding: 12px;'>Busto (cm)</th>"
+                + "<th style='padding: 12px;'>Cintura (cm)</th>"
+                + "<th style='padding: 12px;'>Cadera (cm)</th></tr>"
+                + "<tr style='background-color: #f8f8f8;'><td style='padding: 10px; text-align: center; font-weight: bold;'>XS</td><td style='padding: 10px; text-align: center;'>80-84</td><td style='padding: 10px; text-align: center;'>60-64</td><td style='padding: 10px; text-align: center;'>84-88</td></tr>"
+                + "<tr><td style='padding: 10px; text-align: center; font-weight: bold;'>S</td><td style='padding: 10px; text-align: center;'>84-88</td><td style='padding: 10px; text-align: center;'>64-68</td><td style='padding: 10px; text-align: center;'>88-92</td></tr>"
+                + "<tr style='background-color: #f8f8f8;'><td style='padding: 10px; text-align: center; font-weight: bold;'>M</td><td style='padding: 10px; text-align: center;'>88-92</td><td style='padding: 10px; text-align: center;'>68-72</td><td style='padding: 10px; text-align: center;'>92-96</td></tr>"
+                + "<tr><td style='padding: 10px; text-align: center; font-weight: bold;'>L</td><td style='padding: 10px; text-align: center;'>92-96</td><td style='padding: 10px; text-align: center;'>72-76</td><td style='padding: 10px; text-align: center;'>96-100</td></tr>"
+                + "<tr style='background-color: #f8f8f8;'><td style='padding: 10px; text-align: center; font-weight: bold;'>XL</td><td style='padding: 10px; text-align: center;'>96-100</td><td style='padding: 10px; text-align: center;'>76-80</td><td style='padding: 10px; text-align: center;'>100-104</td></tr>"
                 + "</table>"
-                + "<p style='line-height: 1.8;'><b>Consejos:</b></p>"
-                + "<ul style='line-height: 1.8;'>"
+                + "<p style='margin-bottom: 10px;'><b style='color: #6B2D4D; font-size: 18px;'>💡 Consejos:</b></p>"
+                + "<ul style='margin-left: 20px; line-height: 2;'>"
                 + "<li>Mide tu busto, cintura y cadera para encontrar tu talla perfecta</li>"
                 + "<li>Si estás entre dos tallas, te recomendamos la talla más grande</li>"
                 + "<li>Las medidas pueden variar según el estilo y la marca</li>"
                 + "</ul>"
-                + "</div></html>";
-        JOptionPane.showMessageDialog(this, mensaje, "Guía de Tallas", 
-                JOptionPane.INFORMATION_MESSAGE);
+                + "</div>";
+        mostrarDialogoModerno("Guía de Tallas", contenido, "📏");
     }
     
     /**
      * Muestra información de envío
      */
     private void mostrarInfoEnvio() {
-        String mensaje = "<html><div style='width: 550px;'>"
-                + "<h2 style='color: #6B2D4D; margin-bottom: 20px;'>Información de Envío</h2>"
-                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>📦 Envío Estándar:</b></p>"
-                + "<p style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
-                + "• Tiempo de entrega: 5-7 días hábiles<br>"
-                + "• Costo: $5.99<br>"
-                + "• Envío gratuito en compras superiores a $100"
-                + "</p>"
-                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>🚀 Envío Express:</b></p>"
-                + "<p style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
-                + "• Tiempo de entrega: 2-3 días hábiles<br>"
-                + "• Costo: $12.99"
-                + "</p>"
-                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>🌍 Envío Internacional:</b></p>"
-                + "<p style='line-height: 1.8; margin-left: 20px;'>"
-                + "• Disponible a la mayoría de países<br>"
-                + "• Tiempo de entrega: 10-15 días hábiles<br>"
-                + "• Costo: $25.99"
-                + "</p>"
-                + "</div></html>";
-        JOptionPane.showMessageDialog(this, mensaje, "Información de Envío", 
-                JOptionPane.INFORMATION_MESSAGE);
+        String contenido = "<div style='font-size: 16px;'>"
+                + "<div style='background: linear-gradient(135deg, #f0e0eb, #ffffff); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #6B2D4D;'>"
+                + "<p style='margin-bottom: 10px;'><b style='color: #6B2D4D; font-size: 18px;'>📦 Envío Estándar</b></p>"
+                + "<ul style='margin-left: 20px; line-height: 2;'>"
+                + "<li>Tiempo de entrega: <b>5-7 días hábiles</b></li>"
+                + "<li>Costo: <b>$5.99</b></li>"
+                + "<li>Envío <b style='color: #6B2D4D;'>GRATUITO</b> en compras superiores a $100</li>"
+                + "</ul>"
+                + "</div>"
+                + "<div style='background: linear-gradient(135deg, #f0e0eb, #ffffff); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #8B4A6B;'>"
+                + "<p style='margin-bottom: 10px;'><b style='color: #6B2D4D; font-size: 18px;'>🚀 Envío Express</b></p>"
+                + "<ul style='margin-left: 20px; line-height: 2;'>"
+                + "<li>Tiempo de entrega: <b>2-3 días hábiles</b></li>"
+                + "<li>Costo: <b>$12.99</b></li>"
+                + "</ul>"
+                + "</div>"
+                + "<div style='background: linear-gradient(135deg, #f0e0eb, #ffffff); padding: 15px; border-radius: 10px; border-left: 4px solid #A8557A;'>"
+                + "<p style='margin-bottom: 10px;'><b style='color: #6B2D4D; font-size: 18px;'>🌍 Envío Internacional</b></p>"
+                + "<ul style='margin-left: 20px; line-height: 2;'>"
+                + "<li>Disponible a la mayoría de países</li>"
+                + "<li>Tiempo de entrega: <b>10-15 días hábiles</b></li>"
+                + "<li>Costo: <b>$25.99</b></li>"
+                + "</ul>"
+                + "</div>"
+                + "</div>";
+        mostrarDialogoModerno("Información de Envío", contenido, "📦");
     }
     
     /**
      * Muestra política de devoluciones
      */
     private void mostrarDevoluciones() {
-        String mensaje = "<html><div style='width: 550px;'>"
-                + "<h2 style='color: #6B2D4D; margin-bottom: 20px;'>Política de Devoluciones</h2>"
-                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>⏰ Plazo de Devolución:</b></p>"
-                + "<p style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
-                + "Tienes 30 días desde la fecha de recepción para devolver cualquier artículo."
-                + "</p>"
-                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>✅ Condiciones:</b></p>"
-                + "<ul style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
+        String contenido = "<div style='font-size: 16px;'>"
+                + "<div style='background: linear-gradient(135deg, #fff5f8, #ffffff); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #6B2D4D;'>"
+                + "<p style='margin-bottom: 10px;'><b style='color: #6B2D4D; font-size: 18px;'>⏰ Plazo de Devolución</b></p>"
+                + "<p>Tienes <b>30 días</b> desde la fecha de recepción para devolver cualquier artículo.</p>"
+                + "</div>"
+                + "<div style='background: linear-gradient(135deg, #fff5f8, #ffffff); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #8B4A6B;'>"
+                + "<p style='margin-bottom: 10px;'><b style='color: #6B2D4D; font-size: 18px;'>✅ Condiciones</b></p>"
+                + "<ul style='margin-left: 20px; line-height: 2;'>"
                 + "<li>Los artículos deben estar sin usar y con etiquetas originales</li>"
                 + "<li>Deben incluirse todos los accesorios y embalaje original</li>"
                 + "<li>No se aceptan devoluciones de ropa interior o artículos personalizados</li>"
                 + "</ul>"
-                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>💰 Reembolsos:</b></p>"
-                + "<p style='line-height: 1.8; margin-left: 20px;'>"
-                + "El reembolso se procesará en un plazo de 5-7 días hábiles después de recibir "
-                + "el artículo. El costo de envío original no es reembolsable."
-                + "</p>"
-                + "</div></html>";
-        JOptionPane.showMessageDialog(this, mensaje, "Devoluciones", 
-                JOptionPane.INFORMATION_MESSAGE);
+                + "</div>"
+                + "<div style='background: linear-gradient(135deg, #fff5f8, #ffffff); padding: 20px; border-radius: 10px; border-left: 4px solid #A8557A;'>"
+                + "<p style='margin-bottom: 10px;'><b style='color: #6B2D4D; font-size: 18px;'>💰 Reembolsos</b></p>"
+                + "<p>El reembolso se procesará en un plazo de <b>5-7 días hábiles</b> después de recibir el artículo. "
+                + "El costo de envío original no es reembolsable.</p>"
+                + "</div>"
+                + "</div>";
+        mostrarDialogoModerno("Política de Devoluciones", contenido, "↩️");
     }
     
     /**
      * Permite rastrear un pedido
      */
     private void rastrearPedido() {
-        String numeroPedido = JOptionPane.showInputDialog(this, 
-                "Ingrese el número de su pedido:", "Rastrear Pedido", 
-                JOptionPane.QUESTION_MESSAGE);
-        if (numeroPedido != null && !numeroPedido.trim().isEmpty()) {
-            // Aquí se podría implementar la lógica real de rastreo
-            JOptionPane.showMessageDialog(this, 
-                    "Pedido #" + numeroPedido + "\n\nEstado: En tránsito\n" +
-                    "Última actualización: En camino a destino\n" +
-                    "Tiempo estimado de entrega: 2-3 días hábiles",
-                    "Estado del Pedido", JOptionPane.INFORMATION_MESSAGE);
-        }
+        // Crear diálogo de entrada personalizado
+        JDialog inputDialog = new JDialog(this, "Rastrear Pedido", true);
+        inputDialog.setUndecorated(true);
+        inputDialog.setSize(450, 200);
+        inputDialog.setLocationRelativeTo(this);
+        
+        JPanel inputPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                GradientPaint gradient = new GradientPaint(
+                    0, 0, new Color(250, 246, 249),
+                    getWidth(), getHeight(), new Color(255, 255, 255)
+                );
+                g2.setPaint(gradient);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                
+                g2.dispose();
+            }
+        };
+        inputPanel.setLayout(new BorderLayout(20, 20));
+        inputPanel.setBorder(new EmptyBorder(30, 30, 30, 30));
+        
+        JLabel label = new JLabel("Ingrese el número de su pedido:");
+        label.setFont(new Font("Poppins", Font.PLAIN, 14));
+        
+        JTextField inputField = new JTextField(20);
+        inputField.setFont(new Font("Poppins", Font.PLAIN, 14));
+        inputField.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(COLOR_PRIMARY, 1),
+            new EmptyBorder(8, 12, 8, 12)
+        ));
+        
+        JButton buscarBtn = new JButton("Buscar");
+        buscarBtn.setFont(new Font("Poppins", Font.BOLD, 14));
+        buscarBtn.setForeground(Color.WHITE);
+        buscarBtn.setBackground(COLOR_PRIMARY);
+        buscarBtn.setBorderPainted(false);
+        buscarBtn.setPreferredSize(new Dimension(120, 35));
+        buscarBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        buscarBtn.addActionListener(e -> {
+            String numeroPedido = inputField.getText().trim();
+            if (!numeroPedido.isEmpty()) {
+                inputDialog.dispose();
+                String contenido = "<div style='background: linear-gradient(135deg, #fff5f8, #ffffff); padding: 25px; border-radius: 10px; border-left: 4px solid #6B2D4D;'>"
+                        + "<p style='margin-bottom: 15px;'><b style='color: #6B2D4D; font-size: 18px;'>📦 Pedido #" + numeroPedido + "</b></p>"
+                        + "<p style='margin-bottom: 10px;'><b>Estado:</b> En tránsito</p>"
+                        + "<p style='margin-bottom: 10px;'><b>Última actualización:</b> En camino a destino</p>"
+                        + "<p><b>Tiempo estimado de entrega:</b> 2-3 días hábiles</p>"
+                        + "</div>";
+                mostrarDialogoModerno("Estado del Pedido", contenido, "📦");
+            }
+        });
+        
+        inputPanel.add(label, BorderLayout.NORTH);
+        inputPanel.add(inputField, BorderLayout.CENTER);
+        inputPanel.add(buscarBtn, BorderLayout.SOUTH);
+        
+        inputDialog.setContentPane(inputPanel);
+        inputDialog.setVisible(true);
     }
     
     /**
      * Muestra preguntas frecuentes
      */
     private void mostrarPreguntasFrecuentes() {
-        String mensaje = "<html><div style='width: 600px;'>"
-                + "<h2 style='color: #6B2D4D; margin-bottom: 20px;'>Preguntas Frecuentes</h2>"
-                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>❓ ¿Cómo realizo un pedido?</b></p>"
-                + "<p style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
-                + "Simplemente navega por nuestra tienda, selecciona los productos que deseas, "
-                + "elige tu talla y agrégalos al carrito. Luego procede al checkout."
-                + "</p>"
-                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>❓ ¿Qué métodos de pago aceptan?</b></p>"
-                + "<p style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
-                + "Aceptamos tarjetas de crédito/débito, PayPal y transferencias bancarias."
-                + "</p>"
-                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>❓ ¿Puedo cambiar el tamaño de mi pedido?</b></p>"
-                + "<p style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
-                + "Sí, puedes realizar cambios dentro de los primeros 30 días después de recibir tu pedido."
-                + "</p>"
-                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>❓ ¿Ofrecen envío internacional?</b></p>"
-                + "<p style='line-height: 1.8; margin-left: 20px;'>"
-                + "Sí, realizamos envíos a la mayoría de países. Consulta nuestra sección de "
-                + "Información de Envío para más detalles."
-                + "</p>"
-                + "</div></html>";
-        JOptionPane.showMessageDialog(this, mensaje, "Preguntas Frecuentes", 
-                JOptionPane.INFORMATION_MESSAGE);
+        String contenido = "<div style='font-size: 16px;'>"
+                + "<div style='background: linear-gradient(135deg, #f0e0eb, #ffffff); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #6B2D4D;'>"
+                + "<p style='margin-bottom: 10px;'><b style='color: #6B2D4D; font-size: 18px;'>❓ ¿Cómo realizo un pedido?</b></p>"
+                + "<p>Simplemente navega por nuestra tienda, selecciona los productos que deseas, "
+                + "elige tu talla y agrégalos al carrito. Luego procede al checkout.</p>"
+                + "</div>"
+                + "<div style='background: linear-gradient(135deg, #f0e0eb, #ffffff); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #8B4A6B;'>"
+                + "<p style='margin-bottom: 10px;'><b style='color: #6B2D4D; font-size: 18px;'>❓ ¿Qué métodos de pago aceptan?</b></p>"
+                + "<p>Aceptamos tarjetas de crédito/débito, PayPal y transferencias bancarias.</p>"
+                + "</div>"
+                + "<div style='background: linear-gradient(135deg, #f0e0eb, #ffffff); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #A8557A;'>"
+                + "<p style='margin-bottom: 10px;'><b style='color: #6B2D4D; font-size: 18px;'>❓ ¿Puedo cambiar el tamaño de mi pedido?</b></p>"
+                + "<p>Sí, puedes realizar cambios dentro de los primeros 30 días después de recibir tu pedido.</p>"
+                + "</div>"
+                + "<div style='background: linear-gradient(135deg, #f0e0eb, #ffffff); padding: 20px; border-radius: 10px; border-left: 4px solid #6B2D4D;'>"
+                + "<p style='margin-bottom: 10px;'><b style='color: #6B2D4D; font-size: 18px;'>❓ ¿Ofrecen envío internacional?</b></p>"
+                + "<p>Sí, realizamos envíos a la mayoría de países. Consulta nuestra sección de "
+                + "Información de Envío para más detalles.</p>"
+                + "</div>"
+                + "</div>";
+        mostrarDialogoModerno("Preguntas Frecuentes", contenido, "❓");
     }
     
     /**
      * Muestra métodos de pago disponibles
      */
     private void mostrarMetodosPago() {
-        String mensaje = "<html><div style='width: 550px;'>"
-                + "<h2 style='color: #6B2D4D; margin-bottom: 20px;'>Métodos de Pago</h2>"
-                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>💳 Tarjetas de Crédito/Débito:</b></p>"
-                + "<p style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
-                + "Aceptamos Visa, Mastercard, American Express y Discover. Todas las transacciones "
-                + "están protegidas con encriptación SSL."
-                + "</p>"
-                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>📱 PayPal:</b></p>"
-                + "<p style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
-                + "Puedes pagar de forma segura usando tu cuenta PayPal."
-                + "</p>"
-                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>🏦 Transferencia Bancaria:</b></p>"
-                + "<p style='line-height: 1.8; margin-left: 20px;'>"
-                + "También aceptamos transferencias bancarias directas. El pedido se procesará "
-                + "una vez confirmado el pago."
-                + "</p>"
-                + "</div></html>";
-        JOptionPane.showMessageDialog(this, mensaje, "Métodos de Pago", 
-                JOptionPane.INFORMATION_MESSAGE);
+        String contenido = "<div style='font-size: 16px;'>"
+                + "<div style='background: linear-gradient(135deg, #fff5f8, #ffffff); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #6B2D4D;'>"
+                + "<p style='margin-bottom: 10px;'><b style='color: #6B2D4D; font-size: 18px;'>💳 Tarjetas de Crédito/Débito</b></p>"
+                + "<p>Aceptamos Visa, Mastercard, American Express y Discover. Todas las transacciones "
+                + "están protegidas con encriptación SSL.</p>"
+                + "</div>"
+                + "<div style='background: linear-gradient(135deg, #fff5f8, #ffffff); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #8B4A6B;'>"
+                + "<p style='margin-bottom: 10px;'><b style='color: #6B2D4D; font-size: 18px;'>📱 PayPal</b></p>"
+                + "<p>Puedes pagar de forma segura usando tu cuenta PayPal.</p>"
+                + "</div>"
+                + "<div style='background: linear-gradient(135deg, #fff5f8, #ffffff); padding: 20px; border-radius: 10px; border-left: 4px solid #A8557A;'>"
+                + "<p style='margin-bottom: 10px;'><b style='color: #6B2D4D; font-size: 18px;'>🏦 Transferencia Bancaria</b></p>"
+                + "<p>También aceptamos transferencias bancarias directas. El pedido se procesará "
+                + "una vez confirmado el pago.</p>"
+                + "</div>"
+                + "</div>";
+        mostrarDialogoModerno("Métodos de Pago", contenido, "💳");
     }
     
     /**
      * Muestra información sobre tarjetas de regalo
      */
     private void mostrarTarjetasRegalo() {
-        String mensaje = "<html><div style='width: 550px;'>"
-                + "<h2 style='color: #6B2D4D; margin-bottom: 20px;'>Tarjetas de Regalo</h2>"
-                + "<p style='line-height: 1.8; margin-bottom: 15px;'>"
-                + "Nuestras tarjetas de regalo son el regalo perfecto para esa persona especial. "
-                + "Puedes elegir el monto que deseas regalar."
-                + "</p>"
-                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>💰 Montos Disponibles:</b></p>"
-                + "<p style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
-                + "• $25, $50, $100, $200, $500 o un monto personalizado"
-                + "</p>"
-                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>⏰ Validez:</b></p>"
-                + "<p style='line-height: 1.8; margin-left: 20px; margin-bottom: 15px;'>"
-                + "Las tarjetas de regalo no expiran y pueden usarse en cualquier momento."
-                + "</p>"
-                + "<p style='line-height: 1.8; margin-bottom: 15px;'><b>📧 Entrega:</b></p>"
-                + "<p style='line-height: 1.8; margin-left: 20px;'>"
-                + "Puedes enviar la tarjeta de regalo por email al destinatario o imprimirla "
-                + "para entregarla en persona."
-                + "</p>"
-                + "</div></html>";
-        JOptionPane.showMessageDialog(this, mensaje, "Tarjetas de Regalo", 
-                JOptionPane.INFORMATION_MESSAGE);
+        String contenido = "<div style='font-size: 16px;'>"
+                + "<p style='margin-bottom: 20px;'>Nuestras tarjetas de regalo son el regalo perfecto para esa persona especial. "
+                + "Puedes elegir el monto que deseas regalar.</p>"
+                + "<div style='background: linear-gradient(135deg, #fff5f8, #ffffff); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #6B2D4D;'>"
+                + "<p style='margin-bottom: 10px;'><b style='color: #6B2D4D; font-size: 18px;'>💰 Montos Disponibles</b></p>"
+                + "<p>$25, $50, $100, $200, $500 o un monto personalizado</p>"
+                + "</div>"
+                + "<div style='background: linear-gradient(135deg, #fff5f8, #ffffff); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #8B4A6B;'>"
+                + "<p style='margin-bottom: 10px;'><b style='color: #6B2D4D; font-size: 18px;'>⏰ Validez</b></p>"
+                + "<p>Las tarjetas de regalo no expiran y pueden usarse en cualquier momento.</p>"
+                + "</div>"
+                + "<div style='background: linear-gradient(135deg, #fff5f8, #ffffff); padding: 20px; border-radius: 10px; border-left: 4px solid #A8557A;'>"
+                + "<p style='margin-bottom: 10px;'><b style='color: #6B2D4D; font-size: 18px;'>📧 Entrega</b></p>"
+                + "<p>Puedes enviar la tarjeta de regalo por email al destinatario o imprimirla "
+                + "para entregarla en persona.</p>"
+                + "</div>"
+                + "</div>";
+        mostrarDialogoModerno("Tarjetas de Regalo", contenido, "🎁");
     }
     
     /**
@@ -2651,15 +2842,23 @@ public class principal extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Funcionalidad de perfil en desarrollo", 
                 "Perfil", JOptionPane.INFORMATION_MESSAGE);
         } else {
-            // Abrir login sin cerrar la página actual
-            Inicio ventanaLogin = new Inicio();
+            // Abrir login sobre la ventana principal
+            Inicio ventanaLogin = new Inicio(this);
             ventanaLogin.setVisible(true);
         }
     }
     
     private void abrirCarrito() {
-        JOptionPane.showMessageDialog(this, "Funcionalidad de carrito en desarrollo", 
-            "Carrito", JOptionPane.INFORMATION_MESSAGE);
+        if (userId <= 0 || !isLoggedIn) {
+            JOptionPane.showMessageDialog(this,
+                "Debe iniciar sesión para ver el carrito",
+                "Sesión requerida",
+                JOptionPane.WARNING_MESSAGE);
+            manejarUsuario();
+            return;
+        }
+        this.dispose();
+        new CarritoCompras(userId).setVisible(true);
     }
     
     private void abrirPanelAdmin() {
@@ -2786,7 +2985,7 @@ public class principal extends javax.swing.JFrame {
             }
             
             // Como último recurso, intentar cargar desde web
-            cargarImagenWebCategoria(imageLabel, categoria);
+           
         }).start();
     }
     
@@ -3142,14 +3341,14 @@ public class principal extends javax.swing.JFrame {
                 
                 final ImageIcon iconEscalado = new ImageIcon(bufferedEscalada);
                 
-                SwingUtilities.invokeLater(() -> {
+                    SwingUtilities.invokeLater(() -> {
                     System.out.println("Estableciendo icono en label para: " + archivo.getName());
                     imageLabel.setIcon(iconEscalado);
-                    imageLabel.setText("");
+                        imageLabel.setText("");
                     imageLabel.setOpaque(false);
                     imageLabel.setVisible(true);
                     imageLabel.revalidate();
-                    imageLabel.repaint();
+                        imageLabel.repaint();
                     
                     // Forzar repintado de todos los padres
                     Component parent = imageLabel.getParent();
@@ -3163,105 +3362,18 @@ public class principal extends javax.swing.JFrame {
                 });
                 
                 System.out.println("✓ Imagen local procesada exitosamente: " + archivo.getName() + " (" + targetWidth + "x" + targetHeight + ")");
-            } else {
+                } else {
                 System.err.println("✗ Imagen inválida o no cargada: " + archivo.getName());
-            }
-        } catch (Exception e) {
+                }
+            } catch (Exception e) {
             System.err.println("✗ Error al cargar imagen local: " + e.getMessage());
             e.printStackTrace();
-        }
+                }
     }
 
     /**
      * Carga una imagen web representativa de la categoría
      */
-    private void cargarImagenWebCategoria(JLabel imageLabel, String categoria) {
-        String imageUrl = obtenerUrlImagenCategoria(categoria);
-        
-        // Cargar imagen en un hilo separado para no bloquear la UI
-        new Thread(() -> {
-            try {
-                // Configurar conexión con timeout más largo
-                URL url = new URL(imageUrl);
-                java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
-                connection.setConnectTimeout(10000);
-                connection.setReadTimeout(10000);
-                connection.setRequestMethod("GET");
-                connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
-                connection.setRequestProperty("Accept", "image/webp,image/apng,image/*,*/*;q=0.8");
-                connection.setRequestProperty("Accept-Language", "es-ES,es;q=0.9,en;q=0.8");
-                connection.setInstanceFollowRedirects(true);
-                
-                int responseCode = connection.getResponseCode();
-                if (responseCode == java.net.HttpURLConnection.HTTP_OK) {
-                InputStream inputStream = connection.getInputStream();
-                    BufferedImage img = ImageIO.read(inputStream);
-                inputStream.close();
-                    connection.disconnect();
-                
-                    if (img != null && img.getWidth() > 0 && img.getHeight() > 0) {
-                        System.out.println("✓ Imagen cargada: " + img.getWidth() + "x" + img.getHeight() + " para: " + categoria);
-                        
-                        int targetWidth = 600;
-                        int targetHeight = 220;
-                        
-                        // Calcular escalado para llenar completamente el espacio sin espacios en blanco
-                        int imgWidth = img.getWidth();
-                        int imgHeight = img.getHeight();
-                        
-                        // Calcular escalas para ambos ejes
-                        double scaleX = (double) targetWidth / imgWidth;
-                        double scaleY = (double) targetHeight / imgHeight;
-                        
-                        // Usar el MAYOR factor de escala para que la imagen llene completamente el espacio
-                        // Esto puede recortar partes de la imagen pero elimina espacios en blanco
-                        double scale = Math.max(scaleX, scaleY);
-                        
-                        // Calcular dimensiones escaladas
-                        int scaledWidth = (int) (imgWidth * scale);
-                        int scaledHeight = (int) (imgHeight * scale);
-                        
-                        // Calcular posición para centrar (recortará si es necesario)
-                        int x = (targetWidth - scaledWidth) / 2;
-                        int y = (targetHeight - scaledHeight) / 2;
-                        
-                        // Crear BufferedImage escalado con alta calidad
-                        BufferedImage bufferedEscalada = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-                        Graphics2D g2d = bufferedEscalada.createGraphics();
-                        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                        
-                        // Dibujar fondo blanco primero
-                        g2d.setColor(Color.WHITE);
-                        g2d.fillRect(0, 0, targetWidth, targetHeight);
-                        
-                        // Dibujar la imagen escalada para llenar completamente el espacio
-                        // La imagen se ampliará lo suficiente para llenar todo el espacio, recortando si es necesario
-                        g2d.drawImage(img, x, y, scaledWidth, scaledHeight, null);
-                        g2d.dispose();
-                    
-                    // Actualizar UI en el hilo de eventos
-                        final ImageIcon icon = new ImageIcon(bufferedEscalada);
-                    SwingUtilities.invokeLater(() -> {
-                            imageLabel.setIcon(icon);
-                        imageLabel.setText("");
-                            imageLabel.revalidate();
-                        imageLabel.repaint();
-                    });
-                    }
-                } else {
-                    System.out.println("✗ Error HTTP " + responseCode + " al cargar imagen para: " + categoria);
-                }
-            } catch (java.net.SocketTimeoutException e) {
-                System.out.println("✗ Timeout al cargar imagen para: " + categoria);
-            } catch (java.net.UnknownHostException e) {
-                System.out.println("✗ Sin conexión a internet para: " + categoria);
-            } catch (Exception e) {
-                System.out.println("✗ Error al cargar imagen para " + categoria + ": " + e.getClass().getSimpleName());
-            }
-        }).start();
-    }
     
     /**
      * Obtiene la URL de imagen web según la categoría

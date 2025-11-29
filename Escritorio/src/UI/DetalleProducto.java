@@ -12,6 +12,7 @@ import java.util.List;
 import java.awt.image.BufferedImage;
 import UI.ConfigImagenes;
 import UI.util.ErrorHandler;
+import UI.CarritoCompras;
 
 /**
  * Ventana para ver detalles de un producto y agregarlo al carrito
@@ -194,7 +195,7 @@ public class DetalleProducto extends javax.swing.JFrame {
                 "Sesión requerida",
                 JOptionPane.WARNING_MESSAGE);
             this.dispose();
-            new Inicio().setVisible(true);
+            new Inicio(null).setVisible(true);
             return;
         }
         
